@@ -63,6 +63,11 @@
 .v205-practice-choice p{color:#55dcff;font-size:11px;font-weight:800;letter-spacing:.2em;margin:0 0 8px}
 .v205-practice-choice h3{font-size:27px;margin:0 0 8px}.v205-practice-choice>section>span{color:#8f9db9;font-size:13px}
 .v205-practice-choice section>div{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0 14px}
+.v205-practice-choice section>div>button{
+  width:100%; min-width:0; height:88px; margin:0; padding:0 18px;
+  box-sizing:border-box; display:flex; align-items:center; justify-content:center;
+  font-size:22px; line-height:1;
+}
 .v205-choice-cancel{border:0;background:transparent;color:#7f8ba7;cursor:pointer}
 @media(max-width:780px){
   .v205-history-overlay{padding:8px;align-items:stretch}
@@ -76,4 +81,5 @@
   .v205-day:nth-child(-n+5){display:none}
   .v205-daily-chart{grid-template-columns:repeat(9,1fr)}
   .v205-history-title{align-items:flex-start;flex-direction:column}
+  .v205-practice-choice section>div>button{height:78px;font-size:20px}
 }
