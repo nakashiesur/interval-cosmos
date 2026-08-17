@@ -1,4 +1,4 @@
-const APP_VERSION = 'ver.2.0.3';
+const APP_VERSION = 'ver.2.0.4';
 const CLOUD_CONFIG = window.INTERVAL_COSMOS_CLOUD || {};
 const cloud = window.IntervalCosmosCloud || null;
 
@@ -123,6 +123,7 @@ const state = {
   cloudUserId: null,
   profile: null,
   playerDraft: '',
+  studentNumberDraft: '',
   playerAvatar: '🌟',
   rankingScope: 'monthly',
   rankingMode: 'TEXT',
@@ -1081,10 +1082,12 @@ function recordsModalHTML() {
 
 function playerSetupModalHTML() {
   const currentName = state.playerDraft || state.profile?.player_name || '';
-  return `<div class="player-modal"><section class="modal-card player-card glass" data-stop><div class="modal-head"><div><p class="eyebrow">ONLINE PROFILE</p><h2>PLAYER SETUP</h2><p>ランキングで公開される名前とアイコンです。</p></div>${state.profile ? '<button class="icon-btn" data-action="close-player">×</button>' : ''}</div>
+  const currentStudent = state.studentNumberDraft || state.profile?.student_number || '';
+  return `<div class="player-modal"><section class="modal-card player-card glass" data-stop><div class="modal-head"><div><p class="eyebrow">ONLINE PROFILE</p><h2>PLAYER SETUP</h2><p>初回のみ学籍番号とランキング表示名を登録してください。</p></div>${state.profile ? '<button class="icon-btn" data-action="close-player">×</button>' : ''}</div>
+    <label class="player-student-field"><span>学籍番号</span><input id="studentNumberInput" maxlength="20" value="${escapeHTML(currentStudent)}" placeholder="学籍番号を入力" autocomplete="off" ${state.profile ? 'readonly' : ''} /><small>${state.profile ? '登録済み' : '非公開'}</small></label>
     <div class="avatar-grid">${AVATARS.map(avatar => `<button class="avatar-btn ${state.playerAvatar === avatar ? 'active' : ''}" data-avatar="${avatar}">${avatar}</button>`).join('')}</div>
     <label class="player-name-field"><span>${state.playerAvatar}</span><input id="playerNameInput" maxlength="16" value="${escapeHTML(currentName)}" placeholder="名前を2〜16文字で入力" autocomplete="nickname" /><small>2〜16文字</small></label>
-    <p class="player-public-note">名前・アイコン・スコアはランキング上で公開されます。</p>
+    <p class="player-public-note">学籍番号は管理用でランキングには表示されません。公開されるのは名前・アイコン・スコアです。</p>
     <button class="primary-btn player-save" data-action="save-profile">決定</button>
   </section></div>`;
 }
@@ -1140,6 +1143,7 @@ async function initializeCloud() {
     state.cloudUserId = data.user?.id || null;
     state.profile = data.profile || null;
     state.playerDraft = state.profile?.player_name || '';
+    state.studentNumberDraft = state.profile?.student_number || '';
     state.playerAvatar = state.profile?.avatar || '🌟';
     state.showPlayerSetup = !state.profile;
   } catch (error) {
@@ -1178,7 +1182,14 @@ function openRanking() {
 
 async function savePlayerProfile() {
   const input = document.querySelector('#playerNameInput');
+  const studentInput = document.querySelector('#studentNumberInput');
   const name = String(input?.value || state.playerDraft || '').trim();
+  const studentNumber = String(studentInput?.value || state.studentNumberDraft || state.profile?.student_number || '').trim();
+  if (!state.profile && (studentNumber.length < 3 || studentNumber.length > 20)) {
+    toast('学籍番号を正しく入力してください。');
+    studentInput?.focus();
+    return;
+  }
   if (name.length < 2 || name.length > 16) {
     toast('名前は2〜16文字で入力してください。');
     input?.focus();
@@ -1191,9 +1202,10 @@ async function savePlayerProfile() {
   const button = document.querySelector('[data-action="save-profile"]');
   if (button) { button.disabled = true; button.textContent = 'SAVING...'; }
   try {
-    const profile = await cloud.saveProfile({ playerName: name, avatar: state.playerAvatar });
+    const profile = await cloud.saveProfile({ studentNumber, playerName: name, avatar: state.playerAvatar });
     state.profile = profile;
     state.playerDraft = profile.player_name;
+    state.studentNumberDraft = profile.student_number || studentNumber;
     state.playerAvatar = profile.avatar;
     state.showPlayerSetup = false;
     toast('プレイヤー情報をオンラインに保存しました。');
@@ -1224,6 +1236,7 @@ app.addEventListener('click', event => {
   const avatar = event.target.closest('[data-avatar]');
   if (avatar) {
     state.playerDraft = document.querySelector('#playerNameInput')?.value || state.playerDraft;
+    state.studentNumberDraft = document.querySelector('#studentNumberInput')?.value || state.studentNumberDraft;
     state.playerAvatar = avatar.dataset.avatar;
     render();
     return;
@@ -1287,6 +1300,7 @@ app.addEventListener('click', event => {
   else if (action === 'edit-profile') {
     if (state.cloudStatus !== 'ready') { state.showSettings = true; render(); return; }
     state.playerDraft = state.profile?.player_name || '';
+    state.studentNumberDraft = state.profile?.student_number || state.studentNumberDraft || '';
     state.playerAvatar = state.profile?.avatar || state.playerAvatar || '🌟';
     state.showPlayerSetup = true;
     state.showSettings = false;

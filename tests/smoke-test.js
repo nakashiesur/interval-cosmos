@@ -67,7 +67,7 @@ out.result=app.innerHTML;
 
 const assertions = [
   ['splash logo', out.splash.includes('nakashima-logo.png')],
-  ['splash version v2.0.3', out.splash.includes('ver.2.0.3')],
+  ['splash version v2.0.4', out.splash.includes('ver.2.0.4')],
   ['no final edition', ![out.splash,out.home,out.practice,out.guide,out.playJP,out.settings,out.ranking,out.result].join('').match(/final edition/i)],
   ['home subtitle', out.home.includes('プレイするモードを選択。')],
   ['practice first', out.home.indexOf('PRACTICE MODE') < out.home.indexOf('STANDARD')],
@@ -94,7 +94,7 @@ const assertions = [
   ['both order upgrade default', val("state.settings.bothOrder") === 'harmonicFirst'],
   ['settings gear normal-size class', out.home.includes('settings-gear-btn') && out.practice.includes('settings-gear-btn')],
   ['obsolete settings removed from state', !val("Object.prototype.hasOwnProperty.call(state.settings,'labels')") && !val("Object.prototype.hasOwnProperty.call(state.settings,'reducedMotion')") && !val("Object.prototype.hasOwnProperty.call(state.settings,'direction')")],
-  ['settings version v2.0.3', out.settings.includes('ver.2.0.3')],
+  ['settings version v2.0.4', out.settings.includes('ver.2.0.4')],
   ['online ranking UI retained', out.ranking.includes('ONLINE RANKING') && out.ranking.includes('月間') && out.ranking.includes('殿堂入り')],
   ['offline result score visible', out.result.includes('>1,234</div>')],
   ['missed interval analysis visible', out.result.includes('MISSED INTERVALS') && out.result.includes('短3度') && out.result.includes('誤答 50%')],

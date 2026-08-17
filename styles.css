@@ -526,7 +526,7 @@ h1, h2, h3, p { margin-top: 0; }
 }
 
 /* =========================================================
-   INTERVAL COSMOS ver.2.0.3 — verified mobile/online UI
+   INTERVAL COSMOS ver.2.0.4 — verified mobile/online UI
    ========================================================= */
 html, body { min-height: 100%; }
 body { min-height: 100dvh; }
@@ -634,6 +634,12 @@ button { touch-action: manipulation; user-select: none; }
 .avatar-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin:12px 0 18px; }
 .avatar-btn { aspect-ratio:1; border-radius:13px; border:1px solid rgba(180,220,255,.13); background:rgba(255,255,255,.04); font-size:1.35rem; cursor:pointer; transition:.16s; }
 .avatar-btn.active { border-color:var(--cyan); background:rgba(80,220,255,.15); transform:scale(1.08); box-shadow:0 0 18px rgba(80,220,255,.2); }
+
+.player-student-field { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; border:1px solid rgba(88,228,167,.28); background:rgba(8,28,24,.48); border-radius:15px; padding:11px 12px; margin-bottom:12px; }
+.player-student-field > span { color:var(--green); font-size:.74rem; font-weight:850; white-space:nowrap; }
+.player-student-field input { width:100%; min-width:0; border:0; outline:0; color:white; background:transparent; font-size:.96rem; letter-spacing:.06em; }
+.player-student-field input[readonly] { color:rgba(235,244,255,.65); cursor:not-allowed; }
+.player-student-field small { color:var(--muted); font-size:.58rem; white-space:nowrap; }
 .player-name-field { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:9px; border:1px solid rgba(180,220,255,.18); background:rgba(5,9,20,.72); border-radius:15px; padding:10px 12px; }
 .player-name-field > span { font-size:1.35rem; }
 .player-name-field input { width:100%; min-width:0; border:0; outline:0; color:white; background:transparent; font-size:1rem; }
@@ -726,7 +732,7 @@ button { touch-action: manipulation; user-select: none; }
 
 
 /* =========================================================
-   INTERVAL COSMOS ver.2.0.3
+   INTERVAL COSMOS ver.2.0.4
    ========================================================= */
 
 /* Splash typography */
@@ -893,7 +899,7 @@ button { touch-action: manipulation; user-select: none; }
 }
 
 /* =========================================================
-   INTERVAL COSMOS ver.2.0.3
+   INTERVAL COSMOS ver.2.0.4
    Playback UX refinements
    ========================================================= */
 

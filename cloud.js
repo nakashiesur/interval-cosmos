@@ -54,7 +54,7 @@
 
     const { data: profileData, error: profileError } = await client
       .from(config.profilesTable || 'profiles')
-      .select('id, player_name, avatar, updated_at')
+      .select('id, student_number, player_name, avatar, updated_at')
       .eq('id', user.id)
       .maybeSingle();
     if (profileError) throw profileError;
@@ -62,10 +62,11 @@
     return { configured: true, status: 'ready', user, profile };
   }
 
-  async function saveProfile({ playerName, avatar }) {
+  async function saveProfile({ studentNumber, playerName, avatar }) {
     if (!client || !user) await init();
     const payload = {
       id: user.id,
+      student_number: String(studentNumber || profile?.student_number || '').trim(),
       player_name: String(playerName || '').trim(),
       avatar: avatar || '🌟',
       updated_at: new Date().toISOString(),
@@ -73,7 +74,7 @@
     const { data, error } = await client
       .from(config.profilesTable || 'profiles')
       .upsert(payload, { onConflict: 'id' })
-      .select('id, player_name, avatar, updated_at')
+      .select('id, student_number, player_name, avatar, updated_at')
       .single();
     if (error) throw error;
     profile = data;

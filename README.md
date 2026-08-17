@@ -1,8 +1,8 @@
-# INTERVAL COSMOS ver.2.0.3
+# INTERVAL COSMOS ver.2.0.4
 
 大学生向けのインターバル認識・反射トレーニングWebアプリです。スマートフォンを第一優先に設計し、PCでも利用できます。
 
-## ver.2.0.3 の変更点
+## ver.2.0.4 の変更点
 
 ### Playback
 - `MELODIC / HARMONIC / BOTH` の3種類は維持
@@ -20,9 +20,17 @@
 - SETTINGの歯車アイコンを通常サイズに戻しました
 - Playbackの説明文は小さく表示し、英語表記に不慣れな学生でも意味を把握しやすくしています
 
+
+### Online profile
+- 初回登録に学籍番号を追加
+- 学籍番号はSupabase上でUNIQUE制約をかけ、重複登録を防止
+- 学籍番号はランキング画面には表示せず、管理用データとしてのみ保存
+- プレイヤー名とアバターは後から変更可能
+- 匿名認証のuser_idと学籍番号をprofilesテーブルで紐づけ
+
 ### コード整理・検証
 - 旧設定項目 `Answer labels / Reduced motion / Direction` は本体コードへ再混入していないことを確認
-- Service Workerのキャッシュを `v2-0-3` へ更新
+- Service Workerのキャッシュを `v2-0-4` へ更新
 - Playback専用の挙動テストを追加
 
 ## オンライン公開
