@@ -1,0 +1,37 @@
+name: v2.0.5 regression tests
+
+on:
+  push:
+    branches: [v2.0.5-dev]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  node-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check extension scripts
+        run: |
+          node --check runtime-v205.js
+          node --check phase3-v205.js
+          node --check phase4-v205.js
+          node --check phase4-hotfix-v205.js
+          node --check phase5-progression-v205.js
+      - name: Existing smoke tests
+        run: node tests/smoke-test.js
+      - name: Playback regression
+        run: node tests/playback-test.js
+      - name: Account regression
+        run: node tests/account-v205-test.js
+      - name: Ranking regression
+        run: node tests/ranking-v205-test.js
+      - name: Progression regression
+        run: node tests/progression-v205-test.js
