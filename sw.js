@@ -1,6 +1,7 @@
-const CACHE = 'interval-cosmos-v2-0-4';
+const CACHE = 'interval-cosmos-v2-0-5-alpha1';
 const ASSETS = [
-  './', './index.html', './styles.css', './app.js', './cloud.js',
+  './', './index.html', './styles.css', './account-v205.css',
+  './account-gate.js', './app.js', './cloud.js',
   './nakashima-logo.png', './icon.svg', './manifest.webmanifest'
 ];
 
