@@ -1,6 +1,7 @@
 (() => {
-  const VERSION = 'ver.2.0.5-alpha2';
+  const VERSION = 'ver.2.0.5-alpha2.1';
   const cloud = window.IntervalCosmosCloud;
+
   const COURSE_LABELS = Object.freeze({
     piano: 'ピアノコース',
     orchestral: '管弦打楽コース',
@@ -24,14 +25,14 @@
   });
 
   let lastSubmitResult = null;
-  let lastSubmitPayload = null;
   let rankingCache = [];
   let rankingCacheScope = null;
   let promptScheduledFor = null;
+  let enhanceQueued = false;
   const publishedSessions = new Set();
 
-  const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => (
-    { '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[c]
+  const esc = value => String(value ?? '').replace(/[&<>'\"]/g, c => (
+    { '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '\"':'&quot;' }[c]
   ));
   const formatNumber = value => Math.round(Number(value || 0)).toLocaleString('ja-JP');
   const courseLabel = code => COURSE_LABELS[code] || 'COURSE';
@@ -72,16 +73,25 @@
     window.setTimeout(() => node.remove(), 1800);
   }
 
+  function writeHTML(node, html, signature) {
+    if (!node) return false;
+    if (signature && node.dataset.v205Signature === signature) return false;
+    if (!signature && node.innerHTML === html) return false;
+    node.innerHTML = html;
+    if (signature) node.dataset.v205Signature = signature;
+    return true;
+  }
+
   if (cloud?.submitScore && !cloud.__v205Phase3SubmitWrapped) {
     const originalSubmit = cloud.submitScore.bind(cloud);
     cloud.submitScore = async payload => {
       const result = await originalSubmit(payload);
-      lastSubmitPayload = payload || null;
       lastSubmitResult = result || null;
       if (currentProfile()?.ranking_visibility === 'always_public' && result?.session_id) {
         publishedSessions.add(result.session_id);
       }
       schedulePublicationPrompt(result);
+      queueEnhance();
       return result;
     };
     cloud.__v205Phase3SubmitWrapped = true;
@@ -92,6 +102,7 @@
     cloud.publishPlaySession = async sessionId => {
       const result = await originalPublish(sessionId);
       if (sessionId) publishedSessions.add(sessionId);
+      queueEnhance();
       return result;
     };
     cloud.__v205Phase3PublishWrapped = true;
@@ -103,14 +114,14 @@
       const result = await originalFetch(args);
       rankingCache = Array.isArray(result?.rows) ? result.rows : [];
       rankingCacheScope = `${args?.mode || ''}:${args?.scope || ''}`;
+      queueEnhance();
       return result;
     };
     cloud.__v205Phase3RankingWrapped = true;
   }
 
   function schedulePublicationPrompt(result) {
-    if (!result?.publication_required || !result?.session_id) return;
-    if (!improved(result)) return;
+    if (!result?.publication_required || !result?.session_id || !improved(result)) return;
     if (promptScheduledFor === result.session_id) return;
     promptScheduledFor = result.session_id;
 
@@ -129,7 +140,8 @@
 
   function showPublicationPrompt(result) {
     const overlay = createOverlay('v205-publication-overlay');
-    overlay.innerHTML = `<section class="v205-publication-card">
+    const signature = `publish:${result.session_id}:${result.monthly_rank}:${result.hall_rank}`;
+    const html = `<section class="v205-publication-card">
       <p class="v205-kicker">RANKING PRIVACY</p>
       <h2>この記録を公開しますか？</h2>
       <p class="v205-publication-copy">自己ベストを更新しました。公開しなくても、あなた自身には順位相当が表示されます。</p>
@@ -143,6 +155,7 @@
         <button type="button" class="primary-btn" data-v205-publication="public">このランキングを公開する</button>
       </div>
     </section>`;
+    writeHTML(overlay, html, signature);
   }
 
   async function publishCurrentScore(button) {
@@ -161,7 +174,7 @@
       };
       closeOverlay('v205-publication-overlay');
       toast('ランキングを公開しました。');
-      enhance();
+      queueEnhance();
     } catch (error) {
       console.error('[v2.0.5 publish]', error);
       button.disabled = false;
@@ -174,7 +187,7 @@
     if (lastSubmitResult) lastSubmitResult.publication_required = false;
     closeOverlay('v205-publication-overlay');
     toast('この記録は非公開のまま保存しました。');
-    enhance();
+    queueEnhance();
   }
 
   function enhanceResult() {
@@ -206,19 +219,26 @@
     }
 
     const best = lastSubmitResult.hall_best_score ?? score;
-    grid.innerHTML = `
+    const resultSignature = [
+      lastSubmitResult.session_id, score, best,
+      lastSubmitResult.monthly_rank || '', lastSubmitResult.hall_rank || ''
+    ].join('|');
+    const gridHTML = `
       <div class="v205-result-rank-card current"><span>今回</span><strong>${formatNumber(score)}</strong><small>pts</small></div>
       <div class="v205-result-rank-card"><span>自己ベスト</span><strong>${formatNumber(best)}</strong><small>pts</small></div>
       <div class="v205-result-rank-card"><span>月間順位</span><strong>${lastSubmitResult.monthly_rank ? `${lastSubmitResult.monthly_rank}位相当` : '—'}</strong><small>BEST POSITION</small></div>
       <div class="v205-result-rank-card"><span>殿堂順位</span><strong>${lastSubmitResult.hall_rank ? `${lastSubmitResult.hall_rank}位相当` : '—'}</strong><small>BEST POSITION</small></div>`;
+    writeHTML(grid, gridHTML, resultSignature);
 
     const submit = head.querySelector('.ranking-submit.done');
     if (submit) {
       const isPublic = currentSessionPublished();
-      submit.innerHTML = `<div class="v205-ranking-submit-head"><strong>ONLINE RECORD</strong><em class="v205-public-state ${isPublic ? 'public' : 'private'}">${isPublic ? 'PUBLIC' : 'PRIVATE'}</em></div>
+      const submitSignature = `${resultSignature}|${isPublic ? 'public' : 'private'}|${improved(lastSubmitResult)}`;
+      const submitHTML = `<div class="v205-ranking-submit-head"><strong>ONLINE RECORD</strong><em class="v205-public-state ${isPublic ? 'public' : 'private'}">${isPublic ? 'PUBLIC' : 'PRIVATE'}</em></div>
         <span>月間 <b>${lastSubmitResult.monthly_rank || '-'}${lastSubmitResult.monthly_rank ? '位相当' : ''}</b></span>
         <span>殿堂 <b>${lastSubmitResult.hall_rank || '-'}${lastSubmitResult.hall_rank ? '位相当' : ''}</b></span>
         <span class="v205-ranking-update-note ${improved(lastSubmitResult) ? '' : 'muted'}">${improved(lastSubmitResult) ? 'PERSONAL BEST UPDATED' : '自己ベストを維持'}</span>`;
+      writeHTML(submit, submitHTML, submitSignature);
     }
   }
 
@@ -230,7 +250,7 @@
       }
       if (!node.dataset.v205Kicker && !currentSessionPublished()) {
         const kicker = node.querySelector('.rank-burst-kicker');
-        if (kicker) kicker.textContent = 'RANK POSITION';
+        if (kicker && kicker.textContent !== 'RANK POSITION') kicker.textContent = 'RANK POSITION';
         node.dataset.v205Kicker = '1';
       }
     });
@@ -251,6 +271,7 @@
       box.className = 'setting-row v205-ranking-privacy';
       cloudBox.insertAdjacentElement('afterend', box);
     }
+
     const visibility = profile.ranking_visibility || 'ask';
     const help = visibility === 'always_public'
       ? '今後の自己ベスト更新を自動で公開します。'
@@ -258,18 +279,19 @@
         ? 'ランキングには公開しません。公開中の記録も非公開にします。'
         : '自己ベスト更新時に、公開するか毎回確認します。';
 
-    box.innerHTML = `<div class="setting-label"><strong>Ranking publication</strong><span>公開設定</span></div>
+    const html = `<div class="setting-label"><strong>Ranking publication</strong><span>公開設定</span></div>
       <div class="v205-privacy-tabs">
         <button type="button" class="v205-privacy-btn ${visibility === 'ask' ? 'active' : ''}" data-v205-visibility="ask"><strong>毎回確認</strong><small>ベスト更新時に選択</small></button>
         <button type="button" class="v205-privacy-btn ${visibility === 'always_public' ? 'active' : ''}" data-v205-visibility="always_public"><strong>常に公開</strong><small>今後の更新を自動公開</small></button>
         <button type="button" class="v205-privacy-btn ${visibility === 'always_private' ? 'active' : ''}" data-v205-visibility="always_private"><strong>常に非公開</strong><small>公開中の記録も隠す</small></button>
       </div>
       <p class="v205-privacy-help">${help}</p>`;
+
+    writeHTML(box, html, `visibility:${visibility}`);
   }
 
   async function setVisibility(value, button) {
-    if (!['ask','always_public','always_private'].includes(value)) return;
-    if (!cloud?.updateMyProfile) return;
+    if (!['ask','always_public','always_private'].includes(value) || !cloud?.updateMyProfile) return;
     const buttons = document.querySelectorAll('[data-v205-visibility]');
     buttons.forEach(b => b.disabled = true);
     try {
@@ -277,12 +299,13 @@
         await cloud.hideAllMyRankings();
       }
       await cloud.updateMyProfile({ rankingVisibility: value });
+      await cloud.getMyPlayer?.();
       toast(value === 'always_public'
         ? '今後の自己ベスト更新を自動公開します。'
         : value === 'always_private'
           ? 'ランキング記録を非公開にしました。'
           : '自己ベスト更新時に公開確認を表示します。');
-      enhanceSettings();
+      queueEnhance();
     } catch (error) {
       console.error('[v2.0.5 visibility]', error);
       toast(`公開設定を変更できませんでした：${error?.message || ''}`);
@@ -294,20 +317,20 @@
   function enhanceRanking() {
     const rows = [...document.querySelectorAll('.ranking-list .ranking-row')];
     if (!rows.length || !rankingCache.length) return;
+
     rows.forEach((node, index) => {
       const row = rankingCache[index];
       if (!row) return;
       const rank = Number(row.rank || index + 1);
+      const rankLabel = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : String(rank);
       const rankNode = node.querySelector('.rank-number');
-      if (rankNode) rankNode.textContent = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : String(rank);
+      if (rankNode && rankNode.textContent !== rankLabel) rankNode.textContent = rankLabel;
 
       node.dataset.v205PlayerId = row.player_id || row.user_id || '';
       node.classList.add(`v205-frame-${row.equipped_frame_id || 'normal'}`);
 
       const avatar = node.querySelector('.rank-avatar');
-      if (avatar) {
-        avatar.classList.add('v205-profile-frame', `v205-frame-${row.equipped_frame_id || 'normal'}`);
-      }
+      if (avatar) avatar.classList.add('v205-profile-frame', `v205-frame-${row.equipped_frame_id || 'normal'}`);
 
       const player = node.querySelector('.rank-player');
       if (player && !player.querySelector('.v205-rank-meta')) {
@@ -316,9 +339,11 @@
         meta.innerHTML = `<span class="v205-course-badge">${esc(courseLabel(row.course_code))}</span><small>${esc(titleLabel(row.main_title_id))}</small>`;
         player.appendChild(meta);
       }
-      node.setAttribute('role','button');
-      node.setAttribute('tabindex','0');
-      node.setAttribute('aria-label', `${row.player_name || 'PLAYER'} の公開プロフィール`);
+
+      if (node.getAttribute('role') !== 'button') node.setAttribute('role','button');
+      if (node.getAttribute('tabindex') !== '0') node.setAttribute('tabindex','0');
+      const label = `${row.player_name || 'PLAYER'} の公開プロフィール`;
+      if (node.getAttribute('aria-label') !== label) node.setAttribute('aria-label', label);
     });
 
     const modal = document.querySelector('.ranking-modal');
@@ -333,14 +358,19 @@
   async function openProfileCard(playerId) {
     if (!playerId || !cloud?.fetchPublicProfileCard) return;
     const overlay = createOverlay('v205-profile-overlay');
-    overlay.innerHTML = `<section class="v205-profile-card"><button class="icon-btn v205-profile-close" data-v205-close-profile>×</button><div class="v205-profile-loading"><span class="spinner"></span>LOADING PROFILE...</div></section>`;
+    writeHTML(
+      overlay,
+      `<section class="v205-profile-card"><button class="icon-btn v205-profile-close" data-v205-close-profile>×</button><div class="v205-profile-loading"><span class="spinner"></span>LOADING PROFILE...</div></section>`,
+      `loading:${playerId}`
+    );
     try {
       const card = await cloud.fetchPublicProfileCard(playerId);
       if (!card) throw new Error('公開プロフィールを取得できませんでした。');
       renderProfileCard(card, overlay);
     } catch (error) {
       console.error('[v2.0.5 profile card]', error);
-      overlay.querySelector('.v205-profile-card').innerHTML = `<button class="icon-btn v205-profile-close" data-v205-close-profile>×</button><div class="empty-state">${esc(error?.message || '公開プロフィールを取得できませんでした。')}</div>`;
+      const target = overlay.querySelector('.v205-profile-card');
+      if (target) target.innerHTML = `<button class="icon-btn v205-profile-close" data-v205-close-profile>×</button><div class="empty-state">${esc(error?.message || '公開プロフィールを取得できませんでした。')}</div>`;
     }
   }
 
@@ -351,8 +381,10 @@
     const overall = records.length ? Math.max(...records.map(r => Number(r.score || 0))) : 0;
     const mark = cloud?.avatarMark?.(card.avatar_id) || card.avatar || '✦';
     const target = overlay.querySelector('.v205-profile-card');
+    if (!target) return;
 
-    target.innerHTML = `<button class="icon-btn v205-profile-close" data-v205-close-profile>×</button>
+    const signature = `profile:${card.player_id}:${card.updated_at || ''}:${records.length}:${achievements.length}`;
+    const html = `<button class="icon-btn v205-profile-close" data-v205-close-profile>×</button>
       <div class="v205-profile-hero">
         <div class="v205-profile-avatar v205-profile-frame v205-frame-${esc(frame)}">${esc(mark)}</div>
         <div class="v205-profile-identity">
@@ -375,6 +407,7 @@
         <div class="v205-section-head"><h3>FEATURED ACHIEVEMENTS</h3><span>代表実績</span></div>
         ${achievements.length ? `<div class="v205-achievement-grid">${achievements.map(a => `<div class="v205-achievement"><strong>${esc(a.name || a.id || 'ACHIEVEMENT')}</strong><span>+${Number(a.points || 0)} pt</span><small>${esc(a.description || '')}</small></div>`).join('')}</div>` : '<div class="empty-state">代表実績はまだ設定されていません。</div>'}
       </section>`;
+    writeHTML(target, html, signature);
   }
 
   function enhance() {
@@ -384,7 +417,18 @@
     enhanceRanking();
   }
 
-  const observer = new MutationObserver(enhance);
+  function queueEnhance() {
+    if (enhanceQueued) return;
+    enhanceQueued = true;
+    const run = () => {
+      enhanceQueued = false;
+      enhance();
+    };
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(run);
+    else window.setTimeout(run, 0);
+  }
+
+  const observer = new MutationObserver(queueEnhance);
   observer.observe(document.documentElement, { subtree:true, childList:true });
 
   window.addEventListener('click', event => {
@@ -407,9 +451,7 @@
       return;
     }
 
-    if (event.target.closest?.('[data-v205-close-profile]')) {
-      closeOverlay('v205-profile-overlay');
-    }
+    if (event.target.closest?.('[data-v205-close-profile]')) closeOverlay('v205-profile-overlay');
   }, true);
 
   window.addEventListener('keydown', event => {
@@ -447,6 +489,7 @@
       }
       return;
     }
+
     if (event.key === 'Escape') {
       const button = result.querySelector('[data-action="home"]');
       if (button) {
@@ -457,12 +500,12 @@
     }
   }, true);
 
-  window.addEventListener('DOMContentLoaded', enhance, { once:true });
+  window.addEventListener('DOMContentLoaded', queueEnhance, { once:true });
   window.IntervalCosmosV205 = {
     version: VERSION,
     getLastSubmitResult: () => lastSubmitResult,
     getRankingCache: () => rankingCache,
     getRankingCacheScope: () => rankingCacheScope,
-    enhance,
+    enhance: queueEnhance,
   };
 })();
