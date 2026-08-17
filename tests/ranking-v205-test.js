@@ -88,7 +88,7 @@ vm.runInContext(code,context,{filename:'phase3-v205.js'});
   assertions.push(['privacy controls implemented',code.includes('data-v205-visibility="ask"')&&code.includes('always_public')&&code.includes('always_private')]);
   assertions.push(['profile card implemented',code.includes('FEATURED ACHIEVEMENTS')&&code.includes('PUBLIC RECORDS')]);
   assertions.push(['student number excluded from profile card copy',!code.includes('student_number')]);
-  assertions.push(['result shortcuts implemented',code.includes("event.key.toLowerCase() === 'r'")&&code.includes("event.key === 'Escape'\")]);
+  assertions.push(['result shortcuts implemented',code.includes("event.key.toLowerCase() === 'r'")&&code.includes("event.key === 'Escape'" )]);
 
   let fail=0;
   for(const [name,ok] of assertions){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
