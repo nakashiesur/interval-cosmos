@@ -1,8 +1,6 @@
 window.INTERVAL_COSMOS_CLOUD = {
-  // Supabase Dashboard > Project Settings > API の値を貼り付けます。
-  supabaseUrl: '',
-  supabasePublishableKey: '',
-  profilesTable: 'profiles',
+  supabaseUrl: 'https://ysyvqkzjaksdhaveefur.supabase.co',
+  supabaseAnonKey: 'sb_publishable_95Ge7q8U5FuUz5QiJQO88Q_JWEQKV6z',
   rankingsTable: 'rankings',
-  submitScoreFunction: 'submit_interval_cosmos_score',
+  profilesTable: 'profiles'
 };
