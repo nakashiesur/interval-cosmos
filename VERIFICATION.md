@@ -1,26 +1,60 @@
-# ver.2.0.4 検証結果
+# INTERVAL COSMOS v2.0.5 開発検証記録
 
-## 追加修正
-- Supabase匿名認証とオンラインプロフィールを接続
-- 初回プロフィールに学籍番号を追加
-- `student_number` をUNIQUE化し重複登録を防止
-- 学籍番号はランキングへ出力しない
-- `cloud.js` のprofiles取得・保存を `student_number` 対応
-- rankingsテーブルを既存v2.0.3 cloud.jsの `period` 方式と統一
-- `submit_interval_cosmos_score` RPCをDB側に作成
-- Service Workerキャッシュを `interval-cosmos-v2-0-4` に更新
+## Phase 1 — DB基盤
 
-## 検査
-- `node --check app.js` PASS
-- `node --check cloud.js` PASS
-- `node --check sw.js` PASS
-- `node tests/smoke-test.js` PASS
-- `node tests/playback-test.js` PASS
-- 合計41項目 PASS
+Supabase上でv2.0.5用DBを新規構築し、以下を実機確認済み。
 
-## DBセキュリティ
-- profiles: 本人のみSELECT/INSERT/UPDATE
-- rankings: authenticatedユーザーはSELECTのみ
-- スコア更新: SECURITY DEFINERのRPC経由
-- student_numberはrankingsへコピーしない
-- anon roleにはprofiles/rankingsの権限を付与しない
+- コアテーブル: 18 / 18
+- コースマスタ: 11 / 11
+- 主要RPC: 8 / 8
+- 旧v2.0.4テーブル `profiles` / `rankings`: 0
+- RLSをv2.0.5構造に合わせて有効化
+- `players` と `player_devices` を分離し、1プレイヤーに複数端末を紐付ける構造へ変更
+
+## Phase 2 — 学生アカウント
+
+実ブラウザから新規学生登録を実施し、以下を確認済み。
+
+- 学籍番号の文字列保存
+- プレイヤー名保存
+- 所属コース保存
+- アバター保存
+- ランキング公開設定の初期値 `ask`
+- `player_devices` に初回端末が1件紐付く
+- `public_profiles` が自動生成される
+
+テスト時のDB確認結果:
+
+- course: 作曲コース
+- avatar_id: `wave`
+- ranking_visibility: `ask`
+- linked_devices: `1`
+- public_profile: `OK`
+
+## Phase 2 — 6桁PIN端末追加
+
+6桁PINによる複数端末接続フローを実ブラウザで完遂。
+
+仕様:
+
+- 6桁PIN
+- 有効期限5分
+- PIN入力だけでは接続されない
+- 既存端末側で最終承認が必要
+- 承認後も旧端末・新端末の両方を継続利用可能
+
+実機テスト:
+
+1. 既存ブラウザでPIN発行
+2. 別ブラウザからPIN入力
+3. 既存ブラウザで接続要求を承認
+4. 新ブラウザ側で同じプレイヤー名・プロフィールが表示されることを確認
+
+UIレベルで複数端末共有はPASS。最終DB確認として `linked_devices = 2` の確認を行えばPhase 2を完全クローズできる。
+
+## 開発版起動メモ
+
+- v2.0.4由来のService Workerキャッシュが残っていると旧 `profiles` を参照する場合がある。
+- キャッシュクリア後、v2.0.5の `PLAYER ACCESS` が正常表示されることを確認済み。
+- `START_HERE.command` は実行権限付きに修正済み。
+- 今後の開発版ローカル起動ポートは `8875` を使用し、旧キャッシュとの衝突を避ける。
