@@ -1,5 +1,5 @@
 (() => {
-  const VERSION = 'ver.2.0.5-alpha1';
+  const VERSION = 'ver.2.0.5-alpha2';
   let splashStartedAt = null;
   let lastSubmitResult = null;
   const cloud = window.IntervalCosmosCloud;
@@ -29,8 +29,6 @@
       const now = performance.now();
       if (splashStartedAt == null) splashStartedAt = now;
       const elapsed = Math.max(0, Math.min(3350, now - splashStartedAt));
-      // app.js can redraw the splash after cloud initialization. Continue the same
-      // animation timeline instead of restarting it, eliminating the double-flash.
       splash.style.animationDelay = `-${elapsed}ms`;
     }
 
