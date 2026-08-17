@@ -18,7 +18,7 @@ const tests = [
   ['student number normalized', cloud.includes('normalizeStudentNumber') && cloud.includes("replace(/[^0-9]/g, '')")],
   ['multi-device rpc wrappers', ['createDeviceLinkPin','claimDeviceLinkPin','getDeviceLinkSourceStatus','getDeviceLinkTargetStatus','confirmDeviceLink'].every(k=>cloud.includes(k))],
   ['hold text selection disabled', css.includes('.hold-btn,.hold-btn *') && css.includes('user-select:none')],
-  ['v205 cache contains gate assets', sw.includes('interval-cosmos-v2-0-5-alpha1') && sw.includes('account-gate.js') && sw.includes('account-v205.css')],
+  ['v205 cache contains gate assets', sw.includes("const CACHE = 'interval-cosmos-v2-0-5-") && sw.includes('account-gate.js') && sw.includes('account-v205.css')],
 ];
 let fail=0;
 for(const [name,ok] of tests){ console.log(ok?'PASS':'FAIL',name); if(!ok) fail++; }
