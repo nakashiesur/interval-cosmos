@@ -1,5 +1,6 @@
 (() => {
   const config = window.INTERVAL_COSMOS_CLOUD || {};
+  const GUEST_STORAGE_KEY = 'intervalCosmos.guest.v205';
   let client = null;
   let authUser = null;
   let player = null;
@@ -8,6 +9,56 @@
     Boolean(config.supabaseUrl && (config.supabasePublishableKey || config.supabaseAnonKey));
 
   const firstRow = (data) => Array.isArray(data) ? (data[0] || null) : (data || null);
+
+  const AVATAR_MARKS = Object.freeze({
+    nova: '✦', orbit: '◎', pulse: '∿', prism: '◇', comet: '⟋', nebula: '⁂',
+    vector: '△', echo: '◉', quasar: '⊹', lumen: '⊙', wave: '≈', aster: '✧', teacher: 'T',
+  });
+
+  function avatarMark(avatarId) {
+    return AVATAR_MARKS[avatarId] || AVATAR_MARKS.nova;
+  }
+
+  function isGuestMode() {
+    try { return localStorage.getItem(GUEST_STORAGE_KEY) === '1'; } catch { return false; }
+  }
+
+  function setGuestMode(active) {
+    try {
+      if (active) localStorage.setItem(GUEST_STORAGE_KEY, '1');
+      else localStorage.removeItem(GUEST_STORAGE_KEY);
+    } catch {}
+  }
+
+  function guestProfile() {
+    return {
+      player_id: null,
+      id: null,
+      account_type: 'guest',
+      student_number: null,
+      player_name: 'GUEST',
+      course_code: null,
+      avatar_id: 'nova',
+      avatar: avatarMark('nova'),
+      ranking_visibility: 'always_private',
+      main_title_id: null,
+      equipped_frame_id: 'normal',
+      achievement_points: 0,
+      is_suspended: false,
+      is_admin: false,
+      is_guest: true,
+    };
+  }
+
+  function normalizePlayer(row) {
+    if (!row) return null;
+    return {
+      ...row,
+      id: row.player_id || row.id || null,
+      avatar: row.avatar || avatarMark(row.avatar_id),
+      is_guest: row.account_type === 'guest',
+    };
+  }
 
   function normalizeStudentNumber(value) {
     const fullWidth = '０１２３４５６７８９';
@@ -97,7 +148,7 @@
     return authUser;
   }
 
-  async function getMyPlayer() {
+  async function loadActualPlayer() {
     await ensureAuth();
     if (!client || !authUser) return null;
 
@@ -105,23 +156,29 @@
     if (error) throw error;
 
     player = firstRow(data);
+    if (player) setGuestMode(false);
     return player;
+  }
+
+  async function getMyPlayer() {
+    const actual = await loadActualPlayer();
+    return actual ? normalizePlayer(actual) : (isGuestMode() ? guestProfile() : null);
   }
 
   async function init() {
     if (!configured()) {
-      return { configured: false, status: 'unconfigured', user: null, profile: null };
+      return { configured: false, status: 'unconfigured', user: null, profile: null, player: null };
     }
 
     await ensureAuth();
-    await getMyPlayer();
+    const profile = await getMyPlayer();
 
     return {
       configured: true,
-      status: 'ready',
+      status: profile?.is_guest ? 'guest' : 'ready',
       user: authUser,
-      profile: player,
-      player,
+      profile,
+      player: profile,
     };
   }
 
@@ -129,7 +186,7 @@
     studentNumber,
     playerName,
     courseCode,
-    avatarId = 'default',
+    avatarId = 'nova',
   }) {
     await ensureAuth();
 
@@ -137,8 +194,8 @@
     if (normalized.length < 3 || normalized.length > 20) {
       throw new Error('学籍番号を確認してください。');
     }
-    if (!String(playerName || '').trim()) {
-      throw new Error('プレイヤー名を入力してください。');
+    if (String(playerName || '').trim().length < 2 || String(playerName || '').trim().length > 16) {
+      throw new Error('プレイヤー名は2〜16文字で入力してください。');
     }
     if (!courseCode) {
       throw new Error('所属コースを選択してください。');
@@ -149,12 +206,13 @@
       p_student_number: normalized,
       p_player_name: String(playerName).trim(),
       p_course_code: courseCode,
-      p_avatar_id: avatarId || 'default',
+      p_avatar_id: avatarId || 'nova',
     });
     if (error) throw error;
 
     player = firstRow(data);
-    return player;
+    setGuestMode(false);
+    return normalizePlayer(player);
   }
 
   async function updateMyProfile({
@@ -165,6 +223,8 @@
     equippedFrameId = null,
   } = {}) {
     await ensureAuth();
+    if (!player) await loadActualPlayer();
+    if (!player) throw new Error('正式アカウントが必要です。');
 
     const { error } = await client.rpc('update_my_profile', {
       p_player_name: playerName,
@@ -178,7 +238,6 @@
     return getMyPlayer();
   }
 
-  // Compatibility wrapper used while app.js is being upgraded.
   async function saveProfile({
     studentNumber,
     playerName,
@@ -187,20 +246,23 @@
     courseCode,
     rankingVisibility,
   }) {
-    if (!player) await getMyPlayer();
+    if (!player) await loadActualPlayer();
 
     if (!player) {
+      if (!courseCode) {
+        throw new Error('v2.0.5のアカウント作成画面から所属コースを選択してください。');
+      }
       return createStudentAccount({
         studentNumber,
         playerName,
         courseCode,
-        avatarId: avatarId || avatar || 'default',
+        avatarId: avatarId || 'nova',
       });
     }
 
     return updateMyProfile({
       playerName,
-      avatarId: avatarId || avatar || null,
+      avatarId: avatarId || null,
       rankingVisibility: rankingVisibility || null,
     });
   }
@@ -219,7 +281,20 @@
 
   async function submitScore(payload) {
     await ensureAuth();
-    if (!player) await getMyPlayer();
+    if (!player) await loadActualPlayer();
+
+    if (!player && isGuestMode()) {
+      return {
+        guest: true,
+        publication_required: false,
+        monthly_rank: null,
+        hall_rank: null,
+        monthly_best_improved: false,
+        hall_best_improved: false,
+        monthly_improved: false,
+        hall_improved: false,
+      };
+    }
     if (!player) throw new Error('プレイヤー情報が未設定です。');
 
     const clientEventId = payload.clientEventId || createClientEventId();
@@ -240,8 +315,11 @@
     });
     if (error) throw error;
 
+    const result = firstRow(data) || {};
     return {
-      ...(firstRow(data) || {}),
+      ...result,
+      monthly_improved: Boolean(result.monthly_best_improved),
+      hall_improved: Boolean(result.hall_best_improved),
       client_event_id: clientEventId,
       played_at: playedAt,
     };
@@ -264,7 +342,7 @@
 
   async function fetchRankings({ mode, scope = 'monthly', limit = 50 }) {
     await ensureAuth();
-    if (!player) await getMyPlayer();
+    if (!player) await loadActualPlayer();
 
     const { data, error } = await client.rpc('get_public_rankings', {
       p_mode: mode,
@@ -273,8 +351,14 @@
     });
     if (error) throw error;
 
+    const rows = (data || []).map(row => ({
+      ...row,
+      user_id: row.player_id,
+      avatar: avatarMark(row.avatar_id),
+    }));
+
     return {
-      rows: data || [],
+      rows,
       period: scope === 'hall' ? 'ALL' : jstMonth(),
       currentUserId: player?.player_id || null,
     };
@@ -286,7 +370,8 @@
       p_player_id: playerId,
     });
     if (error) throw error;
-    return data || null;
+    if (!data) return null;
+    return { ...data, avatar: avatarMark(data.avatar_id) };
   }
 
   async function fetchCatalogs() {
@@ -326,7 +411,7 @@
 
   async function fetchLearningHistory({ limit = 200 } = {}) {
     await ensureAuth();
-    if (!player) await getMyPlayer();
+    if (!player) await loadActualPlayer();
     if (!player) return [];
 
     const { data, error } = await client
@@ -338,8 +423,65 @@
     return data || [];
   }
 
+  async function createDeviceLinkPin() {
+    await ensureAuth();
+    if (!player) await loadActualPlayer();
+    if (!player) throw new Error('正式アカウントが必要です。');
+    const { data, error } = await client.rpc('create_device_link_request');
+    if (error) throw error;
+    return firstRow(data);
+  }
+
+  async function claimDeviceLinkPin(pin) {
+    await ensureAuth();
+    if (!player) await loadActualPlayer();
+    if (player) throw new Error('この端末はすでにアカウントへ接続されています。');
+    setGuestMode(false);
+    const normalized = String(pin || '').replace(/[^0-9]/g, '').slice(0, 6);
+    const { data, error } = await client.rpc('claim_device_link_request', { p_pin: normalized });
+    if (error) throw error;
+    return firstRow(data);
+  }
+
+  async function getDeviceLinkSourceStatus(requestId) {
+    await ensureAuth();
+    const { data, error } = await client.rpc('get_device_link_source_status', {
+      p_request_id: requestId,
+    });
+    if (error) throw error;
+    return firstRow(data);
+  }
+
+  async function getDeviceLinkTargetStatus(requestId) {
+    await ensureAuth();
+    const { data, error } = await client.rpc('get_device_link_target_status', {
+      p_request_id: requestId,
+    });
+    if (error) throw error;
+    const result = firstRow(data);
+    if (result?.status === 'confirmed') await loadActualPlayer();
+    return result;
+  }
+
+  async function confirmDeviceLink(requestId) {
+    await ensureAuth();
+    const { data, error } = await client.rpc('confirm_device_link_request', {
+      p_request_id: requestId,
+    });
+    if (error) throw error;
+    return firstRow(data);
+  }
+
+  async function cancelDeviceLink(requestId) {
+    await ensureAuth();
+    const { error } = await client.rpc('cancel_device_link_request', {
+      p_request_id: requestId,
+    });
+    if (error) throw error;
+  }
+
   function getCachedPlayer() {
-    return player;
+    return player ? normalizePlayer(player) : (isGuestMode() ? guestProfile() : null);
   }
 
   function getAuthUser() {
@@ -361,9 +503,18 @@
     fetchCatalogs,
     fetchAssignments,
     fetchLearningHistory,
+    createDeviceLinkPin,
+    claimDeviceLinkPin,
+    getDeviceLinkSourceStatus,
+    getDeviceLinkTargetStatus,
+    confirmDeviceLink,
+    cancelDeviceLink,
     normalizeStudentNumber,
     createClientEventId,
     jstMonth,
+    avatarMark,
+    isGuestMode,
+    setGuestMode,
     getCachedPlayer,
     getAuthUser,
   };
