@@ -1,4 +1,4 @@
-const CACHE = 'interval-cosmos-v2-0-5-alpha2';
+const CACHE = 'interval-cosmos-v2-0-5-alpha2-1';
 const ASSETS = [
   './', './index.html', './styles.css', './account-v205.css', './phase3-v205.css',
   './account-gate.js', './runtime-v205.js', './phase3-v205.js', './app.js', './cloud.js',
