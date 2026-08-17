@@ -1,5 +1,5 @@
 (() => {
-  const VERSION = 'ver.2.0.5-alpha2.1';
+  const VERSION = 'ver.2.0.5-alpha3';
   let splashStartedAt = null;
   let lastSubmitResult = null;
   const cloud = window.IntervalCosmosCloud;
