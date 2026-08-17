@@ -74,16 +74,39 @@ Phase 2は完全クローズ。
 - 公開プロフィールカードにコース / アバター / 称号 / フレーム / 公開ベスト / 正答率 / 最大コンボ / 代表実績を表示
 - 学籍番号は公開プロフィールに含めない
 - RESULTで `R = RETRY`, `Esc = MODE SELECT` を追加
-- Service Workerキャッシュを `interval-cosmos-v2-0-5-alpha2` に更新
 
-ローカル回帰テスト:
+### alpha2.1 hotfix
 
-- 既存 smoke test: PASS
-- playback test: PASS
-- Phase 3 ranking regression test: PASS
-- Phase 3専用確認: 公開確認、誤ランク演出抑止、プロフィールカード、3段階公開設定、ショートカットをPASS
+実ブラウザでSETTINGSを開いた際、Phase 3の公開設定UIと `MutationObserver` が相互に再描画を発生させ、画面がフリーズする不具合を確認。
 
-実ブラウザ確認は次工程で実施する。
+修正内容:
+
+- SETTINGS / RESULT / RANKING の拡張描画を、内容変更時のみDOM更新する方式へ変更
+- `MutationObserver` による無限再描画を防止
+- Phase 3 JS/CSSへ `alpha2.1` のキャッシュバスターを付与
+- バージョン表示を `ver.2.0.5-alpha2.1` に更新
+
+### 実ブラウザ確認
+
+`ranking_visibility = ask` の学生アカウントでSTANDARD / TEXTをプレイし、以下を確認済み。
+
+1. 自己ベスト更新後に `RANKING PRIVACY` の公開確認が表示される
+2. 「非公開のまま続ける」を選択できる
+3. RESULTに `PRIVATE` が表示される
+4. RESULTに `月間 1位相当` が表示される
+5. RESULTに `殿堂 1位相当` が表示される
+6. RESULTに「今回 / 自己ベスト / 月間順位 / 殿堂順位」の4カードが表示される
+7. SETTINGSフリーズ修正後もゲーム継続可能
+
+Phase 3第一段階: PASS
+
+次の実ブラウザ確認:
+
+- `常に公開` での自動公開
+- 公開ランキングへの掲載
+- ランキング行から公開プロフィールカードを表示
+- 自己ベスト未更新時にランク演出が再表示されないこと
+- `常に非公開` で公開済みランキングが隠れること
 
 ## 開発版起動メモ
 
