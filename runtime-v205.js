@@ -1,5 +1,5 @@
 (() => {
-  const VERSION = 'ver.2.0.5-alpha2';
+  const VERSION = 'ver.2.0.5-alpha2.1';
   let splashStartedAt = null;
   let lastSubmitResult = null;
   const cloud = window.IntervalCosmosCloud;
@@ -35,6 +35,8 @@
     const profile = cloud?.getCachedPlayer?.();
     if (profile?.is_guest) {
       document.querySelectorAll('.ranking-submit.done,.ranking-submit.pending').forEach(node => {
+        if (node.dataset.v205Guest === '1') return;
+        node.dataset.v205Guest = '1';
         node.className = 'ranking-submit muted';
         node.innerHTML = '<strong>GUEST MODE</strong><span>ランキング対象外</span>';
       });
@@ -45,7 +47,16 @@
     });
   }
 
-  const observer = new MutationObserver(enhance);
+  let queued = false;
+  function queueEnhance() {
+    if (queued) return;
+    queued = true;
+    const run = () => { queued = false; enhance(); };
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(run);
+    else window.setTimeout(run, 0);
+  }
+
+  const observer = new MutationObserver(queueEnhance);
   observer.observe(document.documentElement, { subtree: true, childList: true });
-  window.addEventListener('DOMContentLoaded', enhance, { once: true });
+  window.addEventListener('DOMContentLoaded', queueEnhance, { once: true });
 })();
