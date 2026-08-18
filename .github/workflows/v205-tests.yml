@@ -25,8 +25,9 @@ jobs:
           node --check runtime-v205.js
           node --check phase3-ranking-hotfix-v205.js
           node --check phase3-v205.js
-          node --check phase4-v205.js
           node --check phase4-hotfix-v205.js
+          node --check phase4-v205.js
+          node --check phase4-analysis-hotfix-v205.js
           node --check phase5-progression-v205.js
           node --check phase6-admin-policy-v205.js
           node --check phase6-multimode-v205.js
@@ -44,6 +45,8 @@ jobs:
         run: node tests/recovery-v205-test.js
       - name: Ranking regression
         run: node tests/ranking-v205-test.js
+      - name: Learning history regression
+        run: node tests/history-v205-test.js
       - name: Progression regression
         run: node tests/progression-v205-test.js
       - name: Assignment regression
