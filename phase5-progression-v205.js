@@ -3,7 +3,7 @@
   const config = window.INTERVAL_COSMOS_CLOUD || {};
   const POINT_FRAMES = new Set(['normal','bronze','silver','gold','platinum','cosmic']);
   const LABELS = {basic:'BASIC',accuracy:'ACCURACY',combo:'COMBO',mode:'MODE',interval:'INTERVAL',streak:'STREAK',ranking:'RANKING',assignment:'ASSIGNMENT',hidden:'SECRET'};
-  let client=null, cache=null, opening=false, queued=false, unlockQueue=[], showing=false;
+  let client=null, cache=null, opening=false, queued=false, unlockQueue=[], showing=false, unlockTimer=null;
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const percent=(v,m)=>m>0?Math.max(0,Math.min(100,Math.round(v/m*100))):0;
 
@@ -19,19 +19,32 @@
   async function evaluate(){const r=await rpc('evaluate_my_progress');try{await cloud?.getMyPlayer?.();}catch{}queueUnlocks(r);return r;}
   async function fetchProgress(){cache=await rpc('get_my_cosmos_progress');return cache;}
 
+  function rankingPresentationBusy(){
+    const lastRankedResult=window.IntervalCosmosV205?.getLastSubmitResult?.();
+    const awaitingPublication=Boolean(lastRankedResult?.publication_required&&document.querySelector('.result-panel'));
+    return Boolean(document.querySelector('.rank-burst,.v205-publication-overlay')||awaitingPublication);
+  }
+  function scheduleUnlock(delay=320){
+    if(showing||!unlockQueue.length||unlockTimer)return;
+    unlockTimer=window.setTimeout(()=>{unlockTimer=null;showUnlock();},delay);
+  }
   function queueUnlocks(r){
     if(!r)return;
     for(const a of r.new_achievements||[])unlockQueue.push(['ACHIEVEMENT',a.name,`+${a.points||0} PT`]);
     for(const t of r.new_titles||[])unlockQueue.push(['TITLE UNLOCKED',t.name,'称号を獲得']);
     for(const f of r.new_frames||[])unlockQueue.push(['FRAME UNLOCKED',f.name,f.animated?'DYNAMIC FRAME':'NEW FRAME']);
     for(const m of r.new_daily_completions||[])unlockQueue.push(['DAILY COMPLETE',m.name,`+${m.reward_points||0} PT`]);
-    showUnlock();
+    // The base RESULT creates its rank cut-in only after submitScore resolves.
+    // Give it a moment to mount, then wait until ranking/privacy presentation is fully finished.
+    scheduleUnlock(420);
   }
   function showUnlock(){
-    if(showing||!unlockQueue.length)return;showing=true;
+    if(showing||!unlockQueue.length)return;
+    if(rankingPresentationBusy()){scheduleUnlock(180);return;}
+    showing=true;
     const [kind,name,sub]=unlockQueue.shift(),n=document.createElement('div');n.className='v205-unlock-burst';
     n.innerHTML=`<div class="v205-unlock-rings"></div><section><p>${esc(kind)}</p><h2>${esc(name)}</h2><span>${esc(sub)}</span></section>`;document.body.appendChild(n);
-    setTimeout(()=>{n.classList.add('out');setTimeout(()=>{n.remove();showing=false;showUnlock();},320)},2100);
+    window.setTimeout(()=>{n.classList.add('out');window.setTimeout(()=>{n.remove();showing=false;scheduleUnlock(260);},320)},2100);
   }
 
   function getOverlay(){let n=document.querySelector('.v205-cosmos-overlay');if(!n){n=document.createElement('div');n.className='v205-cosmos-overlay';document.body.appendChild(n)}return n}
