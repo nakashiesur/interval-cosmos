@@ -1,4 +1,6 @@
 /* INTERVAL COSMOS v2.0.5 — Phase 6 assignments */
+.v205-is-admin .avatar-teacher{--a:#78eaff;--b:#b78cff}
+.v205-is-admin .v205-cosmos-avatar{color:#8beeff!important;border-color:rgba(139,238,255,.72)!important;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.13),rgba(92,120,255,.08))!important;box-shadow:0 0 22px rgba(105,226,255,.28),0 0 38px rgba(166,111,255,.16),inset 0 0 12px rgba(139,238,255,.12)!important;text-shadow:0 0 12px rgba(139,238,255,.5),0 0 24px rgba(183,140,255,.28)}
 .v205-assignment-overlay{position:fixed;inset:0;z-index:2147482500;background:radial-gradient(circle at 50% 10%,rgba(39,77,140,.28),rgba(4,7,16,.97) 48%);backdrop-filter:blur(14px);overflow:auto;padding:24px}
 .v205-assignment-panel{width:min(980px,100%);margin:0 auto;border:1px solid rgba(112,181,255,.2);border-radius:26px;background:rgba(8,13,29,.96);box-shadow:0 35px 100px rgba(0,0,0,.55);padding:24px;min-height:220px}
 .v205-assignment-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding-bottom:18px;border-bottom:1px solid rgba(120,160,220,.14)}
