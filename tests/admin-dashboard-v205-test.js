@@ -2,6 +2,7 @@ const fs=require('fs');
 const path=require('path');
 const sql=fs.readFileSync(path.join(__dirname,'..','sql','admin-dashboard-v2.0.5.sql'),'utf8');
 const js=fs.readFileSync(path.join(__dirname,'..','phase7-admin-dashboard-v205.js'),'utf8');
+const dock=fs.readFileSync(path.join(__dirname,'..','phase7-admin-home-dock-v205.js'),'utf8');
 const css=fs.readFileSync(path.join(__dirname,'..','phase7-admin-dashboard-v205.css'),'utf8');
 const index=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const sw=fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8');
@@ -23,6 +24,12 @@ const tests=[
   ['responsive styles included',css.includes('@media(max-width:700px)')],
   ['dashboard assets loaded',index.includes('phase7-admin-dashboard-v205.js') && index.includes('phase7-admin-dashboard-v205.css')],
   ['dashboard assets cached',sw.includes('phase7-admin-dashboard-v205.js') && sw.includes('phase7-admin-dashboard-v205.css')],
+  ['admin home dock loaded after dashboard',index.indexOf('phase7-admin-dashboard-v205.js') < index.indexOf('phase7-admin-home-dock-v205.js')],
+  ['admin home dock cached',sw.includes('phase7-admin-home-dock-v205.js')],
+  ['admin dock gated by is_admin',dock.includes('getCachedPlayer') && dock.includes('is_admin')],
+  ['admin dock moves only admin controls',dock.includes('[data-v205-admin-dashboard-open]') && dock.includes('[data-a-open]') && dock.includes('Ordinary player controls remain untouched')],
+  ['ordinary footer restored when not admin',dock.includes('restoreIfNeeded') && dock.includes('footer.prepend(assignment)')],
+  ['dock observer is guarded',dock.includes('if (queued) return') && dock.includes('if (arranging) return')],
 ];
 let fail=0;
 for(const [name,ok] of tests){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
