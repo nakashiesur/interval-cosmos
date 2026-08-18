@@ -1,4 +1,4 @@
-const CACHE = 'interval-cosmos-v2-0-5-alpha7-4';
+const CACHE = 'interval-cosmos-v2-0-5-alpha7-5';
 const ASSETS = [
   './', './index.html', './styles.css', './account-v205.css', './phase2-recovery-v205.css', './phase3-v205.css', './phase4-v205.css', './phase4-hotfix-v205.css', './phase5-v205.css', './phase6-assignments-v205.css', './phase6-multimode-v205.css', './phase7-admin-dashboard-v205.css', './phase8-pc-controls-v205.css',
   './account-gate.js', './supabase-singleton-v205.js', './phase2-recovery-v205-fixed.js', './runtime-v205.js', './phase3-ranking-hotfix-v205.js', './phase3-v205.js', './phase4-hotfix-v205.js', './phase4-v205.js', './phase4-analysis-hotfix-v205.js', './phase5-progression-v205.js', './phase5-unlock-copy-hotfix-v205.js', './phase6-admin-policy-v205.js', './phase6-multimode-v205.js', './phase6-assignments-v205.js', './phase7-admin-dashboard-v205.js', './phase7-admin-home-dock-v205.js', './phase8-pc-controls-v205.js', './phase0-wallclock-v205.js', './app.js', './cloud.js',
@@ -22,7 +22,7 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
   if (url.pathname.endsWith('/cloud-config.js')) {
-    event.respondWith(fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request)));
+    event.respondWith(fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request, { ignoreSearch: true })));
     return;
   }
 
@@ -39,9 +39,10 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  const localAsset = url.origin === self.location.origin;
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-      if (url.origin === self.location.origin) {
+    caches.match(event.request, localAsset ? { ignoreSearch: true } : undefined).then(cached => cached || fetch(event.request).then(response => {
+      if (localAsset) {
         const copy = response.clone();
         caches.open(CACHE).then(cache => cache.put(event.request, copy));
       }
