@@ -27,9 +27,12 @@ const tests=[
   ['admin home dock loaded after dashboard',index.indexOf('phase7-admin-dashboard-v205.js') < index.indexOf('phase7-admin-home-dock-v205.js')],
   ['admin home dock cached',sw.includes('phase7-admin-home-dock-v205.js')],
   ['admin dock gated by is_admin',dock.includes('getCachedPlayer') && dock.includes('is_admin')],
-  ['admin dock moves only admin controls',dock.includes('[data-v205-admin-dashboard-open]') && dock.includes('[data-a-open]') && dock.includes('Ordinary player controls remain untouched')],
-  ['ordinary footer restored when not admin',dock.includes('restoreIfNeeded') && dock.includes('footer.prepend(assignment)')],
+  ['admin dock does not move source controls',dock.includes('v205-admin-dock-source') && !dock.includes('actions.appendChild(dashboard)') && !dock.includes('actions.appendChild(assignment)')],
+  ['admin dock uses dedicated entry controls',dock.includes('data-v205-admin-dock-dashboard') && dock.includes('data-v205-admin-dock-assignments')],
+  ['ordinary player controls restored outside admin',dock.includes('restoreSources') && dock.includes("classList.remove('v205-admin-dock-source')")],
   ['dock observer is guarded',dock.includes('if (queued) return') && dock.includes('if (arranging) return')],
+  ['dashboard injector checks whole document',js.includes("document.querySelector('[data-v205-admin-dashboard-open]')") && !js.includes("footer.querySelector('[data-v205-admin-dashboard-open]')")),
+  ['cache version includes freeze fix',sw.includes('alpha6-2') && index.includes('phase7-admin-home-dock-v205.js?v=alpha6.2')],
 ];
 let fail=0;
 for(const [name,ok] of tests){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
