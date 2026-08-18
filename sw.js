@@ -1,7 +1,7 @@
-const CACHE = 'interval-cosmos-v2-0-5-alpha4-2-1';
+const CACHE = 'interval-cosmos-v2-0-5-alpha5';
 const ASSETS = [
-  './', './index.html', './styles.css', './account-v205.css', './phase2-recovery-v205.css', './phase3-v205.css', './phase4-v205.css', './phase4-hotfix-v205.css', './phase5-v205.css',
-  './account-gate.js', './phase2-recovery-v205-fixed.js', './runtime-v205.js', './phase3-v205.js', './phase4-hotfix-v205.js', './phase4-v205.js', './phase5-progression-v205.js', './app.js', './cloud.js',
+  './', './index.html', './styles.css', './account-v205.css', './phase2-recovery-v205.css', './phase3-v205.css', './phase4-v205.css', './phase4-hotfix-v205.css', './phase5-v205.css', './phase6-assignments-v205.css',
+  './account-gate.js', './supabase-singleton-v205.js', './phase2-recovery-v205-fixed.js', './runtime-v205.js', './phase3-v205.js', './phase4-hotfix-v205.js', './phase4-v205.js', './phase5-progression-v205.js', './phase6-assignments-v205.js', './app.js', './cloud.js',
   './nakashima-logo.png', './icon.svg', './manifest.webmanifest'
 ];
 
