@@ -5,9 +5,35 @@
     window.setTimeout(fn, ms);
   }
 
+  function showFocusVeil() {
+    let veil = document.querySelector('.v205-focus-transition-veil');
+    if (veil) return veil;
+    veil = document.createElement('div');
+    veil.className = 'v205-focus-transition-veil';
+    veil.innerHTML = '<div><small>FOCUS PRACTICE</small><strong>練習範囲を準備しています</strong></div>';
+    Object.assign(veil.style, {
+      position:'fixed', inset:'0', zIndex:'2600', display:'grid', placeItems:'center',
+      background:'#070b18', color:'#eef4ff', textAlign:'center', pointerEvents:'all'
+    });
+    const inner = veil.firstElementChild;
+    if (inner) inner.style.cssText = 'display:grid;gap:8px;letter-spacing:.08em';
+    const small = veil.querySelector('small');
+    if (small) small.style.cssText = 'color:#5ee2ff;font-weight:800;letter-spacing:.2em';
+    document.body.appendChild(veil);
+    window.setTimeout(() => veil?.remove(), 1400); // fail-safe only
+    return veil;
+  }
+
+  function hideFocusVeil() {
+    document.querySelector('.v205-focus-transition-veil')?.remove();
+  }
+
   function chooseOnly(intervalKey) {
     document.querySelector('[data-action="clear-all"]')?.click();
-    later(() => document.querySelector(`[data-interval="${intervalKey}"]`)?.click(), 25);
+    later(() => {
+      document.querySelector(`[data-interval="${intervalKey}"]`)?.click();
+      later(hideFocusVeil, 90);
+    }, 25);
   }
 
   function enterFocus(intervalKey, preferredView) {
@@ -19,7 +45,11 @@
         later(() => chooseOnly(intervalKey), 40);
         return;
       }
-      if (document.querySelector('[data-action="clear-all"]')) chooseOnly(intervalKey);
+      if (document.querySelector('[data-action="clear-all"]')) {
+        chooseOnly(intervalKey);
+        return;
+      }
+      hideFocusVeil();
     };
 
     const go = () => {
@@ -43,6 +73,7 @@
   function start(intervalKey, preferredView) {
     if (!INTERVALS.has(intervalKey)) return;
 
+    showFocusVeil();
     document.querySelector('.v205-practice-choice')?.remove();
     document.querySelector('.v205-history-overlay')?.remove();
 
