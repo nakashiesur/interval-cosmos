@@ -31,6 +31,7 @@ jobs:
           node --check phase6-multimode-v205.js
           node --check phase6-assignments-v205.js
           node --check phase7-admin-dashboard-v205.js
+          node --check phase7-admin-home-dock-v205.js
       - name: Existing smoke tests
         run: node tests/smoke-test.js
       - name: Playback regression
