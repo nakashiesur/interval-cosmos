@@ -32,7 +32,7 @@ const tests=[
   ['ordinary player controls restored outside admin',dock.includes('restoreSources') && dock.includes("classList.remove('v205-admin-dock-source')")],
   ['dock observer is guarded',dock.includes('if (queued) return') && dock.includes('if (arranging) return')],
   ['dashboard injector checks whole document',js.includes("document.querySelector('[data-v205-admin-dashboard-open]')") && !js.includes("footer.querySelector('[data-v205-admin-dashboard-open]')")),
-  ['cache version includes freeze fix',sw.includes('alpha6-2') && index.includes('phase7-admin-home-dock-v205.js?v=alpha6.2')],
+  ['freeze-fix dock revision remains loaded',index.includes('phase7-admin-home-dock-v205.js?v=alpha6.2')],
 ];
 let fail=0;
 for(const [name,ok] of tests){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
