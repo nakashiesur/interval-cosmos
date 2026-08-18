@@ -2,7 +2,9 @@ const fs=require('fs');
 const path=require('path');
 const sql=fs.readFileSync(path.join(__dirname,'..','sql','assignments-v2.0.5.sql'),'utf8');
 const adminSql=fs.readFileSync(path.join(__dirname,'..','sql','assignments-admin-only-v2.0.5.sql'),'utf8');
+const multiSql=fs.readFileSync(path.join(__dirname,'..','sql','assignments-multimode-v2.0.5.sql'),'utf8');
 const js=fs.readFileSync(path.join(__dirname,'..','phase6-assignments-v205.js'),'utf8');
+const multiJs=fs.readFileSync(path.join(__dirname,'..','phase6-multimode-v205.js'),'utf8');
 const adminPolicy=fs.readFileSync(path.join(__dirname,'..','phase6-admin-policy-v205.js'),'utf8');
 const singleton=fs.readFileSync(path.join(__dirname,'..','supabase-singleton-v205.js'),'utf8');
 const index=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
@@ -28,6 +30,19 @@ const tests=[
   ['assignment assets loaded', index.includes('phase6-assignments-v205.js') && index.includes('phase6-assignments-v205.css')],
   ['admin policy cached', sw.includes('phase6-admin-policy-v205.js')],
   ['assignment assets cached', sw.includes('phase6-assignments-v205.js') && sw.includes('phase6-assignments-v205.css')],
+  ['multi-mode column migration', multiSql.includes('add column if not exists allowed_modes text[]') && multiSql.includes('set allowed_modes = array[mode]')],
+  ['per-mode best table', multiSql.includes('create table if not exists public.assignment_mode_bests') && multiSql.includes('primary key (assignment_id, player_id, mode)')],
+  ['multi-mode admin create rpc', multiSql.includes('create or replace function public.create_assignment_v2(') && multiSql.includes('p_allowed_modes text[]')],
+  ['assignment v2 dedicated submit rpc', multiSql.includes('submit_assignment_session_v2') && multiSql.includes("'this_run_achieved'")),
+  ['assignment mode validation server side', multiSql.includes('p_mode = any(v_modes)')],
+  ['mixed score families protected', multiSql.includes('Mixed STANDARD/HYPER assignments cannot use one shared score target')),
+  ['existing assignment sessions migrated', multiSql.includes("where ps.source = 'assignment'") && multiSql.includes('row_number() over')),
+  ['student chooses allowed mode', multiJs.includes('CHOOSE YOUR ROUTE') && multiJs.includes('data-a-mode-start')],
+  ['admin can select multiple modes', multiJs.includes('複数選択可／学生が選択') && multiJs.includes('data-a-mode-option')],
+  ['mode bests displayed independently', multiJs.includes('MODE BEST SCORE') && multiJs.includes('v205-a-mode-best-grid')],
+  ['this run achievement distinguished', multiJs.includes('TARGET ALREADY ACHIEVED') && multiJs.includes('TARGET NOT REACHED') && multiJs.includes('this_run_achieved')],
+  ['multi-mode patch loads before legacy assignment module', index.indexOf('phase6-multimode-v205.js') < index.indexOf('phase6-assignments-v205.js')],
+  ['multi-mode assets loaded and cached', index.includes('phase6-multimode-v205.css') && sw.includes('phase6-multimode-v205.js') && sw.includes('phase6-multimode-v205.css')],
 ];
 let fail=0;
 for(const [name,ok] of tests){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
