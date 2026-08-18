@@ -32,6 +32,7 @@ jobs:
           node --check phase6-assignments-v205.js
           node --check phase7-admin-dashboard-v205.js
           node --check phase7-admin-home-dock-v205.js
+          node --check phase8-pc-controls-v205.js
       - name: Existing smoke tests
         run: node tests/smoke-test.js
       - name: Playback regression
@@ -48,3 +49,5 @@ jobs:
         run: node tests/assignments-v205-test.js
       - name: Admin dashboard regression
         run: node tests/admin-dashboard-v205-test.js
+      - name: PC controls regression
+        run: node tests/pc-controls-v205-test.js
