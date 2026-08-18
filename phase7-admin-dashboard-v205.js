@@ -203,7 +203,9 @@
   function inject(){
     const footer=document.querySelector('.home-footer');
     const p=cloud?.getCachedPlayer?.();
-    if(!footer||!p?.is_admin||footer.querySelector('[data-v205-admin-dashboard-open]'))return;
+    // The admin home dock moves this button outside .home-footer. Check the whole document
+    // so moving it cannot trigger an inject -> move -> inject MutationObserver loop.
+    if(!footer||!p?.is_admin||document.querySelector('[data-v205-admin-dashboard-open]'))return;
     const b=document.createElement('button');
     b.type='button';b.className='secondary-btn v205-admin-launch';b.dataset.v205AdminDashboardOpen='1';b.textContent='◫ ADMIN DASHBOARD';
     footer.prepend(b);
