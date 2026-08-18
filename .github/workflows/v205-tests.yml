@@ -59,3 +59,6 @@ jobs:
         run: node tests/admin-dashboard-v205-test.js
       - name: PC controls regression
         run: node tests/pc-controls-v205-test.js
+      - name: Release blocker gate
+        if: github.event_name == 'pull_request'
+        run: node tests/release-blockers-v205-test.js
