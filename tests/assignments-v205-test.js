@@ -5,6 +5,7 @@ const adminSql=fs.readFileSync(path.join(__dirname,'..','sql','assignments-admin
 const multiSql=fs.readFileSync(path.join(__dirname,'..','sql','assignments-multimode-v2.0.5.sql'),'utf8');
 const js=fs.readFileSync(path.join(__dirname,'..','phase6-assignments-v205.js'),'utf8');
 const multiJs=fs.readFileSync(path.join(__dirname,'..','phase6-multimode-v205.js'),'utf8');
+const multiCss=fs.readFileSync(path.join(__dirname,'..','phase6-multimode-v205.css'),'utf8');
 const adminPolicy=fs.readFileSync(path.join(__dirname,'..','phase6-admin-policy-v205.js'),'utf8');
 const singleton=fs.readFileSync(path.join(__dirname,'..','supabase-singleton-v205.js'),'utf8');
 const index=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
@@ -41,6 +42,7 @@ const tests=[
   ['admin can select multiple modes', multiJs.includes('複数選択可／学生が選択') && multiJs.includes('data-a-mode-option')],
   ['mode bests displayed independently', multiJs.includes('MODE BEST SCORE') && multiJs.includes('v205-a-mode-best-grid')],
   ['this run achievement distinguished', multiJs.includes('TARGET ALREADY ACHIEVED') && multiJs.includes('TARGET NOT REACHED') && multiJs.includes('this_run_achieved')],
+  ['assignment overlay no longer reveals underlying app',multiCss.includes('.v205-assignment-overlay')&&multiCss.includes('backdrop-filter:none!important')&&!multiCss.includes('rgba(39,77,140,.28)')],
   ['multi-mode patch loads before legacy assignment module', index.indexOf('phase6-multimode-v205.js') < index.indexOf('phase6-assignments-v205.js')],
   ['multi-mode assets loaded and cached', index.includes('phase6-multimode-v205.css') && sw.includes('phase6-multimode-v205.js') && sw.includes('phase6-multimode-v205.css')],
 ];
