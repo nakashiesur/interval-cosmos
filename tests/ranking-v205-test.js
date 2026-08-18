@@ -57,6 +57,9 @@ const context = {
 };
 vm.createContext(context);
 const code=fs.readFileSync(path.join(__dirname,'..','phase3-v205.js'),'utf8');
+const hotfix=fs.readFileSync(path.join(__dirname,'..','phase3-ranking-hotfix-v205.js'),'utf8');
+const index=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
+const sw=fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8');
 vm.runInContext(code,context,{filename:'phase3-v205.js'});
 
 (async()=>{
@@ -78,6 +81,10 @@ vm.runInContext(code,context,{filename:'phase3-v205.js'});
   assertions.push(['false rank scene removal guard',code.includes('lastSubmitResult && !improved(lastSubmitResult)')&&code.includes('node.remove()')]);
 
   assertions.push(['privacy controls implemented',code.includes('data-v205-visibility="ask"')&&code.includes('always_public')&&code.includes('always_private')]);
+  assertions.push(['always-private no longer hides previous public records',hotfix.includes("rankingVisibility: 'always_private'")&&!hotfix.includes('await cloud.hideAllMyRankings')&&hotfix.includes('過去の公開記録は残ります')]);
+  assertions.push(['private hotfix is loaded before phase3',index.indexOf('phase3-ranking-hotfix-v205.js')>=0&&index.indexOf('phase3-ranking-hotfix-v205.js')<index.indexOf('phase3-v205.js')]);
+  assertions.push(['private hotfix is cached',sw.includes('phase3-ranking-hotfix-v205.js')]);
+  assertions.push(['result rank wording identifies personal-best position',hotfix.includes('自己ベスト 月間順位')&&hotfix.includes('自己ベスト 殿堂順位')&&hotfix.includes('BEST RECORD POSITION')]);
   assertions.push(['profile card implemented',code.includes('FEATURED ACHIEVEMENTS')&&code.includes('PUBLIC RECORDS')]);
   assertions.push(['student number excluded from profile card copy',!code.includes('student_number')]);
   assertions.push(['result shortcuts implemented',code.includes("event.key.toLowerCase() === 'r'")&&code.includes("event.key === 'Escape'" )]);
