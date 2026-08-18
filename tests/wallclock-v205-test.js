@@ -69,7 +69,8 @@ const tests=[
   ['only named core gameLoop is targeted',code.includes("callback.name === 'gameLoop'")],
   ['synthetic rAF scheduling is suppressed',code.includes('if (insideCatchup) return suppressedId--')],
   ['wallclock layer loads before account gate/core import',index.indexOf('phase0-wallclock-v205.js')>=0&&index.indexOf('phase0-wallclock-v205.js')<index.indexOf('account-gate.js')],
-  ['wallclock asset cached',sw.includes('phase0-wallclock-v205.js')&&sw.includes('alpha7-4')],
+  ['wallclock asset cached',sw.includes('phase0-wallclock-v205.js')],
+  ['versioned local assets can use precache',sw.includes('ignoreSearch: true')],
 ];
 let fail=0;
 for(const [name,ok] of tests){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
