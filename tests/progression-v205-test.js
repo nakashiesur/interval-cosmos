@@ -18,6 +18,7 @@ const assertions = [
   ['hidden ui stays secret', js.includes("secret?'CONDITION ???'") || js.includes('CONDITION ???')],
   ['title and frame equip', js.includes('mainTitleId') && js.includes('equippedFrameId')],
   ['unlock presentation', js.includes('v205-unlock-burst') && css.includes('.v205-unlock-burst')],
+  ['cut-ins wait for ranking/privacy presentation', js.includes('rankingPresentationBusy') && js.includes('.rank-burst,.v205-publication-overlay') && js.includes('publication_required')],
   ['mobile layout', css.includes('@media(max-width:780px)')],
 ];
 
