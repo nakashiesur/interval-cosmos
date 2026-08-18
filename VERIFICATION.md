@@ -150,7 +150,7 @@ GitHub Issue #1で追跡する。
 
 ## Phase 5 — MY COSMOS / 実績・称号・フレーム・デイリー
 
-重い基盤実装を `v2.0.5-dev` へ先行コミット。実ブラウザ/Supabase適用テストは次回セッションで行う。
+重い基盤実装を `v2.0.5-dev` へ先行コミット。
 
 実装済み:
 
@@ -175,6 +175,35 @@ GitHub Issue #1で追跡する。
 
 Phase 1の実際のセットアップSQLと列名を照合し、Phase 5が利用するカタログ/進捗テーブルの構造一致を確認済み。
 
+### 実ブラウザ確認 — 初回表示
+
+2026-08-18、Phase 5 SQLをSupabase SQL Editorで実行し `Success. No rows returned` を確認。
+
+その後 `v2.0.5-dev` 最新版を起動し、学生アカウント `test` で `MY COSMOS` を開いて以下を確認。
+
+- MY COSMOS画面が正常表示される
+- 既存プレイ履歴から `FIRST SIGNAL` が遡及解除される
+- COSMOS PT = `10`
+- メイン称号 = `FIRST SIGNAL`
+- フレーム = `NORMAL`
+- 次段階 `BRONZE` まで `10 / 100 PT` と表示される
+- 2026-08-18のDAILY MISSIONSが3枠生成される
+  - `10 CLEAR SIGNALS` 0/10
+  - `HYPER SPARK` 0/1
+  - `DUAL ROUTE` 0/2
+- NORMAL / BRONZE / SILVER / GOLD / PLATINUM / COSMIC / AURORA / hidden frames が表示される
+- 未解放の高難度フレームは `???` として条件を隠して表示される
+
+初回表示: PASS
+
+次の確認:
+
+- 1プレイ後にデイリー進捗が更新されること
+- 新規実績解除演出が表示されること
+- COSMOS PTが再計算されること
+- 100PT到達時にBRONZEが自動解放・装備されること
+- 代表実績の選択と公開プロフィール反映
+
 ### 自動回帰テスト
 
 `.github/workflows/v205-tests.yml` を追加。以後 `v2.0.5-dev` push時に以下を自動実行する。
@@ -186,7 +215,7 @@ Phase 1の実際のセットアップSQLと列名を照合し、Phase 5が利用
 - ranking regression
 - progression regression
 
-初回は旧テストのキャッシュ名固定、2回目は簡易DOMテストの誤判定で失敗したためテスト側を修正。Run #3で全ジョブPASSを確認済み。
+Run #4まで全ジョブPASSを確認済み。
 
 ## 開発版起動メモ
 
