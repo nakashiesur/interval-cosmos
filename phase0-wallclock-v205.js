@@ -11,8 +11,10 @@
   let insideCatchup = false;
   let lastGameWall = 0;
   let lastGamePerf = 0;
+  let lastGameScheduleWall = 0;
   let suppressedId = -1;
   const MAX_CATCHUP_STEPS = 720; // 180 sec; safely beyond normal/hyper session length.
+  const NEW_SESSION_GAP_MS = 500;
 
   function isCoreGameLoop(callback) {
     return typeof callback === 'function' && callback.name === 'gameLoop';
@@ -22,6 +24,11 @@
     return document.querySelector('#timerText')?.textContent?.trim() === '∞';
   }
 
+  function resetBaseline() {
+    lastGameWall = 0;
+    lastGamePerf = 0;
+  }
+
   window.requestAnimationFrame = function(callback) {
     if (!isCoreGameLoop(callback)) return nativeRAF(callback);
 
@@ -29,6 +36,17 @@
     // hundreds of real browser rAF registrations. The final real invocation below
     // schedules exactly one next frame.
     if (insideCatchup) return suppressedId--;
+
+    const scheduledAt = Date.now();
+    // During a running game, gameLoop schedules its next frame every ~16ms.
+    // If no gameLoop registration happened for a while, this is a fresh game
+    // session after a result/menu screen, not a resumed background frame.
+    // A background-resume callback was registered BEFORE the tab became hidden,
+    // so it reaches the native callback below without passing this reset again.
+    if (lastGameScheduleWall && scheduledAt - lastGameScheduleWall > NEW_SESSION_GAP_MS) {
+      resetBaseline();
+    }
+    lastGameScheduleWall = scheduledAt;
 
     return nativeRAF(perfNow => {
       const wallNow = Date.now();
@@ -67,14 +85,12 @@
     };
   }
 
-  // Reset the elapsed baseline when no timed play exists. This prevents time spent
-  // on menus/results from being applied to the next game session.
+  // Focus/visibility can occur while the user is on a result/menu screen. Clear
+  // stale timing there, but do not clear a live timed session before its resumed
+  // frame consumes the hidden elapsed time.
   function resetBaselineIfIdle() {
     const timer = document.querySelector('#timerText');
-    if (!timer || timer.textContent.trim() === '∞') {
-      lastGameWall = 0;
-      lastGamePerf = 0;
-    }
+    if (!timer || timer.textContent.trim() === '∞') resetBaseline();
   }
   window.addEventListener('focus', resetBaselineIfIdle);
   document.addEventListener('visibilitychange', () => {
