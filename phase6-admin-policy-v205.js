@@ -34,7 +34,8 @@
     const button = document.querySelector('[data-a-open]');
     if (!button) return;
     const player = realPlayer();
-    button.innerHTML = player?.is_admin ? '▣ ADMIN ASSIGNMENTS' : '▣ ASSIGNMENTS';
+    const desired = player?.is_admin ? '▣ ADMIN ASSIGNMENTS' : '▣ ASSIGNMENTS';
+    if (button.textContent !== desired) button.textContent = desired;
   }
 
   function queueRelabel() {
