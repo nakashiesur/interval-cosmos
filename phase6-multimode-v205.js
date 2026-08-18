@@ -32,7 +32,6 @@
     return [...new Set(rows.filter(m => MODE_MAP[m]))];
   };
   const modeBest = (a, mode) => (Array.isArray(a?.mode_bests) ? a.mode_bests : []).find(x => x.mode === mode) || null;
-  const modeLabels = a => allowedModes(a).map(m => MODE_MAP[m].label);
   const mixedScoreFamilies = modes => {
     const f = new Set(modes.map(m => MODE_MAP[m]?.family).filter(Boolean));
     return f.size > 1;
@@ -79,7 +78,6 @@
     }
   }
 
-  // Assignment submission v2: bypass the legacy single-mode validator only for assignments.
   if (cloud?.submitScore && !cloud.__v205AssignmentMultiModeSubmitWrapped) {
     const originalSubmit = cloud.submitScore.bind(cloud);
     cloud.submitScore = async payload => {
@@ -321,16 +319,18 @@
     if (!lastSubmission) return;
     const panel = document.querySelector('.v205-assignment-panel.result');
     if (!panel || !panel.querySelector('.v205-a-current')) return;
+    const thisRun = Boolean(lastSubmission.this_run_achieved);
+    const overall = Boolean(lastSubmission.achieved);
+    const playedMode = lastSubmission.played_mode;
+    const mb = (lastSubmission.mode_bests||[]).find(x=>x.mode===playedMode);
+    const signature = `${lastSubmission.session_id}:${thisRun}:${overall}:${playedMode||''}:${mb?.best_score??''}:${mb?.attempts??''}`;
+    if (panel.dataset.v205ResultCorrected === signature) return;
+
     const title = panel.querySelector('.v205-assignment-head h2');
     const kicker = panel.querySelector('.v205-assignment-head p');
     const target = panel.querySelector('.v205-a-target');
     const strong = target?.querySelector('strong');
     const span = target?.querySelector('span');
-    const thisRun = Boolean(lastSubmission.this_run_achieved);
-    const overall = Boolean(lastSubmission.achieved);
-    const playedMode = lastSubmission.played_mode;
-    const mb = (lastSubmission.mode_bests||[]).find(x=>x.mode===playedMode);
-
     const runLabel = panel.querySelector('.v205-a-current small');
     if (runLabel && playedMode) runLabel.textContent = `THIS RUN · ${MODE_MAP[playedMode]?.short || playedMode}`;
     const best = panel.querySelector('.v205-a-best.result');
@@ -355,7 +355,7 @@
       if (strong) strong.textContent = '今回は目標未達でした';
       if (span) span.textContent = '何度でも挑戦できます。条件を満たす記録を目指してください。';
     }
-    panel.dataset.v205ResultCorrected = `${lastSubmission.session_id}:${thisRun}:${overall}`;
+    panel.dataset.v205ResultCorrected = signature;
   }
 
   async function enhance() {
@@ -367,7 +367,6 @@
       await enhanceTeacherCards();
       await enhanceAdminResults();
     } catch (error) {
-      // During pre-migration loads the v2 RPC/table may not exist yet; keep the legacy UI usable.
       if (!/function|relation|column|does not exist/i.test(String(error?.message||''))) console.warn('[assignment multimode enhance]',error);
     } finally {
       enhanceBusy = false;
@@ -379,7 +378,6 @@
     setTimeout(() => { enhanceQueued = false; enhance(); }, 40);
   }
 
-  // Register before phase6-assignments-v205.js so route-changing events can safely override legacy handlers.
   window.addEventListener('click', event => {
     const newButton = event.target.closest?.('[data-a-new]');
     if (newButton) {
