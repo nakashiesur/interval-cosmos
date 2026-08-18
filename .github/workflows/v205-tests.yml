@@ -27,6 +27,7 @@ jobs:
           node --check phase4-v205.js
           node --check phase4-hotfix-v205.js
           node --check phase5-progression-v205.js
+          node --check phase6-admin-policy-v205.js
           node --check phase6-assignments-v205.js
       - name: Existing smoke tests
         run: node tests/smoke-test.js
