@@ -20,7 +20,7 @@ jobs:
           node-version: '22'
       - name: Syntax check extension scripts
         run: |
-          node --check phase2-recovery-v205.js
+          node --check phase2-recovery-v205-fixed.js
           node --check runtime-v205.js
           node --check phase3-v205.js
           node --check phase4-v205.js
