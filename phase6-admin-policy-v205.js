@@ -13,6 +13,11 @@
     return player;
   }
 
+  function applyAdminVisualState() {
+    const isAdmin = Boolean(realPlayer()?.is_admin);
+    document.documentElement.classList.toggle('v205-is-admin', isAdmin);
+  }
+
   function openWithAdminPolicy() {
     const api = window.IntervalCosmosAssignmentsV205;
     if (!api?.open || !cloud?.getCachedPlayer) return false;
@@ -31,6 +36,7 @@
   }
 
   function relabelAssignmentButton() {
+    applyAdminVisualState();
     const button = document.querySelector('[data-a-open]');
     if (!button) return;
     const player = realPlayer();
@@ -65,5 +71,6 @@
   window.IntervalCosmosAssignmentAdminPolicyV205 = {
     assignmentRoleView,
     openWithAdminPolicy,
+    applyAdminVisualState,
   };
 })();
