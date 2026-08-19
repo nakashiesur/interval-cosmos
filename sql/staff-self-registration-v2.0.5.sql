@@ -93,10 +93,12 @@ begin
 end;
 $$;
 
--- Remove the earlier two-argument/one-argument drafts if this migration was
--- already applied before course selection was added.
+-- Remove earlier drafts if this migration was already applied before course
+-- selection was added. get_my_private_identity must be dropped because its
+-- TABLE return shape changed from 2 columns to 3.
 drop function if exists public.create_staff_account(text, text);
 drop function if exists public.update_my_staff_identity(text);
+drop function if exists public.get_my_private_identity();
 
 create or replace function public.create_staff_account(
   p_real_name text,
