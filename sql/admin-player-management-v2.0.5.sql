@@ -153,9 +153,6 @@ begin
 end;
 $$;
 
--- Remove the player's currently published leaderboard records without deleting
--- play history or their private bests. This is the safe "make rankings private"
--- operation.
 create or replace function public.admin_unpublish_player_rankings(p_player_id uuid)
 returns jsonb
 language plpgsql
@@ -195,9 +192,6 @@ begin
 end;
 $$;
 
--- Delete the player's ranking-best cache while preserving durable play history.
--- This is stronger than unpublish and intentionally requires an explicit UI
--- confirmation. A future ranked submission can create new best rows again.
 create or replace function public.admin_delete_player_rankings(p_player_id uuid)
 returns jsonb
 language plpgsql
@@ -230,22 +224,19 @@ begin
 end;
 $$;
 
--- Server-side Edge Function uses this to perform the final application-row
--- deletion only after it has verified the caller and deleted linked auth.users
--- with the service-role admin API.
+-- This function is callable only by the service_role JWT. The Edge Function
+-- verifies the human caller with is_current_admin() before using service_role.
 create or replace function public.admin_delete_player_application_row(p_player_id uuid)
 returns void
 language plpgsql
 security definer
 set search_path = ''
 as $$
+declare
+  v_role text := coalesce(current_setting('request.jwt.claim.role', true), '');
 begin
-  if not public.is_current_admin() then
-    raise exception 'Admin account required';
-  end if;
-
-  if p_player_id = public.current_player_id() then
-    raise exception 'You cannot delete your own admin account';
+  if v_role <> 'service_role' then
+    raise exception 'Service role required';
   end if;
 
   delete from public.players p where p.id = p_player_id;
@@ -260,17 +251,13 @@ revoke all on function public.admin_update_player_profile(uuid,text,text,text) f
 revoke all on function public.admin_set_player_suspended(uuid,boolean) from public, anon;
 revoke all on function public.admin_unpublish_player_rankings(uuid) from public, anon;
 revoke all on function public.admin_delete_player_rankings(uuid) from public, anon;
-revoke all on function public.admin_delete_player_application_row(uuid) from public, anon;
+revoke all on function public.admin_delete_player_application_row(uuid) from public, anon, authenticated;
 
 grant execute on function public.admin_get_player_management(uuid) to authenticated;
 grant execute on function public.admin_update_player_profile(uuid,text,text,text) to authenticated;
 grant execute on function public.admin_set_player_suspended(uuid,boolean) to authenticated;
 grant execute on function public.admin_unpublish_player_rankings(uuid) to authenticated;
 grant execute on function public.admin_delete_player_rankings(uuid) to authenticated;
--- Deliberately NOT granted to authenticated. The Edge Function invokes this as
--- service_role after independently verifying the requester's admin status.
-revoke execute on function public.admin_delete_player_application_row(uuid) from authenticated;
-
 grant execute on function public.admin_delete_player_application_row(uuid) to service_role;
 
 notify pgrst, 'reload schema';
