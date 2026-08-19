@@ -16,6 +16,7 @@ const currentMigrations=[
   'sql/assignments-multimode-v2.0.5.sql',
   'sql/admin-dashboard-v2.0.5.sql',
   'sql/staff-self-registration-v2.0.5.sql',
+  'sql/admin-player-management-v2.0.5.sql',
 ];
 
 function sha256(buffer){return crypto.createHash('sha256').update(buffer).digest('hex');}
@@ -36,6 +37,11 @@ check('generated bundle includes every current migration marker',currentMigratio
 check('generated bundle includes current avatar seed',[
   'nova','orbit','pulse','prism','comet','nebula','vector','echo','quasar','lumen','wave','aster','teacher'
 ].every(id=>bundle.includes(`'${id}'`)));
+check('generated bundle includes admin management RPCs',[
+  'admin_get_player_management','admin_update_player_profile','admin_set_player_suspended',
+  'admin_unpublish_player_rankings','admin_delete_player_rankings','admin_delete_player_application_row'
+].every(name=>bundle.includes(name)));
+check('complete deletion server function exists',fs.existsSync(path.join(root,'supabase','functions','admin-delete-player','index.ts')));
 check('fresh-build verification SQL exists',fs.existsSync(path.join(root,'sql','verify-v2.0.5-fresh-build.sql')));
 
 try{fs.rmSync(path.join(root,'dist'),{recursive:true,force:true});}catch{}
