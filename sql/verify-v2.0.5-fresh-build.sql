@@ -10,7 +10,6 @@ declare
   v_missing text;
   v_default text;
 begin
-  -- Core + later-migration tables: Phase 1 (18) + recovery + per-mode assignment bests.
   select count(*) into v_count
   from information_schema.tables
   where table_schema = 'public'
@@ -80,7 +79,6 @@ begin
     raise exception 'players.real_name is missing';
   end if;
 
-  -- Every application table in the expected set must have RLS enabled.
   select string_agg(c.relname, ', ' order by c.relname) into v_missing
   from pg_class c
   join pg_namespace n on n.oid=c.relnamespace
@@ -98,7 +96,6 @@ begin
     raise exception 'RLS disabled on: %', v_missing;
   end if;
 
-  -- Required current RPC/function names. Overloads are allowed; at least one current definition must exist.
   select string_agg(req.name, ', ' order by req.name) into v_missing
   from unnest(array[
     'current_player_id','is_current_admin','create_player_account','get_my_player','update_my_profile',
@@ -109,7 +106,9 @@ begin
     'evaluate_my_progress','get_my_cosmos_progress','toggle_featured_achievement',
     'create_assignment_v2','get_my_assignments','get_my_assignment_status','submit_assignment_session_v2','get_assignment_results',
     'normalize_assignment_modes','get_admin_dashboard_overview','get_admin_student_dashboard',
-    'create_staff_account','get_my_private_identity'
+    'create_staff_account','get_my_private_identity',
+    'admin_get_player_management','admin_update_player_profile','admin_set_player_suspended',
+    'admin_unpublish_player_rankings','admin_delete_player_rankings','admin_delete_player_application_row'
   ]) as req(name)
   where not exists (
     select 1 from pg_proc p
@@ -118,6 +117,14 @@ begin
   );
   if v_missing is not null then
     raise exception 'Missing required current functions: %', v_missing;
+  end if;
+
+  if has_function_privilege('authenticated', 'public.admin_delete_player_application_row(uuid)', 'EXECUTE') then
+    raise exception 'authenticated must not execute admin_delete_player_application_row';
+  end if;
+
+  if not has_function_privilege('service_role', 'public.admin_delete_player_application_row(uuid)', 'EXECUTE') then
+    raise exception 'service_role must be able to execute admin_delete_player_application_row';
   end if;
 end;
 $$;
