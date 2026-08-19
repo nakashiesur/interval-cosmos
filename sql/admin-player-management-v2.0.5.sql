@@ -9,6 +9,49 @@
 
 begin;
 
+create or replace function public.admin_get_player_management(p_player_id uuid)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+declare
+  v_result jsonb;
+begin
+  if not public.is_current_admin() then
+    raise exception 'Admin account required';
+  end if;
+
+  select jsonb_build_object(
+    'player_id', p.id,
+    'account_type', p.account_type,
+    'student_number', p.student_number,
+    'player_name', p.player_name,
+    'course_code', p.course_code,
+    'avatar_id', p.avatar_id,
+    'ranking_visibility', p.ranking_visibility,
+    'is_suspended', p.is_suspended,
+    'is_admin', p.is_admin,
+    'created_at', p.created_at,
+    'linked_devices', (
+      select count(*)::integer from public.player_devices d where d.player_id = p.id
+    ),
+    'published_ranking_rows', (
+      select count(*)::integer from public.ranking_bests rb where rb.player_id = p.id and rb.public_score is not null
+    )
+  ) into v_result
+  from public.players p
+  where p.id = p_player_id;
+
+  if v_result is null then
+    raise exception 'Player not found';
+  end if;
+
+  return v_result;
+end;
+$$;
+
 create or replace function public.admin_update_player_profile(
   p_player_id uuid,
   p_player_name text,
@@ -212,12 +255,14 @@ begin
 end;
 $$;
 
+revoke all on function public.admin_get_player_management(uuid) from public, anon;
 revoke all on function public.admin_update_player_profile(uuid,text,text,text) from public, anon;
 revoke all on function public.admin_set_player_suspended(uuid,boolean) from public, anon;
 revoke all on function public.admin_unpublish_player_rankings(uuid) from public, anon;
 revoke all on function public.admin_delete_player_rankings(uuid) from public, anon;
 revoke all on function public.admin_delete_player_application_row(uuid) from public, anon;
 
+grant execute on function public.admin_get_player_management(uuid) to authenticated;
 grant execute on function public.admin_update_player_profile(uuid,text,text,text) to authenticated;
 grant execute on function public.admin_set_player_suspended(uuid,boolean) to authenticated;
 grant execute on function public.admin_unpublish_player_rankings(uuid) to authenticated;
