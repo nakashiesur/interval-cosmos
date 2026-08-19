@@ -3,6 +3,9 @@
   let lastLearningTarget = null;
   let captureFlashTimer = 0;
   let captureFlashButton = null;
+  let scrollOverlay = null;
+  let panelScrollTop = 0;
+  let overlayScrollTop = 0;
 
   const DEFAULT_HELP = '予備キーは任意、決定キーは必須です。変更したい枠をクリックしてください。';
   const LEARNING_HELP = '希望するキーを押してください。';
@@ -34,12 +37,39 @@
     }, 380);
   }
 
+  function bindAndRestoreScroll(overlay) {
+    if (scrollOverlay !== overlay) {
+      scrollOverlay = overlay;
+      panelScrollTop = 0;
+      overlayScrollTop = 0;
+      overlay.addEventListener('scroll', event => {
+        const target = event.target;
+        if (target === overlay) {
+          overlayScrollTop = overlay.scrollTop;
+          return;
+        }
+        if (target instanceof Element && target.classList.contains('v205-pc-config-panel')) {
+          panelScrollTop = target.scrollTop;
+        }
+      }, true);
+    }
+
+    const panel = overlay.querySelector('.v205-pc-config-panel');
+    if (overlay.scrollTop !== overlayScrollTop) overlay.scrollTop = overlayScrollTop;
+    if (panel && panel.scrollTop !== panelScrollTop) panel.scrollTop = panelScrollTop;
+  }
+
   function polishConfig() {
     const overlay = document.querySelector('.v205-pc-config-overlay');
     if (!overlay) {
       lastLearningTarget = null;
+      scrollOverlay = null;
+      panelScrollTop = 0;
+      overlayScrollTop = 0;
       return;
     }
+
+    bindAndRestoreScroll(overlay);
 
     const help = overlay.querySelector('.v205-pc-config-head > div > span');
     const note = overlay.querySelector('.v205-pc-config-note');
@@ -95,6 +125,8 @@
         message.classList.remove('learning');
       }
     }
+
+    bindAndRestoreScroll(overlay);
   }
 
   function schedule() {
