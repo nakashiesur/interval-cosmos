@@ -21,10 +21,10 @@ const tests=[
   ['complete deletion uses Edge Function rather than browser service key',js.includes("functions.invoke('admin-delete-player'")&&!js.includes('SERVICE_ROLE')],
   ['Edge Function requires service role only server-side',edge.includes("Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')")&&edge.includes('auth.admin.deleteUser')],
   ['Edge Function verifies caller is admin',edge.includes("rpc('is_current_admin')")&&edge.includes('adminAllowed !== true')],
-  ['database mutation RPCs enforce admin authorization',[
+  ['database browser mutation RPCs enforce admin authorization',[
     'admin_get_player_management','admin_update_player_profile','admin_set_player_suspended','admin_unpublish_player_rankings','admin_delete_player_rankings'
   ].every(name=>sql.includes(name))&&((sql.match(/if not public\.is_current_admin\(\) then/g)||[]).length>=5)],
-  ['application-row delete is not granted to authenticated',sql.includes('revoke execute on function public.admin_delete_player_application_row(uuid) from authenticated')&&sql.includes('grant execute on function public.admin_delete_player_application_row(uuid) to service_role')],
+  ['application-row delete requires service_role JWT',sql.includes("v_role <> 'service_role'")&&sql.includes('grant execute on function public.admin_delete_player_application_row(uuid) to service_role')&&sql.includes('from public, anon, authenticated')],
   ['management CSS contains explicit danger zone',css.includes('.danger-zone')&&css.includes('.v205-admin-confirm-overlay')],
 ];
 
