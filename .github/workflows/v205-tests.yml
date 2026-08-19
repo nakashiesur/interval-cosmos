@@ -58,6 +58,8 @@ jobs:
         run: node tests/progression-v205-test.js
       - name: Assignment regression
         run: node tests/assignments-v205-test.js
+      - name: Assignment gameplay layout regression
+        run: node tests/assignment-layout-v205-test.js
       - name: Admin dashboard regression
         run: node tests/admin-dashboard-v205-test.js
       - name: PC controls regression
