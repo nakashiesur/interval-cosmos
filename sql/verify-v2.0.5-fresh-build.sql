@@ -103,11 +103,12 @@ begin
   from unnest(array[
     'current_player_id','is_current_admin','create_player_account','get_my_player','update_my_profile',
     'submit_play_session','publish_play_session','get_public_rankings','get_public_profile_card',
-    'create_device_link_pin','claim_device_link_pin','confirm_device_link_request',
-    'set_my_recovery_code','recover_student_account',
-    'evaluate_my_progress','get_my_cosmos',
-    'create_assignment','get_my_assignments','submit_assignment_attempt','get_assignment_results',
-    'normalize_assignment_modes','get_admin_learning_overview','get_admin_student_detail',
+    'create_device_link_request','claim_device_link_request','confirm_device_link_request',
+    'get_device_link_source_status','get_device_link_target_status','cancel_device_link_request',
+    'set_my_recovery_code','get_my_recovery_status','recover_student_account',
+    'evaluate_my_progress','get_my_cosmos_progress','toggle_featured_achievement',
+    'create_assignment_v2','get_my_assignments','get_my_assignment_status','submit_assignment_session_v2','get_assignment_results',
+    'normalize_assignment_modes','get_admin_dashboard_overview','get_admin_student_dashboard',
     'create_staff_account','get_my_private_identity'
   ]) as req(name)
   where not exists (
