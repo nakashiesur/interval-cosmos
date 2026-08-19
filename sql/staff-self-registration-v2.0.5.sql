@@ -257,3 +257,6 @@ revoke all on function public.update_my_staff_identity(text, text) from public, 
 grant execute on function public.create_staff_account(text, text, text) to authenticated;
 grant execute on function public.get_my_private_identity() to authenticated;
 grant execute on function public.update_my_staff_identity(text, text) to authenticated;
+
+-- Make the new RPC signatures visible to PostgREST immediately.
+notify pgrst, 'reload schema';
