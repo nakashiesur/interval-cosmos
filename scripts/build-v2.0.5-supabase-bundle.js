@@ -16,6 +16,7 @@ const files = [
   'sql/admin-dashboard-v2.0.5.sql',
   'sql/staff-self-registration-v2.0.5.sql',
   'sql/admin-player-management-v2.0.5.sql',
+  'sql/security-hardening-v2.0.5.sql',
 ];
 
 for (const relative of files) {
