@@ -17,7 +17,7 @@ const tests=[
   ['suspension RPC is wired',js.includes("rpc('admin_set_player_suspended'")&&sql.includes('admin_set_player_suspended')],
   ['ranking unpublish and delete are separate actions',js.includes('admin_unpublish_player_rankings')&&js.includes('admin_delete_player_rankings')&&sql.includes('admin_unpublish_player_rankings')&&sql.includes('admin_delete_player_rankings')],
   ['destructive ranking deletion requires typed confirmation',js.includes("typed:'RANKING'")],
-  ['complete deletion requires typed DELETE confirmation',js.includes("typed:'DELETE'")&&js.includes("confirmation:'DELETE'"))],
+  ['complete deletion requires typed DELETE confirmation',js.includes("typed:'DELETE'")&&js.includes("confirmation:'DELETE'")],
   ['complete deletion uses Edge Function rather than browser service key',js.includes("functions.invoke('admin-delete-player'")&&!js.includes('SERVICE_ROLE')],
   ['Edge Function requires service role only server-side',edge.includes("Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')")&&edge.includes('auth.admin.deleteUser')],
   ['Edge Function verifies caller is admin',edge.includes("rpc('is_current_admin')")&&edge.includes('adminAllowed !== true')],
