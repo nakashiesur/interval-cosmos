@@ -8,12 +8,13 @@ const index=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const migrationOrder=fs.readFileSync(path.join(__dirname,'..','sql','V2.0.5_MIGRATION_ORDER.md'),'utf8');
 const migrationRunner=fs.readFileSync(path.join(__dirname,'..','scripts','apply-v2.0.5-db.sh'),'utf8');
 const avatarMigration=fs.readFileSync(path.join(__dirname,'..','sql','avatar-catalog-v2.0.5.sql'),'utf8');
+const adminManagement=fs.readFileSync(path.join(__dirname,'..','sql','admin-player-management-v2.0.5.sql'),'utf8');
 
 const currentLayers=[
   'supabase-singleton-v205.js','phase0-wallclock-v205.js','phase9-staff-registration-v205.js',
   'phase3-ranking-hotfix-v205.js','phase4-analysis-hotfix-v205.js','phase5-unlock-copy-hotfix-v205.js',
   'phase6-multimode-v205.js','phase7-admin-dashboard-v205.js','phase7-admin-home-dock-v205.js',
-  'phase8-pc-controls-v205.js',
+  'phase8-admin-player-management-v205.js','phase8-pc-controls-v205.js',
 ];
 
 const dbChain=[
@@ -27,6 +28,7 @@ const dbChain=[
   'sql/assignments-multimode-v2.0.5.sql',
   'sql/admin-dashboard-v2.0.5.sql',
   'sql/staff-self-registration-v2.0.5.sql',
+  'sql/admin-player-management-v2.0.5.sql',
 ];
 
 const baseParts=Array.from({length:8},(_,i)=>
@@ -47,6 +49,7 @@ const tests=[
   ['database migration runner stops on SQL errors',migrationRunner.includes('ON_ERROR_STOP=1')&&migrationRunner.includes('set -euo pipefail')],
   ['canonical avatar migration includes every current avatar',currentAvatars.every(x=>avatarMigration.includes(`'${x}'`))],
   ['canonical avatar migration retires Phase 1 default and defaults new rows to nova',avatarMigration.includes("where id = 'default'")&&avatarMigration.includes("set default 'nova'")),
+  ['admin final delete is service-role only',adminManagement.includes("v_role <> 'service_role'")&&adminManagement.includes('grant execute on function public.admin_delete_player_application_row(uuid) to service_role')&&adminManagement.includes('from public, anon, authenticated')],
   ['service worker precaches current extension layers',currentLayers.every(x=>sw.includes(x))],
   ['current extension layers are loaded',currentLayers.every(x=>index.includes(x))],
 ];
