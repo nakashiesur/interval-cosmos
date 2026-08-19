@@ -1,14 +1,41 @@
 (() => {
   let queued = false;
+  let lastLearningTarget = null;
+  let captureFlashTimer = 0;
+
+  const DEFAULT_HELP = '予備キーは任意、決定キーは必須です。変更したい枠をクリックしてください。';
+  const LEARNING_HELP = '希望するキーを押してください。';
+
+  function setHelp(help, learning) {
+    if (!help) return;
+    help.classList.toggle('learning', learning);
+    if (learning) {
+      const html = `${LEARNING_HELP}<span class="v205-pc-config-cancel-hint"><kbd>ESC</kbd>でキャンセル</span>`;
+      if (help.innerHTML !== html) help.innerHTML = html;
+      return;
+    }
+    if (help.textContent !== DEFAULT_HELP) help.textContent = DEFAULT_HELP;
+  }
+
+  function flashCaptured(overlay, target) {
+    if (!overlay || !target) return;
+    const button = overlay.querySelector(`[data-pc-record="${target.slot}"][data-pc-id="${target.id}"]`);
+    if (!button) return;
+    clearTimeout(captureFlashTimer);
+    button.classList.remove('captured');
+    void button.offsetWidth;
+    button.classList.add('captured');
+    captureFlashTimer = setTimeout(() => button.classList.remove('captured'), 380);
+  }
 
   function polishConfig() {
     const overlay = document.querySelector('.v205-pc-config-overlay');
-    if (!overlay) return;
+    if (!overlay) {
+      lastLearningTarget = null;
+      return;
+    }
 
-    const help = overlay.querySelector('.v205-pc-config-head span');
-    const helpText = '予備キーは任意、決定キーは必須です。変更したい枠をクリックして、希望するキーを押してください。';
-    if (help && help.textContent !== helpText) help.textContent = helpText;
-
+    const help = overlay.querySelector('.v205-pc-config-head > div > span');
     const note = overlay.querySelector('.v205-pc-config-note');
     if (note) {
       const html = '初期値：長・完全は度数の数字、短音程は <b>M → 度数</b>、三全音は <b>T</b>。予備キーを消すには、予備キーの枠を選択中に Delete / Backspace。';
@@ -24,23 +51,34 @@
     }
 
     const recording = overlay.querySelector('.v205-pc-keybox.recording');
+    const message = overlay.querySelector('.v205-pc-config-message');
+    const rawMessage = message?.textContent.trim() || '';
+    const cancelled = rawMessage === 'RECをキャンセルしました。' || rawMessage === 'キー入力をキャンセルしました。';
+    const cleared = rawMessage === '予備キーを解除しました。';
+
     if (recording) {
-      if (recording.textContent.trim() === 'REC') recording.textContent = '…';
+      lastLearningTarget = {
+        id: recording.dataset.pcId,
+        slot: recording.dataset.pcRecord,
+      };
+      recording.textContent = '入力待ち…';
       recording.setAttribute('aria-label', 'キー入力待ち');
       recording.title = '希望するキーを押してください';
+      setHelp(help, true);
+    } else {
+      setHelp(help, false);
+      if (lastLearningTarget && !cancelled && !cleared && !message?.classList.contains('error')) {
+        flashCaptured(overlay, lastLearningTarget);
+      }
+      lastLearningTarget = null;
     }
 
-    const message = overlay.querySelector('.v205-pc-config-message');
     if (message) {
-      const raw = message.textContent.trim();
-      if (raw === 'RECをキャンセルしました。') {
-        message.textContent = 'キー入力をキャンセルしました。';
-      }
+      if (cancelled) message.textContent = 'キー入力をキャンセルしました。';
       if (recording) {
         message.classList.add('learning');
-        const current = message.textContent.trim();
-        if (/REC中です|希望のキーを1つ押してください/.test(current)) {
-          message.textContent = '希望するキーを押してください';
+        if (/REC中です|希望のキーを1つ押してください/.test(rawMessage)) {
+          message.textContent = '';
         }
         if (/予約されています|別のキーを選んでください|同じキー操作|設定してください/.test(message.textContent)) {
           message.classList.add('error');
