@@ -1,6 +1,6 @@
-const CACHE = 'interval-cosmos-v2-0-5-alpha8-1';
+const CACHE = 'interval-cosmos-v2-0-5-alpha8-2';
 const ASSETS = [
-  './', './index.html', './styles.css', './account-v205.css', './phase2-recovery-v205.css', './phase3-v205.css', './phase4-v205.css', './phase4-hotfix-v205.css', './phase5-v205.css', './phase6-assignments-v205.css', './phase6-multimode-v205.css', './phase7-admin-dashboard-v205.css', './phase8-pc-controls-v205.css',
+  './', './index.html', './styles.css', './account-v205.css', './phase2-recovery-v205.css', './phase3-v205.css', './phase4-v205.css', './phase4-hotfix-v205.css', './phase5-v205.css', './phase6-assignments-v205.css', './phase6-multimode-v205.css', './phase6-game-layout-v205.css', './phase7-admin-dashboard-v205.css', './phase8-pc-controls-v205.css',
   './account-gate.js', './supabase-singleton-v205.js', './phase9-staff-registration-v205.js', './phase2-recovery-v205-fixed.js', './runtime-v205.js', './phase3-ranking-hotfix-v205.js', './phase3-v205.js', './phase4-hotfix-v205.js', './phase4-v205.js', './phase4-analysis-hotfix-v205.js', './phase5-progression-v205.js', './phase5-unlock-copy-hotfix-v205.js', './phase6-admin-policy-v205.js', './phase6-multimode-v205.js', './phase6-assignments-v205.js', './phase7-admin-dashboard-v205.js', './phase7-admin-home-dock-v205.js', './phase8-pc-controls-v205.js', './phase0-wallclock-v205.js', './app.js', './cloud.js',
   './nakashima-logo.png', './icon.svg', './manifest.webmanifest'
 ];
