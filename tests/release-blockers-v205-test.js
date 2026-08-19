@@ -1,5 +1,6 @@
 const fs=require('fs');
 const path=require('path');
+const crypto=require('crypto');
 
 const root=fs.readFileSync(path.join(__dirname,'..','supabase_setup.sql'),'utf8').trim();
 const sw=fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8');
@@ -28,10 +29,19 @@ const dbChain=[
   'sql/staff-self-registration-v2.0.5.sql',
 ];
 
+const baseParts=Array.from({length:8},(_,i)=>
+  path.join(__dirname,'..','sql','base-v2.0.5',`part-${String(i+1).padStart(2,'0')}.sql`)
+);
+const restoredBase=baseParts.map(file=>fs.readFileSync(file)).reduce((all,part)=>Buffer.concat([all,part]),Buffer.alloc(0));
+const restoredBaseHash=crypto.createHash('sha256').update(restoredBase).digest('hex');
+const CANONICAL_PHASE1_SHA256='1949b4dc9aed25c72e93ebce746af363ef51fb771a64ae73817a85be385bba23';
+
 const currentAvatars=['nova','orbit','pulse','prism','comet','nebula','vector','echo','quasar','lumen','wave','aster','teacher'];
 
 const tests=[
   ['root supabase_setup.sql is not placeholder',root.length>1000&&!root.includes('__TOO_LARGE_PLACEHOLDER__')],
+  ['root setup includes every restored Phase 1 part',baseParts.every((_,i)=>root.includes(`part-${String(i+1).padStart(2,'0')}.sql`))],
+  ['restored Phase 1 SQL matches canonical source hash',restoredBaseHash===CANONICAL_PHASE1_SHA256],
   ['database migration order documents the complete chain',dbChain.every(x=>migrationOrder.includes(x))],
   ['database migration runner applies the complete chain',dbChain.every(x=>migrationRunner.includes(x))],
   ['database migration runner stops on SQL errors',migrationRunner.includes('ON_ERROR_STOP=1')&&migrationRunner.includes('set -euo pipefail')],
