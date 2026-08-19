@@ -74,7 +74,10 @@
     const help = overlay.querySelector('.v205-pc-config-head > div > span');
     const note = overlay.querySelector('.v205-pc-config-note');
     if (note) {
-      const html = '初期値：長・完全は度数の数字、短音程は <b>M → 度数</b>、三全音は <b>T</b>。予備キーを消すには、予備キーの枠を選択中に Delete / Backspace。';
+      const chord = overlay.querySelector('[data-pc-input-mode="chord"].selected');
+      const html = chord
+        ? '同時押し：予備キーを押しながら決定キーを押します。例：短3度は <b>M + 3</b>。予備キーを消すには、予備キーの枠を選択中に Delete / Backspace。'
+        : '2段階入力：予備キーを押してから決定キーを押します。例：短3度は <b>M → 3</b>。予備キーを消すには、予備キーの枠を選択中に Delete / Backspace。';
       if (note.innerHTML !== html) note.innerHTML = html;
     }
 
@@ -115,7 +118,7 @@
       }
       if (recording) {
         message.classList.add('learning');
-        if (/REC中です|希望のキーを1つ押してください/.test(rawMessage)) {
+        if (/REC中です|希望のキーを1つ押してください|希望するキーを押してください/.test(rawMessage)) {
           message.textContent = '';
         }
         if (/予約されています|別のキーを選んでください|同じキー操作|設定してください/.test(message.textContent)) {
@@ -140,7 +143,7 @@
 
   new MutationObserver(schedule).observe(document.documentElement, { subtree: true, childList: true });
   document.addEventListener('click', event => {
-    if (event.target.closest?.('[data-pc-record]')) schedule();
+    if (event.target.closest?.('[data-pc-record], [data-pc-input-mode]')) schedule();
   }, true);
   window.addEventListener('DOMContentLoaded', schedule, { once: true });
   schedule();
