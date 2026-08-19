@@ -22,6 +22,7 @@ jobs:
         run: |
           node --check supabase-singleton-v205.js
           node --check phase0-wallclock-v205.js
+          node --check phase9-staff-registration-v205.js
           node --check phase2-recovery-v205-fixed.js
           node --check runtime-v205.js
           node --check phase3-ranking-hotfix-v205.js
@@ -45,6 +46,8 @@ jobs:
         run: node tests/wallclock-v205-test.js
       - name: Account regression
         run: node tests/account-v205-test.js
+      - name: Staff registration regression
+        run: node tests/staff-registration-v205-test.js
       - name: Recovery regression
         run: node tests/recovery-v205-test.js
       - name: Ranking regression
