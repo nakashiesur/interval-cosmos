@@ -6,6 +6,7 @@ const sw=fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8');
 const index=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const migrationOrder=fs.readFileSync(path.join(__dirname,'..','sql','V2.0.5_MIGRATION_ORDER.md'),'utf8');
 const migrationRunner=fs.readFileSync(path.join(__dirname,'..','scripts','apply-v2.0.5-db.sh'),'utf8');
+const avatarMigration=fs.readFileSync(path.join(__dirname,'..','sql','avatar-catalog-v2.0.5.sql'),'utf8');
 
 const currentLayers=[
   'supabase-singleton-v205.js','phase0-wallclock-v205.js','phase9-staff-registration-v205.js',
@@ -16,6 +17,7 @@ const currentLayers=[
 
 const dbChain=[
   'supabase_setup.sql',
+  'sql/avatar-catalog-v2.0.5.sql',
   'sql/device-link-v2.0.5.sql',
   'sql/account-recovery-v2.0.5.sql',
   'sql/progression-v2.0.5.sql',
@@ -26,11 +28,15 @@ const dbChain=[
   'sql/staff-self-registration-v2.0.5.sql',
 ];
 
+const currentAvatars=['nova','orbit','pulse','prism','comet','nebula','vector','echo','quasar','lumen','wave','aster','teacher'];
+
 const tests=[
   ['root supabase_setup.sql is not placeholder',root.length>1000&&!root.includes('__TOO_LARGE_PLACEHOLDER__')],
   ['database migration order documents the complete chain',dbChain.every(x=>migrationOrder.includes(x))],
   ['database migration runner applies the complete chain',dbChain.every(x=>migrationRunner.includes(x))],
   ['database migration runner stops on SQL errors',migrationRunner.includes('ON_ERROR_STOP=1')&&migrationRunner.includes('set -euo pipefail')],
+  ['canonical avatar migration includes every current avatar',currentAvatars.every(x=>avatarMigration.includes(`'${x}'`))],
+  ['canonical avatar migration retires Phase 1 default and defaults new rows to nova',avatarMigration.includes("where id = 'default'")&&avatarMigration.includes("set default 'nova'")),
   ['service worker precaches current extension layers',currentLayers.every(x=>sw.includes(x))],
   ['current extension layers are loaded',currentLayers.every(x=>index.includes(x))],
 ];
