@@ -37,8 +37,10 @@ jobs:
           node --check phase6-assignments-v205.js
           node --check phase7-admin-dashboard-v205.js
           node --check phase7-admin-home-dock-v205.js
+          node --check phase8-admin-player-management-v205.js
           node --check phase8-pc-controls-v205.js
           node --check scripts/build-v2.0.5-supabase-bundle.js
+          node --check tests/admin-player-management-v205-test.js
       - name: Existing smoke tests
         run: node tests/smoke-test.js
       - name: Playback regression
@@ -63,6 +65,8 @@ jobs:
         run: node tests/assignment-layout-v205-test.js
       - name: Admin dashboard regression
         run: node tests/admin-dashboard-v205-test.js
+      - name: Admin player management regression
+        run: node tests/admin-player-management-v205-test.js
       - name: PC controls regression
         run: node tests/pc-controls-v205-test.js
       - name: Database build regression
