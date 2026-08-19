@@ -2,6 +2,7 @@
   let queued = false;
   let lastLearningTarget = null;
   let captureFlashTimer = 0;
+  let captureFlashButton = null;
 
   const DEFAULT_HELP = '予備キーは任意、決定キーは必須です。変更したい枠をクリックしてください。';
   const LEARNING_HELP = '希望するキーを押してください。';
@@ -22,10 +23,15 @@
     const button = overlay.querySelector(`[data-pc-record="${target.slot}"][data-pc-id="${target.id}"]`);
     if (!button) return;
     clearTimeout(captureFlashTimer);
+    captureFlashButton?.classList.remove('captured');
+    captureFlashButton = button;
     button.classList.remove('captured');
     void button.offsetWidth;
     button.classList.add('captured');
-    captureFlashTimer = setTimeout(() => button.classList.remove('captured'), 380);
+    captureFlashTimer = setTimeout(() => {
+      button.classList.remove('captured');
+      if (captureFlashButton === button) captureFlashButton = null;
+    }, 380);
   }
 
   function polishConfig() {
@@ -61,7 +67,7 @@
         id: recording.dataset.pcId,
         slot: recording.dataset.pcRecord,
       };
-      recording.textContent = '入力待ち…';
+      if (recording.textContent.trim() !== '入力待ち…') recording.textContent = '入力待ち…';
       recording.setAttribute('aria-label', 'キー入力待ち');
       recording.title = '希望するキーを押してください';
       setHelp(help, true);
@@ -74,7 +80,9 @@
     }
 
     if (message) {
-      if (cancelled) message.textContent = 'キー入力をキャンセルしました。';
+      if (cancelled && message.textContent !== 'キー入力をキャンセルしました。') {
+        message.textContent = 'キー入力をキャンセルしました。';
+      }
       if (recording) {
         message.classList.add('learning');
         if (/REC中です|希望のキーを1つ押してください/.test(rawMessage)) {
