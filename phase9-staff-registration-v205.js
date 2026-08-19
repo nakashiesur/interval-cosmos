@@ -29,8 +29,8 @@
   }
 
   function esc(value) {
-    return String(value ?? '').replace(/[&<>'"]/g, c => ({
-      '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;'
+    return String(value ?? '').replace(/[&<>'\"]/g, c => ({
+      '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '\"':'&quot;'
     }[c]));
   }
 
@@ -109,7 +109,7 @@
             <span class="ic-avatar-art avatar-teacher" aria-hidden="true"><i></i><b></b></span>
             <div><strong>TEACHER IDENTITY</strong><p>教職員アイコンは固定です。学籍番号・教職員番号は不要です。</p></div>
           </div>
-          <label><span>氏名 <em>PRIVATE</em></span><input id="v205StaffRealName" type="text" autocomplete="name" maxlength="40" placeholder="例：中島 慧" required></label>
+          <label><span>氏名 <em>PRIVATE</em></span><input id="v205StaffRealName" type="text" autocomplete="name" maxlength="40" placeholder="例：教員 太郎" required></label>
           <label><span>プレイヤー名 <em>PUBLIC</em></span><input id="v205StaffPlayerName" type="text" autocomplete="nickname" maxlength="16" placeholder="2〜16文字" required></label>
           <label><span>所属コース <em>PUBLIC BADGE</em></span><select id="v205StaffCourse" required><option value="">選択してください</option>${courseOptions()}</select></label>
           <p class="ic-account-footnote">氏名はランキング・公開プロフィールには表示されません。所属コースは学生と同様に公開バッジとして表示されます。自己登録した教職員アカウントに管理者権限は付与されません。</p>
