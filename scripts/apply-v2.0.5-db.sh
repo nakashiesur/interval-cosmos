@@ -26,6 +26,7 @@ FILES=(
   "sql/admin-dashboard-v2.0.5.sql"
   "sql/staff-self-registration-v2.0.5.sql"
   "sql/admin-player-management-v2.0.5.sql"
+  "sql/security-hardening-v2.0.5.sql"
 )
 
 if grep -q '__TOO_LARGE_PLACEHOLDER__' "$ROOT_DIR/supabase_setup.sql"; then
