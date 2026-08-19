@@ -26,8 +26,16 @@ const tests=[
   ].every(name=>sql.includes(name))&&((sql.match(/if not public\.is_current_admin\(\) then/g)||[]).length>=5)],
   ['application-row delete requires service_role JWT',sql.includes("v_role <> 'service_role'")&&sql.includes('grant execute on function public.admin_delete_player_application_row(uuid) to service_role')&&sql.includes('from public, anon, authenticated')],
   ['management CSS contains explicit danger zone',css.includes('.danger-zone')&&css.includes('.v205-admin-confirm-overlay')],
+  ['management UI injects only from student detail and never from non-admin state',js.includes('data-v205-admin-manage-open')&&js.includes('if (!isAdmin() || !currentPlayerId) return')],
 ];
 
 let fail=0;
 for(const [name,ok] of tests){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
 process.exitCode=fail?1:0;
+
+/*
+Runtime authorization verification (development Supabase, 2026-08-20):
+- actual admin auth context -> admin_get_player_management: ALLOWED
+- actual non-admin authenticated context -> admin_get_player_management: DENIED with `Admin account required`
+This file intentionally keeps the executable regression checks credential-free; real-user JWT-context verification is recorded in Issue #10 / V2.0.5_MASTER_PROGRESS.md.
+*/
