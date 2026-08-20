@@ -226,16 +226,16 @@ $$;
 
 -- This function is callable only by the service_role JWT. The Edge Function
 -- verifies the human caller with is_current_admin() before using service_role.
+-- Use auth.role() rather than the legacy request.jwt.claim.role GUC: current
+-- PostgREST service-role requests do not guarantee that legacy GUC is populated.
 create or replace function public.admin_delete_player_application_row(p_player_id uuid)
 returns void
 language plpgsql
 security definer
 set search_path = ''
 as $$
-declare
-  v_role text := coalesce(current_setting('request.jwt.claim.role', true), '');
 begin
-  if v_role <> 'service_role' then
+  if coalesce(auth.role(), '') <> 'service_role' then
     raise exception 'Service role required';
   end if;
 
