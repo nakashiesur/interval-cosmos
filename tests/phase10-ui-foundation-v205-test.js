@@ -4,12 +4,14 @@ const root=path.join(__dirname,'..');
 const js=fs.readFileSync(path.join(root,'phase10-ui-foundation-v205.js'),'utf8');
 const css=fs.readFileSync(path.join(root,'phase10-ui-foundation-v205.css'),'utf8');
 const headerCss=fs.readFileSync(path.join(root,'phase10-header-polish-v205.css'),'utf8');
+const practiceCss=fs.readFileSync(path.join(root,'phase10-practice-polish-v205.css'),'utf8');
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
 
 const tests=[
   ['Phase 10 foundation assets are loaded',index.includes('phase10-ui-foundation-v205.js?v=alpha10.6')&&index.includes('phase10-ui-foundation-v205.css')],
-  ['Phase 10 header polish is loaded and cached',index.includes('phase10-header-polish-v205.css?v=alpha10.9')&&sw.includes('phase10-header-polish-v205.css')&&sw.includes('alpha10-9')],
+  ['Phase 10 header polish is loaded and cached',index.includes('phase10-header-polish-v205.css?v=alpha10.10')&&sw.includes('phase10-header-polish-v205.css')&&sw.includes('alpha10-10')],
+  ['Phase 10 practice polish is loaded and cached',index.includes('phase10-practice-polish-v205.css?v=alpha10.1')&&sw.includes('phase10-practice-polish-v205.css')],
   ['service worker caches Phase 10 foundation',sw.includes('phase10-ui-foundation-v205.js')&&sw.includes('phase10-ui-foundation-v205.css')],
   ['home puts MY COSMOS beside existing settings gear',js.includes('v205-home-cosmos-pill')&&js.includes('data-v205-cosmos-open')&&js.includes("querySelector('[data-action=\"settings\"]')")],
   ['learning history is exposed beside MY COSMOS on desktop and mobile',js.includes('configureHistoryEntry')&&js.includes('v205-home-history-pill')&&js.includes('data-v205-history-open')&&css.includes('.v205-home-history-pill')&&css.includes('.v205-phase10-history-source-hidden{display:none!important}')],
@@ -33,6 +35,9 @@ const tests=[
   ['settings category change animates content height from a fixed top anchor',js.includes('animateSettingsCategory')&&js.includes('fromHeight')&&js.includes('toHeight')&&css.includes('align-items:flex-start!important')],
   ['desktop and mobile reuse compact practice slot as PRACTICE MODE',js.includes('configurePracticeEntry')&&js.includes("shortcut.dataset.action = 'practice'")&&js.includes('🔰')&&js.includes('PRACTICE MODE')&&js.includes('v205-phase10-practice-source-hidden')&&css.includes('.v205-phase10-practice-source-hidden{display:none!important}')&&css.includes('v205-practice-entry')],
   ['mobile mode select uses compact two-column STANDARD cards',css.includes('@media(max-width:700px)')&&css.includes('grid-template-columns:repeat(2,minmax(0,1fr))')&&css.includes('.home-screen .mode-grid-home .mode-desc{display:none}')],
+  ['practice menu is three-up on desktop and compact single-column on mobile',practiceCss.includes('grid-template-columns:repeat(3,minmax(0,1fr))')&&practiceCss.includes('@media(max-width:700px)')&&practiceCss.includes('grid-template-columns:1fr')],
+  ['practice mobile back control is icon-only to protect title width',practiceCss.includes("content:'←'")&&practiceCss.includes('font-size:0')&&practiceCss.includes('grid-template-columns:44px minmax(0,1fr) 44px')],
+  ['focus select uses four columns on desktop and two on mobile',practiceCss.includes('grid-template-columns:repeat(4,minmax(0,1fr))')&&practiceCss.includes('grid-template-columns:repeat(2,minmax(0,1fr))')],
   ['unlock cut-in contrast baseline is strengthened',css.includes('.v205-unlock-burst section')&&css.includes('text-shadow')],
 ];
 let fail=0;
