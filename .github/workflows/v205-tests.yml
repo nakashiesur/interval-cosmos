@@ -40,8 +40,10 @@ jobs:
           node --check phase7-admin-home-dock-v205.js
           node --check phase8-admin-player-management-v205.js
           node --check phase8-pc-controls-v205.js
+          node --check phase10-ui-foundation-v205.js
           node --check scripts/build-v2.0.5-supabase-bundle.js
           node --check tests/admin-player-management-v205-test.js
+          node --check tests/phase10-ui-foundation-v205-test.js
       - name: Existing smoke tests
         run: node tests/smoke-test.js
       - name: Playback regression
@@ -70,6 +72,8 @@ jobs:
         run: node tests/admin-player-management-v205-test.js
       - name: PC controls regression
         run: node tests/pc-controls-v205-test.js
+      - name: Phase 10 UI foundation regression
+        run: node tests/phase10-ui-foundation-v205-test.js
       - name: Database build regression
         run: node tests/db-build-v205-test.js
       - name: Release blocker gate
