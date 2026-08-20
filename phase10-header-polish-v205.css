@@ -1,0 +1,152 @@
+/* INTERVAL COSMOS v2.0.5 — Phase 10 header polish
+   Desktop keeps readable MY COSMOS / HISTORY labels without forcing SELECT MODE to wrap.
+   Smartphone uses three compact icon-only header actions. */
+
+@media (min-width:701px){
+  .home-screen .topbar-home{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:22px;
+  }
+  .home-screen .topbar-title{
+    flex:1 1 auto;
+    min-width:250px;
+  }
+  .home-screen .topbar-title h1{
+    margin:0;
+    font-size:clamp(32px,3.5vw,46px);
+    line-height:1.02;
+    letter-spacing:.025em;
+    white-space:nowrap;
+  }
+  .home-screen .topbar-title p{
+    margin-top:9px;
+  }
+  .home-screen .topbar-home .top-actions{
+    flex:0 0 auto;
+    align-items:center;
+    gap:8px;
+  }
+  .v205-home-cosmos-pill{
+    min-width:168px;
+    width:168px;
+    flex:0 0 168px;
+    min-height:58px;
+    padding:0 15px;
+    grid-template-columns:20px minmax(0,1fr);
+    grid-template-rows:auto auto;
+    grid-template-areas:"icon title" "icon subtitle";
+    column-gap:10px;
+    row-gap:1px;
+    justify-items:start;
+  }
+  .v205-home-cosmos-pill>span{
+    grid-area:icon;
+    grid-row:auto;
+    justify-self:center;
+    align-self:center;
+    line-height:1;
+  }
+  .v205-home-cosmos-pill strong{
+    grid-area:title;
+    align-self:end;
+    font-size:12px;
+    line-height:1.05;
+    white-space:nowrap;
+  }
+  .v205-home-cosmos-pill small{
+    grid-area:subtitle;
+    align-self:start;
+    font-size:7px;
+    line-height:1.05;
+    white-space:nowrap;
+  }
+  .v205-home-history-pill{
+    min-width:154px;
+    width:154px;
+    flex:0 0 154px;
+    padding:0 15px;
+  }
+}
+
+@media (max-width:700px){
+  .home-screen .topbar-home{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:8px;
+  }
+  .home-screen .topbar-title{
+    min-width:0;
+  }
+  .home-screen .topbar-title h1{
+    margin:0;
+    font-size:clamp(19px,5.6vw,25px);
+    line-height:1;
+    letter-spacing:.02em;
+    white-space:nowrap;
+  }
+  .home-screen .topbar-home .top-actions{
+    display:flex;
+    flex:0 0 auto;
+    align-items:center;
+    gap:5px;
+  }
+  .v205-home-cosmos-pill,
+  .v205-home-history-pill{
+    min-width:44px!important;
+    width:44px!important;
+    flex:0 0 44px!important;
+    min-height:44px!important;
+    height:44px;
+    padding:0!important;
+    border-radius:13px;
+    display:flex!important;
+    align-items:center;
+    justify-content:center;
+  }
+  .v205-home-cosmos-pill>span,
+  .v205-home-history-pill>span{
+    grid-area:auto;
+    grid-row:auto;
+    margin:0;
+    font-size:14px;
+    line-height:1;
+  }
+  .v205-home-cosmos-pill strong,
+  .v205-home-cosmos-pill small,
+  .v205-home-history-pill strong,
+  .v205-home-history-pill small{
+    display:none!important;
+  }
+  .home-screen .settings-gear-btn{
+    min-width:44px!important;
+    width:44px!important;
+    height:44px!important;
+    min-height:44px!important;
+    border-radius:13px!important;
+  }
+}
+
+@media (max-width:430px){
+  .home-screen .topbar-home{
+    gap:6px;
+  }
+  .home-screen .topbar-home .top-actions{
+    gap:4px;
+  }
+  .home-screen .topbar-title h1{
+    font-size:18px;
+  }
+  .v205-home-cosmos-pill,
+  .v205-home-history-pill,
+  .home-screen .settings-gear-btn{
+    min-width:40px!important;
+    width:40px!important;
+    flex-basis:40px!important;
+    min-height:40px!important;
+    height:40px!important;
+    border-radius:12px!important;
+  }
+}
