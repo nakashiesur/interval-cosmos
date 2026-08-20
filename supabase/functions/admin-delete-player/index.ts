@@ -63,10 +63,21 @@ Deno.serve(async (req) => {
     if (devicesError) throw devicesError;
 
     const authIds = [...new Set((devices || []).map((row) => row.auth_user_id).filter(Boolean))];
+    let deletedAuthUsers = 0;
 
+    // Auth deletion can succeed before a later application-row deletion fails.
+    // Treat an already-missing Auth user as success so the whole operation is
+    // safely retryable after a partial failure.
     for (const authUserId of authIds) {
       const { error } = await serviceClient.auth.admin.deleteUser(authUserId);
-      if (error) throw error;
+      if (error) {
+        const status = Number((error as { status?: number })?.status || 0);
+        const message = String(error?.message || '');
+        const alreadyMissing = status === 404 || /user(?:\s+was)?\s+not\s+found|not\s+found/i.test(message);
+        if (!alreadyMissing) throw error;
+      } else {
+        deletedAuthUsers += 1;
+      }
     }
 
     // Run the reviewed cascade deletion through the database function rather
@@ -76,7 +87,7 @@ Deno.serve(async (req) => {
     });
     if (deleteError) throw deleteError;
 
-    return json({ ok: true, player_id: playerId, deleted_auth_users: authIds.length }, 200);
+    return json({ ok: true, player_id: playerId, deleted_auth_users: deletedAuthUsers }, 200);
   } catch (error) {
     console.error('[admin-delete-player]', error);
     return json({ error: error instanceof Error ? error.message : 'Deletion failed' }, 500);
