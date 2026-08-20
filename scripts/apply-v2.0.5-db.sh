@@ -19,6 +19,7 @@ FILES=(
   "sql/avatar-catalog-v2.0.5.sql"
   "sql/device-link-v2.0.5.sql"
   "sql/account-recovery-v2.0.5.sql"
+  "sql/account-avatar-default-v2.0.5.sql"
   "sql/progression-v2.0.5.sql"
   "sql/assignments-v2.0.5.sql"
   "sql/assignments-admin-only-v2.0.5.sql"
