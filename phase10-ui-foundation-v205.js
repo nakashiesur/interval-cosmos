@@ -2,6 +2,7 @@
   let queued = false;
   let arranging = false;
   let settingsCategory = 'game';
+  let settingsAnimation = null;
 
   const CATEGORY_ORDER = ['game', 'controls', 'ranking', 'account'];
   const CATEGORY_LABELS = {
@@ -15,45 +16,49 @@
     const text = String(node?.textContent || '').toLowerCase();
     const cls = String(node?.className || '').toLowerCase();
     if (cls.includes('v205-pc-settings-entry') || /pc key|key config|shortcut|keyboard|回答キー|操作/.test(text)) return 'controls';
+    if (cls.includes('v205-ranking-privacy') || /ranking publication|privacy|公開設定|公開方針/.test(text)) return 'ranking';
+    if (cls.includes('cloud-setting') || cls.includes('v205-recovery-setting') || /player|profile|account|recovery|復旧|端末|device|学籍|教職員|staff|course|コース|avatar|アバター|名前/.test(text)) return 'account';
     if (/ranking|privacy|公開|殿堂|monthly|hall/.test(text)) return 'ranking';
-    if (cls.includes('v205-recovery-setting') || /player|profile|account|recovery|復旧|端末|device|学籍|教職員|staff|course|コース|avatar|アバター|名前/.test(text)) return 'account';
     return 'game';
   }
 
-  function ensureHomeDeck() {
+  function ensureHomeTools() {
     const panel = document.querySelector('.home-panel');
     const topbar = panel?.querySelector('.topbar-home');
-    if (!panel || !topbar) return;
+    const topActions = topbar?.querySelector('.top-actions');
+    if (!panel || !topbar || !topActions) return;
 
-    let deck = panel.querySelector('.v205-home-command-deck');
-    if (!deck) {
-      deck = document.createElement('section');
-      deck.className = 'v205-home-command-deck';
-      deck.setAttribute('aria-label', 'プレイヤーメニュー');
-      deck.innerHTML = `
-        <button type="button" class="v205-home-command cosmos" data-v205-cosmos-open>
-          <span class="v205-home-command-kicker">PROFILE & GROWTH</span>
-          <strong>MY COSMOS</strong>
-          <small>実績・称号・フレーム</small>
-        </button>
-        <button type="button" class="v205-home-command ranking" data-action="records">
-          <span class="v205-home-command-kicker">ONLINE</span>
-          <strong>RANKING</strong>
-          <small>月間・殿堂・公開プロフィール</small>
-        </button>
-        <button type="button" class="v205-home-command settings" data-action="settings">
-          <span class="v205-home-command-kicker">SYSTEM</span>
-          <strong>SETTINGS</strong>
-          <small>音・操作・公開・端末</small>
-        </button>`;
-      topbar.insertAdjacentElement('afterend', deck);
+    panel.querySelector('.v205-home-command-deck')?.remove();
+
+    let cosmos = topActions.querySelector('.v205-home-cosmos-pill');
+    if (!cosmos) {
+      cosmos = document.createElement('button');
+      cosmos.type = 'button';
+      cosmos.className = 'v205-home-cosmos-pill';
+      cosmos.dataset.v205CosmosOpen = '1';
+      cosmos.innerHTML = '<span aria-hidden="true">✦</span><strong>MY COSMOS</strong><small>PROFILE</small>';
+      const gear = topActions.querySelector('[data-action="settings"]');
+      gear ? topActions.insertBefore(cosmos, gear) : topActions.appendChild(cosmos);
+    }
+
+    const ear = panel.querySelector('.earlink-elite');
+    if (ear) {
+      let ranking = panel.querySelector('.v205-home-ranking-bar');
+      if (!ranking) {
+        ranking = document.createElement('button');
+        ranking.type = 'button';
+        ranking.className = 'v205-home-ranking-bar';
+        ranking.dataset.action = 'records';
+        ranking.innerHTML = '<span aria-hidden="true">◇</span><strong>ONLINE RANKING</strong><small>月間・殿堂・公開プロフィール</small><b>VIEW →</b>';
+      }
+      if (ranking.previousElementSibling !== ear) ear.insertAdjacentElement('afterend', ranking);
     }
 
     const footer = panel.querySelector('.home-footer');
     const legacyCosmos = footer?.querySelector('[data-v205-cosmos-open]');
     const legacyRanking = footer?.querySelector('[data-action="records"]');
-    if (legacyCosmos && !legacyCosmos.closest('.v205-home-command-deck')) legacyCosmos.classList.add('v205-phase10-source-hidden');
-    if (legacyRanking && !legacyRanking.closest('.v205-home-command-deck')) legacyRanking.classList.add('v205-phase10-source-hidden');
+    if (legacyCosmos) legacyCosmos.classList.add('v205-phase10-source-hidden');
+    if (legacyRanking) legacyRanking.classList.add('v205-phase10-source-hidden');
   }
 
   function ensureSettingsShell(card) {
@@ -121,8 +126,6 @@
       groups.querySelector(`[data-v205-settings-group="${category}"] .v205-settings-group-body`)?.appendChild(row);
     }
 
-    // Existing injectors may append rows inside the card after this layer runs.
-    // Sweep them into a category without cloning or replacing the real controls.
     for (const row of card.querySelectorAll(':scope > .setting-row')) {
       if (row.classList.contains('v205-cosmos-setting')) legacy.appendChild(row);
       else {
@@ -157,6 +160,38 @@
     if (version && version.previousElementSibling !== groups) groups.insertAdjacentElement('afterend', version);
   }
 
+  function animateSettingsCategory(next) {
+    if (!CATEGORY_ORDER.includes(next)) return;
+    const card = document.querySelector('.settings-modal .modal-card.v205-settings-card');
+    const groups = card?.querySelector(':scope > .v205-settings-groups');
+    if (!card || !groups || next === settingsCategory) return;
+
+    const fromHeight = groups.getBoundingClientRect().height;
+    settingsCategory = next;
+    arrangeSettings();
+    const toHeight = groups.getBoundingClientRect().height;
+
+    settingsAnimation?.cancel?.();
+    settingsAnimation = null;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches || !groups.animate || Math.abs(toHeight - fromHeight) < 3) return;
+
+    groups.style.height = `${fromHeight}px`;
+    groups.style.overflow = 'hidden';
+    settingsAnimation = groups.animate([
+      { height:`${fromHeight}px`, opacity:.86, transform:'scaleY(.985)' },
+      { height:`${toHeight}px`, opacity:1, transform:'scaleY(1)' },
+    ], {
+      duration:210,
+      easing:'cubic-bezier(.18,.78,.22,1.08)',
+      fill:'none',
+    });
+    settingsAnimation.onfinish = settingsAnimation.oncancel = () => {
+      groups.style.height = '';
+      groups.style.overflow = '';
+      settingsAnimation = null;
+    };
+  }
+
   function improveUnlockContrast() {
     document.querySelectorAll('.v205-unlock-burst section').forEach(section => section.classList.add('v205-phase10-readable'));
   }
@@ -165,7 +200,7 @@
     if (arranging) return;
     arranging = true;
     try {
-      ensureHomeDeck();
+      ensureHomeTools();
       arrangeSettings();
       improveUnlockContrast();
     } finally {
@@ -187,8 +222,7 @@
     if (!tab) return;
     event.preventDefault();
     event.stopPropagation();
-    settingsCategory = tab.dataset.v205SettingsCategory || 'game';
-    arrangeSettings();
+    animateSettingsCategory(tab.dataset.v205SettingsCategory || 'game');
   }, true);
 
   new MutationObserver(schedule).observe(document.documentElement, { subtree:true, childList:true });
