@@ -113,136 +113,170 @@
 
 @media (max-width:620px){
   .result-panel{
-    padding:15px 12px 16px;
+    padding:14px 11px 15px;
     border-radius:20px;
   }
   .result-head .eyebrow{
-    font-size:.56rem;
-    letter-spacing:.24em;
-    margin-bottom:4px;
+    font-size:.54rem;
+    letter-spacing:.22em;
+    margin-bottom:3px;
   }
   .result-head h1{
-    font-size:1.7rem;
+    font-size:1.64rem;
     letter-spacing:.08em;
+    margin-bottom:2px;
   }
   .result-mode{
-    font-size:.62rem;
+    font-size:.6rem;
   }
   .score-big{
-    font-size:clamp(3.25rem,18vw,5.2rem);
-    margin:11px 0 4px;
+    font-size:clamp(3.1rem,17vw,4.9rem);
+    margin:9px 0 3px;
   }
   .score-caption{
-    font-size:.5rem;
-    letter-spacing:.2em;
+    font-size:.48rem;
+    letter-spacing:.18em;
   }
-  .v205-result-rank-grid{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    margin:12px auto 5px;
-    gap:6px;
+
+  /* Rank cards remain readable as a 2 × 2 block on phones. */
+  .result-panel .v205-result-rank-grid{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    margin:10px auto 5px!important;
+    gap:6px!important;
   }
-  .v205-result-rank-card{
-    min-height:62px;
-    padding:8px 9px;
-    border-radius:12px;
-  }
-  .v205-result-rank-card span{
-    font-size:.54rem;
-  }
-  .v205-result-rank-card strong{
-    font-size:.98rem;
-  }
-  .v205-result-rank-card small{
-    font-size:.44rem;
-  }
-  .ranking-submit{
-    margin-top:9px;
-  }
-  .stat-grid{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    margin:13px 0;
-    gap:6px;
-  }
-  .stat-card{
-    min-height:64px;
-    padding:8px 5px;
+  .result-panel .v205-result-rank-card{
+    min-height:58px;
+    padding:7px 8px;
     border-radius:11px;
   }
-  .stat-card .label{
-    font-size:.48rem;
-    letter-spacing:.04em;
+  .result-panel .v205-result-rank-card span{
+    font-size:.5rem;
   }
-  .stat-card .value{
-    font-size:.92rem;
-    margin-top:2px;
+  .result-panel .v205-result-rank-card strong{
+    font-size:.9rem;
   }
-  .stat-grid .stat-card:nth-last-child(-n+2){
-    grid-column:span 1;
+  .result-panel .v205-result-rank-card small{
+    font-size:.41rem;
   }
-  .analysis-title{
+
+  .result-panel .ranking-submit{
+    margin-top:8px!important;
+    padding-top:9px;
+    padding-bottom:9px;
+  }
+
+  /* 2 primary metrics + 3 secondary metrics = two rows instead of three. */
+  .result-panel .stat-grid{
+    display:grid!important;
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;
+    margin:11px 0 12px!important;
+    gap:5px!important;
+  }
+  .result-panel .stat-card{
+    min-height:58px;
+    padding:7px 4px;
+    border-radius:10px;
+  }
+  .result-panel .stat-card:nth-child(1),
+  .result-panel .stat-card:nth-child(2){
+    grid-column:span 3!important;
+  }
+  .result-panel .stat-card:nth-child(n+3){
+    grid-column:span 2!important;
+  }
+  .result-panel .stat-card .label{
+    font-size:.44rem;
+    letter-spacing:.02em;
+  }
+  .result-panel .stat-card .value{
+    font-size:.86rem;
+    margin-top:1px;
+  }
+
+  .result-panel .miss-analysis,
+  .result-panel .analysis-section{
+    margin-top:11px;
+  }
+  .result-panel .analysis-title{
     align-items:flex-end;
+    margin-bottom:6px;
   }
-  .analysis-title h2{
-    font-size:.75rem;
+  .result-panel .analysis-title h2{
+    font-size:.71rem;
   }
-  .analysis-title span{
-    font-size:.48rem;
+  .result-panel .analysis-title span{
+    font-size:.44rem;
   }
-  .miss-grid{
+  .result-panel .miss-grid{
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
-  .miss-card{
-    min-height:88px;
-    padding:9px;
+  .result-panel .miss-card{
+    min-height:82px;
+    padding:8px;
   }
-  .mastery-grid{
-    grid-template-columns:repeat(7,minmax(0,1fr));
-    gap:4px;
+  .result-panel .miss-perfect{
+    padding:12px 10px;
+    font-size:.68rem;
+    line-height:1.45;
   }
-  .mastery-cell{
-    min-height:46px;
-    padding:5px 2px;
+
+  /* Seven columns fit at normal iPhone widths and remove a full mastery row. */
+  .result-panel .mastery-grid{
+    display:grid!important;
+    grid-template-columns:repeat(7,minmax(0,1fr))!important;
+    gap:4px!important;
   }
-  .mastery-cell .key{
-    font-size:.62rem;
+  .result-panel .mastery-cell{
+    min-height:43px;
+    padding:4px 1px;
+    border-radius:8px;
   }
-  .mastery-cell .pct{
-    font-size:.46rem;
+  .result-panel .mastery-cell .key{
+    font-size:.57rem;
   }
-  .insight-grid{
+  .result-panel .mastery-cell .pct{
+    font-size:.42rem;
+  }
+
+  .result-panel .insight-grid{
     grid-template-columns:1fr;
-    gap:6px;
+    gap:5px;
+    margin-top:8px;
   }
-  .insight-card{
-    padding:10px;
+  .result-panel .insight-card{
+    padding:9px 10px;
   }
-  .insight-card h3{
-    font-size:.65rem;
+  .result-panel .insight-card h3{
+    font-size:.61rem;
+    margin-bottom:4px;
   }
-  .insight-card p{
-    font-size:.62rem;
-    line-height:1.5;
+  .result-panel .insight-card p{
+    font-size:.58rem;
+    line-height:1.42;
+    margin-bottom:0;
   }
-  .result-actions{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:7px;
-    margin-top:14px;
+
+  /* Force a 2 × 2 action dock even if older mobile CSS declares flex-column. */
+  .result-panel .result-actions{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    flex-direction:initial!important;
+    gap:6px!important;
+    margin-top:11px!important;
   }
-  .result-actions .primary-btn,
-  .result-actions .secondary-btn{
-    min-width:0;
-    width:100%;
-    min-height:48px;
-    padding:11px 8px;
+  .result-panel .result-actions .primary-btn,
+  .result-panel .result-actions .secondary-btn{
+    min-width:0!important;
+    width:100%!important;
+    min-height:46px!important;
+    padding:9px 6px!important;
+    font-size:.72rem;
   }
 }
 
-@media (max-width:390px){
-  .stat-grid{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-  .mastery-grid{
-    grid-template-columns:repeat(5,minmax(0,1fr));
+@media (max-width:360px){
+  .result-panel .mastery-grid{
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
   }
 }
