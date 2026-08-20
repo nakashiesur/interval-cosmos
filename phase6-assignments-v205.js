@@ -220,6 +220,12 @@
     stop(){this.token++}
   }
   function accidental(a){return a===1?'♯':a===-1?'♭':''}
+  const octaveNumber=midi=>Math.floor(Number(midi||0)/12)-1;
+  function displayQuestionNote(q,side){
+    const note=side==='base'?q.base:q.target,midi=side==='base'?q.baseMidi:q.targetMidi;
+    const register=q.intervalKey==='P1'||q.intervalKey==='P8'?`<sub class="v205-a-note-register">${octaveNumber(midi)}</sub>`:'';
+    return `<span class="v205-a-note-name">${esc(note)}</span>${register}`;
+  }
   function realize(base,acc,iv){const ti=mod(LETTERS.indexOf(base)+iv.n-1,7),letter=LETTERS[ti],basePc=mod(NAT[base]+acc,12),wanted=mod(basePc+iv.semitones,12);let ta=wanted-NAT[letter];if(ta>6)ta-=12;if(ta<-6)ta+=12;if(Math.abs(ta)>1)return null;return{letter,acc:ta}}
   function midiFor(pc){const c=[];for(let m=54;m<=69;m++)if(mod(m,12)===pc)c.push(m);return pick(c.length?c:[60+pc])}
   function makeQuestion(keys,previous){
@@ -238,28 +244,40 @@
     const whites=Array.from({length:14},(_,i)=>`<rect x="${margin+i*whiteW}" y="8" width="${whiteW-2}" height="120" rx="5" class="v205-a-white"/>`).join('');let blacks='';for(let o=0;o<2;o++)for(const pc of[1,3,6,8,10])blacks+=`<rect x="${x(low+o*12+pc)-12}" y="8" width="24" height="74" rx="4" class="v205-a-black"/>`;
     return `<div class="v205-a-keyboard"><svg viewBox="0 0 ${width} 136">${whites}${blacks}${q.baseMidi===q.targetMidi?marker(q.baseMidi,-8)+marker(q.targetMidi,8):marker(q.baseMidi)+marker(q.targetMidi)}</svg></div>`;
   }
-  function answerGrid(){const groups=[['P1'],['m2','M2'],['m3','M3'],['P4','TT','P5'],['m6','M6'],['m7','M7'],['P8']],symbol=game.labelSymbol;return `<div class="answer-rows">${groups.map(g=>`<div class="answer-row cols-${g.length}">${g.map(k=>`<button class="answer-btn answer-btn-large ${game.flash?.key===k?game.flash.type:''}" data-a-answer="${k}" ${game.locked?'disabled':''}><span class="answer-main">${symbol?k:IV[k].jp}</span></button>`).join('')}</div>`).join('')}</div>`}
+  function answerGrid(){
+    const groups=[['P1'],['m2','M2'],['m3','M3'],['P4','TT','P5'],['m6','M6'],['m7','M7'],['P8']],symbol=game.labelSymbol;
+    return `<div class="answer-rows">${groups.map(g=>`<div class="answer-row cols-${g.length}">${g.map(k=>{
+      let flash='';
+      if(game.feedbackType){
+        if(k===game.question?.intervalKey)flash='correct';
+        else if(game.feedbackType==='wrong'&&k===game.chosenKey)flash='wrong';
+      }
+      return `<button class="answer-btn answer-btn-large ${flash}" data-a-answer="${k}" ${game.locked?'disabled':''}><span class="answer-main">${symbol?k:IV[k].jp}</span></button>`;
+    }).join('')}</div>`).join('')}</div>`;
+  }
   function renderGame(){
     if(!game)return;const remain=Math.max(0,(game.wallDeadline-Date.now())/1000),q=game.question,def=game.def;
-    const main=def.view==='keys'?keyboard(q):def.view==='ear'?`<div class="ear-prompt"><span class="ear-wave"><i></i><i></i><i></i><i></i><i></i></span><strong>LISTEN</strong><small>音だけで判定</small></div>${game.reveal?`<div class="note-question note-pair"><span>${esc(q.base)}</span><span class="note-gap"></span><span>${esc(q.target)}</span></div>`:''}`:`<div class="note-question note-pair"><span>${esc(q.base)}</span><span class="note-gap"></span><span>${esc(q.target)}</span></div>`;
-    overlay().innerHTML=`<section class="v205-a-game ${def.hyper?'hyper':''}">
+    const notePair=`<div class="note-question note-pair"><span>${displayQuestionNote(q,'base')}</span><span class="note-gap"></span><span>${displayQuestionNote(q,'target')}</span></div>`;
+    const main=def.view==='keys'?keyboard(q):def.view==='ear'?`<div class="ear-prompt"><span class="ear-wave"><i></i><i></i><i></i><i></i><i></i></span><strong>LISTEN</strong><small>音だけで判定</small></div>${game.reveal?notePair:''}`:notePair;
+    const feedbackBanner=game.feedbackType?`<div class="v205-a-feedback-banner ${game.feedbackType}"><span>${game.feedbackType==='correct'?'✓':'✕'}</span><div><strong>${game.feedbackType==='correct'?'CORRECT':'WRONG'}</strong><small>${game.feedbackType==='correct'?IV[q.intervalKey].jp:`正解：${IV[q.intervalKey].jp}`}</small></div></div>`:'';
+    overlay().innerHTML=`<section class="v205-a-game ${def.hyper?'hyper':''} ${game.feedbackType?`feedback-${game.feedbackType}`:''}">
       <header class="play-hud"><div class="hud-left"><span class="mode-mini">ASSIGNMENT</span><small>${esc(currentAssignment.title)}</small></div><div class="hud-center"><div class="v205-a-timer">${Math.ceil(remain)}</div></div><div class="hud-right">${def.hyper?`<div class="metric combo"><span class="metric-label">COMBO</span><span class="metric-value">${game.combo}</span></div>`:''}<div class="metric"><span class="metric-label">SCORE</span><span class="metric-value">${fmt(game.score)}</span></div></div></header>
-      <section class="question-zone"><div class="question-card glass"><p class="question-label">${def.view==='ear'?'AUDIO IDENTIFICATION':'INTERVAL IDENTIFICATION'}</p>${main}<div class="sound-controls"><button class="secondary-btn" data-a-replay>▶ REPLAY</button></div></div></section>
+      <section class="question-zone"><div class="question-card glass"><p class="question-label">${def.view==='ear'?'AUDIO IDENTIFICATION':'INTERVAL IDENTIFICATION'}</p>${main}${feedbackBanner}<div class="sound-controls"><button class="secondary-btn" data-a-replay>▶ REPLAY</button></div></div></section>
       <section class="answer-area">${answerGrid()}</section><footer class="v205-a-game-foot"><div>${game.feedback||`${esc(def.label)} ・ ${esc(intervalText(currentAssignment))}`}</div><button class="secondary-btn danger" data-a-abort>課題を中断</button></footer>
     </section>`;
   }
   function gameTick(){if(!game||game.finished)return;if(Date.now()>=game.wallDeadline){finishGame();return}const t=document.querySelector('.v205-a-timer');if(t)t.textContent=String(Math.ceil((game.wallDeadline-Date.now())/1000));raf=requestAnimationFrame(gameTick)}
   async function startGame(a){
     const st=statusOf(a);if(st!=='active')return;currentAssignment=a;const def=MODE_MAP[a.mode];if(!def)return alert('未対応モードです。');const keys=(a.interval_keys||[]).filter(k=>IV[k]);if(!keys.length)keys.push(...INTERVALS.map(x=>x.key));audio ||= new AssignmentAudio();try{await audio.unlock()}catch{}
-    game={def,keys,score:0,combo:0,maxCombo:0,total:0,correct:0,response:[],previous:null,locked:true,reveal:false,flash:null,feedback:'',finished:false,labelSymbol:Math.random()<.5,wallDeadline:Date.now()+def.duration*1000,question:null,questionAt:0};
+    game={def,keys,score:0,combo:0,maxCombo:0,total:0,correct:0,response:[],previous:null,locked:true,reveal:false,flash:null,feedback:'',feedbackType:null,chosenKey:null,finished:false,labelSymbol:Math.random()<.5,wallDeadline:Date.now()+def.duration*1000,question:null,questionAt:0};
     let c=3;overlay().innerHTML=`<div class="v205-a-countdown"><small>${esc(a.title)}</small><strong id="v205ACount">3</strong></div>`;
     const tick=()=>{const el=document.querySelector('#v205ACount');if(!game)return;if(c>0){if(el)el.textContent=String(c--);setTimeout(tick,650)}else{if(el)el.textContent='START';setTimeout(()=>{if(!game)return;game.locked=false;game.question=makeQuestion(keys,null);game.questionAt=performance.now();renderGame();audio.play(game.question).catch(()=>{});gameTick()},450)}};tick();
   }
   function answer(k){
     if(!game||game.finished||game.locked||!game.question)return;const q=game.question,ms=Math.max(80,performance.now()-game.questionAt),sec=ms/1000,ok=k===q.intervalKey,delta=calcPoints(sec,ok,ok?game.combo:0);
     game.total++;if(ok)game.correct++;game.combo=ok?game.combo+1:0;game.maxCombo=Math.max(game.maxCombo,game.combo);game.response.push(sec);game.score=Math.max(-9999,game.score+delta);updateMastery(q.intervalKey,k,ok,ms);if(game.def.hyper&&ok&&game.combo>0&&game.combo%10===0)game.wallDeadline+=3000;
-    game.flash={key:k,type:ok?'correct':'wrong'};game.feedback=ok?`<strong class="ok">CORRECT</strong>　${IV[q.intervalKey].jp}　${sec.toFixed(2)}s`:`<strong class="ng">${IV[k].jp}</strong> ではなく <strong class="ok">${IV[q.intervalKey].jp}</strong>`;game.locked=true;game.reveal=true;renderGame();if(!ok)audio.play(q).catch(()=>{});
-    setTimeout(()=>{if(!game||game.finished)return;game.previous=q.intervalKey;game.question=makeQuestion(game.keys,game.previous);game.questionAt=performance.now();game.locked=false;game.reveal=false;game.flash=null;game.labelSymbol=Math.random()<.5;renderGame();audio.play(game.question).catch(()=>{})},ok?360:780);
+    game.flash={key:k,type:ok?'correct':'wrong'};game.chosenKey=k;game.feedbackType=ok?'correct':'wrong';game.feedback=ok?`<strong class="ok">✓ CORRECT</strong>　${IV[q.intervalKey].jp}　${sec.toFixed(2)}s`:`<strong class="ng">✕ ${IV[k].jp}</strong>　→　正解 <strong class="ok">${IV[q.intervalKey].jp}</strong>`;game.locked=true;game.reveal=true;renderGame();if(!ok)audio.play(q).catch(()=>{});
+    setTimeout(()=>{if(!game||game.finished)return;game.previous=q.intervalKey;game.question=makeQuestion(game.keys,game.previous);game.questionAt=performance.now();game.locked=false;game.reveal=false;game.flash=null;game.feedback='';game.feedbackType=null;game.chosenKey=null;game.labelSymbol=Math.random()<.5;renderGame();audio.play(game.question).catch(()=>{})},ok?620:1050);
   }
   async function finishGame(){
     if(!game||game.finished)return;game.finished=true;cancelAnimationFrame(raf);audio?.stop?.();const score=finalScore(),acc=accuracy(game.correct,game.total),avg=game.response.length?game.response.reduce((a,b)=>a+b,0)/game.response.length:0;
