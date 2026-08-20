@@ -34,6 +34,32 @@
     if (shortcut.innerHTML !== html) shortcut.innerHTML = html;
   }
 
+  function configureHistoryEntry(panel, topActions, cosmos) {
+    // Phase 4 owns the real launch button and uses its presence in .home-footer
+    // as an injection guard. Keep that source mounted, but hide it and expose a
+    // dedicated header trigger so rerenders cannot create duplicate history buttons.
+    const source = panel?.querySelector('.home-footer [data-v205-history-open]');
+    if (source) source.classList.add('v205-phase10-history-source-hidden');
+
+    let history = topActions?.querySelector('.v205-home-history-pill');
+    if (!history && topActions) {
+      history = document.createElement('button');
+      history.type = 'button';
+      history.className = 'v205-home-history-pill';
+      history.dataset.v205HistoryOpen = '1';
+      history.title = '学習履歴';
+      history.setAttribute('aria-label', '学習履歴');
+      history.innerHTML = '<span aria-hidden="true">◫</span><strong>学習履歴</strong><small>HISTORY</small>';
+    }
+
+    if (history && topActions) {
+      const gear = topActions.querySelector('[data-action="settings"]');
+      if (cosmos && history.previousElementSibling !== cosmos) cosmos.insertAdjacentElement('afterend', history);
+      else if (!cosmos && gear && history.nextElementSibling !== gear) topActions.insertBefore(history, gear);
+      else if (!history.parentElement) topActions.appendChild(history);
+    }
+  }
+
   function ensureHomeTools() {
     const panel = document.querySelector('.home-panel');
     const topbar = panel?.querySelector('.topbar-home');
@@ -52,6 +78,8 @@
       const gear = topActions.querySelector('[data-action="settings"]');
       gear ? topActions.insertBefore(cosmos, gear) : topActions.appendChild(cosmos);
     }
+
+    configureHistoryEntry(panel, topActions, cosmos);
 
     const ear = panel.querySelector('.earlink-elite');
     if (ear) {
