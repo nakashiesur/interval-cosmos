@@ -8,8 +8,8 @@ const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
 
 const tests=[
-  ['Phase 10 foundation assets are loaded',index.includes('phase10-ui-foundation-v205.js')&&index.includes('phase10-ui-foundation-v205.css')],
-  ['Phase 10 header polish is loaded and cached',index.includes('phase10-header-polish-v205.css?v=alpha10.8')&&sw.includes('phase10-header-polish-v205.css')&&sw.includes('alpha10-8')],
+  ['Phase 10 foundation assets are loaded',index.includes('phase10-ui-foundation-v205.js?v=alpha10.6')&&index.includes('phase10-ui-foundation-v205.css')],
+  ['Phase 10 header polish is loaded and cached',index.includes('phase10-header-polish-v205.css?v=alpha10.9')&&sw.includes('phase10-header-polish-v205.css')&&sw.includes('alpha10-9')],
   ['service worker caches Phase 10 foundation',sw.includes('phase10-ui-foundation-v205.js')&&sw.includes('phase10-ui-foundation-v205.css')],
   ['home puts MY COSMOS beside existing settings gear',js.includes('v205-home-cosmos-pill')&&js.includes('data-v205-cosmos-open')&&js.includes("querySelector('[data-action=\"settings\"]')")],
   ['learning history is exposed beside MY COSMOS on desktop and mobile',js.includes('configureHistoryEntry')&&js.includes('v205-home-history-pill')&&js.includes('data-v205-history-open')&&css.includes('.v205-home-history-pill')&&css.includes('.v205-phase10-history-source-hidden{display:none!important}')],
@@ -17,6 +17,8 @@ const tests=[
   ['desktop header uses a shrinkable title track instead of a fixed minimum',headerCss.includes('grid-template-columns:minmax(0,1fr) auto')&&headerCss.includes('width:100%')&&headerCss.includes('max-width:100%')],
   ['desktop action cluster has an explicit in-panel width budget',headerCss.includes('grid-template-columns:140px 130px 50px')&&headerCss.includes('width:332px')&&headerCss.includes('justify-self:end')],
   ['narrow desktop compacts before the mobile breakpoint',headerCss.includes('@media (min-width:701px) and (max-width:1050px)')&&headerCss.includes('grid-template-columns:126px 118px 46px')&&headerCss.includes('width:300px')&&headerCss.includes('font-size:28px')],
+  ['desktop header performs a real rendered-geometry self-check',js.includes('fitHomeHeader')&&js.includes('getBoundingClientRect')&&js.includes('titleRect.right + 10 > actionsRect.left')&&js.includes('actionsRect.right > barRect.right + 1')],
+  ['runtime fallback compacts the desktop header when geometry still overlaps',js.includes("classList.add('v205-header-auto-tight')")&&headerCss.includes('.topbar-home.v205-header-auto-tight')&&headerCss.includes('width:270px!important')],
   ['desktop gear cannot grow beyond its reserved track',headerCss.includes('min-width:50px!important')&&headerCss.includes('width:50px!important')&&headerCss.includes('padding:0!important')],
   ['desktop MY COSMOS and history keep stable labeled layouts',headerCss.includes('grid-template-areas:"icon title" "icon subtitle"')&&headerCss.includes('white-space:nowrap')],
   ['mobile header actions are icon only',headerCss.includes('.v205-home-cosmos-pill strong')&&headerCss.includes('.v205-home-history-pill strong')&&headerCss.includes('display:none!important')&&headerCss.includes('width:44px!important')],
