@@ -22,23 +22,16 @@
     return 'game';
   }
 
-  function configureMobilePractice(panel) {
+  function configurePracticeEntry(panel) {
     const shortcut = panel?.querySelector('.practice-shortcut');
+    const largeCard = panel?.querySelector('.mode-card.practice-top');
+    if (largeCard) largeCard.classList.add('v205-phase10-practice-source-hidden');
     if (!shortcut) return;
-    const mobile = Boolean(window.matchMedia?.('(max-width:700px)')?.matches);
 
-    if (!shortcut.dataset.v205OriginalAction) shortcut.dataset.v205OriginalAction = shortcut.dataset.action || 'quick-adaptive';
-    if (!shortcut.dataset.v205OriginalHtml) shortcut.dataset.v205OriginalHtml = shortcut.innerHTML;
-
-    if (mobile) {
-      shortcut.dataset.action = 'practice';
-      shortcut.classList.add('v205-mobile-practice-entry');
-      if (shortcut.innerHTML !== '<strong>PRACTICE MODE</strong>') shortcut.innerHTML = '<strong>PRACTICE MODE</strong>';
-    } else {
-      shortcut.dataset.action = shortcut.dataset.v205OriginalAction || 'quick-adaptive';
-      shortcut.classList.remove('v205-mobile-practice-entry');
-      if (shortcut.dataset.v205OriginalHtml && shortcut.innerHTML !== shortcut.dataset.v205OriginalHtml) shortcut.innerHTML = shortcut.dataset.v205OriginalHtml;
-    }
+    shortcut.dataset.action = 'practice';
+    shortcut.classList.add('v205-practice-entry');
+    const html = '<strong><span aria-hidden="true">🔰</span> PRACTICE MODE</strong>';
+    if (shortcut.innerHTML !== html) shortcut.innerHTML = html;
   }
 
   function ensureHomeTools() {
@@ -79,7 +72,7 @@
     if (legacyCosmos) legacyCosmos.classList.add('v205-phase10-source-hidden');
     if (legacyRanking) legacyRanking.classList.add('v205-phase10-source-hidden');
 
-    configureMobilePractice(panel);
+    configurePracticeEntry(panel);
   }
 
   function ensureSettingsShell(card) {
