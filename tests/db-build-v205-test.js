@@ -10,6 +10,7 @@ const currentMigrations=[
   'sql/avatar-catalog-v2.0.5.sql',
   'sql/device-link-v2.0.5.sql',
   'sql/account-recovery-v2.0.5.sql',
+  'sql/account-avatar-default-v2.0.5.sql',
   'sql/progression-v2.0.5.sql',
   'sql/assignments-v2.0.5.sql',
   'sql/assignments-admin-only-v2.0.5.sql',
@@ -17,6 +18,7 @@ const currentMigrations=[
   'sql/admin-dashboard-v2.0.5.sql',
   'sql/staff-self-registration-v2.0.5.sql',
   'sql/admin-player-management-v2.0.5.sql',
+  'sql/security-hardening-v2.0.5.sql',
 ];
 
 function sha256(buffer){return crypto.createHash('sha256').update(buffer).digest('hex');}
@@ -37,10 +39,12 @@ check('generated bundle includes every current migration marker',currentMigratio
 check('generated bundle includes current avatar seed',[
   'nova','orbit','pulse','prism','comet','nebula','vector','echo','quasar','lumen','wave','aster','teacher'
 ].every(id=>bundle.includes(`'${id}'`)));
+check('account creation fallback is canonical nova',bundle.includes("DEFAULT 'nova'::text")||bundle.includes("default 'nova'"));
 check('generated bundle includes admin management RPCs',[
   'admin_get_player_management','admin_update_player_profile','admin_set_player_suspended',
   'admin_unpublish_player_rankings','admin_delete_player_rankings','admin_delete_player_application_row'
 ].every(name=>bundle.includes(name)));
+check('security hardening is included',bundle.includes('security-hardening-v2.0.5.sql'));
 check('complete deletion server function exists',fs.existsSync(path.join(root,'supabase','functions','admin-delete-player','index.ts')));
 check('fresh-build verification SQL exists',fs.existsSync(path.join(root,'sql','verify-v2.0.5-fresh-build.sql')));
 
