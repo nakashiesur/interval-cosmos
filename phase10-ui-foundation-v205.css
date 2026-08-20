@@ -4,6 +4,7 @@
    and move RANKING to a single dedicated bar below EAR LINK. */
 .v205-home-command-deck{display:none!important}
 .v205-phase10-source-hidden{display:none!important}
+.v205-phase10-practice-source-hidden{display:none!important}
 .home-screen .topbar-home .top-actions{
   display:flex;
   align-items:center;
@@ -70,6 +71,15 @@
   border-color:rgba(255,209,102,.68);
   background:linear-gradient(90deg,rgba(77,59,19,.62),rgba(37,32,25,.82) 48%,rgba(69,51,15,.58));
   box-shadow:0 10px 28px rgba(0,0,0,.18),0 0 24px rgba(255,209,102,.045);
+}
+.home-screen .home-footer-rich>.v205-practice-entry{
+  border-color:rgba(95,226,176,.42);
+  background:linear-gradient(145deg,rgba(20,66,58,.72),rgba(13,43,42,.8));
+  color:#c9ffed;
+}
+.home-screen .home-footer-rich>.v205-practice-entry strong{
+  font-size:12px;
+  letter-spacing:.08em;
 }
 
 /* SETTINGS becomes a categorized destination rather than one long mixed list.
@@ -180,7 +190,7 @@
 /* Calmer desktop MODE SELECT hierarchy. */
 .home-screen .home-panel{padding-top:24px}
 .home-screen .topbar-home{margin-bottom:12px}
-.home-screen .mode-card.practice-top{margin-top:2px}
+.home-screen .mode-card.practice-top{display:none!important}
 .home-screen .mode-grid-home{gap:12px}
 .home-screen .home-footer-rich{margin-top:12px}
 
@@ -189,8 +199,8 @@
   .hero-wrap{transform:scale(.94);transform-origin:center}
 }
 
-/* Smartphone MODE SELECT: remove the oversized PRACTICE hero and reuse the compact
-   quick-practice slot as the main PRACTICE entry. Keep the screen scannable first. */
+/* Smartphone MODE SELECT: reuse the compact practice slot as the main PRACTICE entry.
+   Keep the screen scannable first. */
 @media(max-width:700px){
   .home-screen{align-items:flex-start;padding:6px 0 12px}
   .home-screen .home-panel{
@@ -215,7 +225,6 @@
   .home-screen .settings-gear-btn{min-width:44px;width:44px;height:44px;min-height:44px;border-radius:13px}
 
   .home-screen .mode-card{border-radius:14px}
-  .home-screen .mode-card.practice-top{display:none!important}
   .home-screen .home-section-label{margin:7px 2px 5px}
   .home-screen .home-section-label span{font-size:8px;letter-spacing:.14em}
   .home-screen .home-section-label small{display:none}
@@ -269,12 +278,7 @@
     font-size:9px;
     border-radius:12px;
   }
-  .home-screen .home-footer-rich>.v205-mobile-practice-entry{
-    border-color:rgba(95,226,176,.42);
-    background:linear-gradient(145deg,rgba(20,66,58,.72),rgba(13,43,42,.8));
-    color:#c9ffed;
-  }
-  .home-screen .home-footer-rich>.v205-mobile-practice-entry strong{
+  .home-screen .home-footer-rich>.v205-practice-entry strong{
     font-size:9.5px;
     letter-spacing:.07em;
   }
