@@ -138,13 +138,17 @@ begin
     raise exception 'service_role must be able to execute admin_delete_player_application_row';
   end if;
 
-  if has_function_privilege('anon','public.sync_public_profile()','EXECUTE')
-     or has_function_privilege('authenticated','public.sync_public_profile()','EXECUTE') then
-    raise exception 'internal sync_public_profile trigger function is exposed';
+  if to_regprocedure('public.sync_public_profile()') is not null then
+    if has_function_privilege('anon','public.sync_public_profile()','EXECUTE')
+       or has_function_privilege('authenticated','public.sync_public_profile()','EXECUTE') then
+      raise exception 'internal sync_public_profile trigger function is exposed';
+    end if;
   end if;
-  if has_function_privilege('anon','public.rls_auto_enable()','EXECUTE')
-     or has_function_privilege('authenticated','public.rls_auto_enable()','EXECUTE') then
-    raise exception 'internal rls_auto_enable event-trigger function is exposed';
+  if to_regprocedure('public.rls_auto_enable()') is not null then
+    if has_function_privilege('anon','public.rls_auto_enable()','EXECUTE')
+       or has_function_privilege('authenticated','public.rls_auto_enable()','EXECUTE') then
+      raise exception 'internal rls_auto_enable event-trigger function is exposed';
+    end if;
   end if;
 end;
 $$;
