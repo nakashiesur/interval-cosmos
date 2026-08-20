@@ -32,6 +32,7 @@ jobs:
           node --check phase4-analysis-hotfix-v205.js
           node --check phase5-progression-v205.js
           node --check phase5-unlock-copy-hotfix-v205.js
+          node --check phase5-scroll-retention-v205.js
           node --check phase6-admin-policy-v205.js
           node --check phase6-multimode-v205.js
           node --check phase6-assignments-v205.js
