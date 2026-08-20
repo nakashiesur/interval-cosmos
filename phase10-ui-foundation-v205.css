@@ -1,15 +1,16 @@
 /* INTERVAL COSMOS v2.0.5 — Phase 10 UI foundation */
 
-/* MODE SELECT: keep SETTINGS on the existing gear, put MY COSMOS beside it,
-   and move RANKING to a single dedicated bar below EAR LINK. */
+/* MODE SELECT: keep SETTINGS on the existing gear, put MY COSMOS and HISTORY
+   in the header, and move RANKING to a single dedicated bar below EAR LINK. */
 .v205-home-command-deck{display:none!important}
 .v205-phase10-source-hidden{display:none!important}
 .v205-phase10-practice-source-hidden{display:none!important}
+.v205-phase10-history-source-hidden{display:none!important}
 .home-screen .topbar-home .top-actions{
   display:flex;
   align-items:center;
   justify-content:flex-end;
-  gap:10px;
+  gap:8px;
 }
 .v205-home-cosmos-pill{
   appearance:none;
@@ -38,7 +39,33 @@
 }
 .v205-home-cosmos-pill strong{font-size:13px;letter-spacing:.075em;line-height:1.1}
 .v205-home-cosmos-pill small{font-size:8px;letter-spacing:.16em;color:#7f99bd;line-height:1.1}
-.v205-home-cosmos-pill:hover{
+.v205-home-history-pill{
+  appearance:none;
+  min-height:58px;
+  padding:0 14px;
+  border-radius:17px;
+  border:1px solid rgba(132,157,204,.28);
+  background:linear-gradient(145deg,rgba(19,31,56,.94),rgba(14,23,45,.92));
+  color:#dce9ff;
+  display:grid;
+  grid-template-columns:auto auto;
+  grid-template-rows:auto auto;
+  align-items:center;
+  justify-content:center;
+  column-gap:7px;
+  text-align:left;
+  cursor:pointer;
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+.v205-home-history-pill>span{
+  grid-row:1/3;
+  color:#9db9e8;
+  font-size:16px;
+}
+.v205-home-history-pill strong{font-size:11px;letter-spacing:.045em;line-height:1.08;white-space:nowrap}
+.v205-home-history-pill small{font-size:7px;letter-spacing:.15em;color:#6f87ad;line-height:1.08}
+.v205-home-cosmos-pill:hover,
+.v205-home-history-pill:hover{
   transform:translateY(-1px);
   border-color:rgba(80,220,255,.62);
   box-shadow:0 10px 28px rgba(0,0,0,.2),0 0 24px rgba(80,220,255,.08);
@@ -208,20 +235,32 @@
     padding:12px 11px 14px;
     border-radius:19px;
   }
-  .home-screen .topbar-home{align-items:center;gap:7px;margin-bottom:8px}
+  .home-screen .topbar-home{align-items:center;gap:6px;margin-bottom:8px}
   .home-screen .topbar-title{min-width:0}
-  .home-screen .topbar-title h1{font-size:clamp(20px,6vw,26px);letter-spacing:.03em}
+  .home-screen .topbar-title h1{font-size:clamp(19px,5.6vw,25px);letter-spacing:.025em;white-space:nowrap}
   .home-screen .topbar-title p{display:none}
-  .home-screen .topbar-home .top-actions{gap:6px}
+  .home-screen .topbar-home .top-actions{gap:5px}
   .v205-home-cosmos-pill{
     min-height:44px;
-    padding:0 10px;
+    padding:0 9px;
     border-radius:13px;
     column-gap:5px;
   }
   .v205-home-cosmos-pill>span{font-size:13px}
-  .v205-home-cosmos-pill strong{font-size:9.5px;letter-spacing:.05em}
+  .v205-home-cosmos-pill strong{font-size:9px;letter-spacing:.045em}
   .v205-home-cosmos-pill small{font-size:6px;letter-spacing:.1em}
+  .v205-home-history-pill{
+    min-width:44px;
+    width:44px;
+    min-height:44px;
+    padding:0;
+    border-radius:13px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .v205-home-history-pill>span{font-size:14px}
+  .v205-home-history-pill strong,.v205-home-history-pill small{display:none}
   .home-screen .settings-gear-btn{min-width:44px;width:44px;height:44px;min-height:44px;border-radius:13px}
 
   .home-screen .mode-card{border-radius:14px}
@@ -306,9 +345,12 @@
 }
 
 @media(max-width:430px){
-  .home-screen .topbar-title h1{font-size:20px}
-  .v205-home-cosmos-pill{padding:0 8px;min-width:96px}
+  .home-screen .topbar-title h1{font-size:18px}
+  .home-screen .topbar-home .top-actions{gap:4px}
+  .v205-home-cosmos-pill{padding:0 7px;min-width:88px;min-height:40px}
   .v205-home-cosmos-pill small{display:none}
+  .v205-home-history-pill{min-width:40px;width:40px;min-height:40px;border-radius:12px}
+  .home-screen .settings-gear-btn{min-width:40px;width:40px;height:40px;min-height:40px;border-radius:12px}
   .home-screen .mode-grid-home{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
   .home-screen .mode-grid-home .mode-title{font-size:13.5px}
   .home-screen .mode-card.big{min-height:76px}
@@ -318,6 +360,6 @@
 }
 
 @media(prefers-reduced-motion:reduce){
-  .v205-home-cosmos-pill,.v205-home-ranking-bar,.v205-settings-tab{transition:none}
+  .v205-home-cosmos-pill,.v205-home-history-pill,.v205-home-ranking-bar,.v205-settings-tab{transition:none}
   .v205-settings-groups{will-change:auto}
 }
