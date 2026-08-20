@@ -57,6 +57,12 @@
   }
 
   function ensureSettingsShell(card) {
+    const head = card.querySelector(':scope > .modal-head');
+    const title = head?.querySelector('h2');
+    const copy = head?.querySelector('p');
+    if (title && title.textContent !== 'SETTINGS') title.textContent = 'SETTINGS';
+    if (copy && copy.textContent !== 'カテゴリを選んで設定を調整します。') copy.textContent = 'カテゴリを選んで設定を調整します。';
+
     let legacy = card.querySelector(':scope > .v205-settings-legacy-sources');
     if (!legacy) {
       legacy = document.createElement('div');
@@ -73,8 +79,8 @@
       nav.className = 'v205-settings-nav';
       nav.setAttribute('role', 'tablist');
       nav.innerHTML = CATEGORY_ORDER.map(id => {
-        const [title, sub] = CATEGORY_LABELS[id];
-        return `<button type="button" class="v205-settings-tab" role="tab" data-v205-settings-category="${id}"><strong>${title}</strong><small>${sub}</small></button>`;
+        const [tabTitle, sub] = CATEGORY_LABELS[id];
+        return `<button type="button" class="v205-settings-tab" role="tab" data-v205-settings-category="${id}"><strong>${tabTitle}</strong><small>${sub}</small></button>`;
       }).join('');
     }
 
@@ -83,12 +89,11 @@
       groups = document.createElement('div');
       groups.className = 'v205-settings-groups';
       groups.innerHTML = CATEGORY_ORDER.map(id => {
-        const [title, sub] = CATEGORY_LABELS[id];
-        return `<section class="v205-settings-group" data-v205-settings-group="${id}"><header><span>${title}</span><small>${sub}</small></header><div class="v205-settings-group-body"></div></section>`;
+        const [groupTitle, sub] = CATEGORY_LABELS[id];
+        return `<section class="v205-settings-group" data-v205-settings-group="${id}"><header><span>${groupTitle}</span><small>${sub}</small></header><div class="v205-settings-group-body"></div></section>`;
       }).join('');
     }
 
-    const head = card.querySelector(':scope > .modal-head');
     if (head) {
       if (nav.parentElement !== card) head.insertAdjacentElement('afterend', nav);
       else if (nav.previousElementSibling !== head) head.insertAdjacentElement('afterend', nav);
