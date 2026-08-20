@@ -9,6 +9,8 @@ declare
   v_count integer;
   v_missing text;
   v_default text;
+  v_args text;
+  v_def text;
 begin
   select count(*) into v_count
   from information_schema.tables
@@ -63,6 +65,16 @@ begin
   where table_schema='public' and table_name='players' and column_name='avatar_id';
   if coalesce(v_default,'') not like '%nova%' then
     raise exception 'players.avatar_id default is not nova: %', v_default;
+  end if;
+
+  select pg_get_function_arguments('public.create_player_account(text,text,text,text,text,text)'::regprocedure),
+         pg_get_functiondef('public.create_player_account(text,text,text,text,text,text)'::regprocedure)
+    into v_args, v_def;
+  if coalesce(v_args,'') not like '%DEFAULT ''nova''%' then
+    raise exception 'create_player_account avatar argument does not default to nova: %', v_args;
+  end if;
+  if coalesce(v_def,'') not like '%coalesce(nullif(p_avatar_id,''''), ''nova'')%' then
+    raise exception 'create_player_account empty avatar fallback is not nova';
   end if;
 
   if not exists (
@@ -122,9 +134,17 @@ begin
   if has_function_privilege('authenticated', 'public.admin_delete_player_application_row(uuid)', 'EXECUTE') then
     raise exception 'authenticated must not execute admin_delete_player_application_row';
   end if;
-
   if not has_function_privilege('service_role', 'public.admin_delete_player_application_row(uuid)', 'EXECUTE') then
     raise exception 'service_role must be able to execute admin_delete_player_application_row';
+  end if;
+
+  if has_function_privilege('anon','public.sync_public_profile()','EXECUTE')
+     or has_function_privilege('authenticated','public.sync_public_profile()','EXECUTE') then
+    raise exception 'internal sync_public_profile trigger function is exposed';
+  end if;
+  if has_function_privilege('anon','public.rls_auto_enable()','EXECUTE')
+     or has_function_privilege('authenticated','public.rls_auto_enable()','EXECUTE') then
+    raise exception 'internal rls_auto_enable event-trigger function is exposed';
   end if;
 end;
 $$;
