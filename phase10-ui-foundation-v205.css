@@ -1,61 +1,92 @@
 /* INTERVAL COSMOS v2.0.5 — Phase 10 UI foundation */
 
-.v205-home-command-deck{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
-  margin:2px 0 18px;
-}
-.v205-home-command{
-  appearance:none;
-  border:1px solid rgba(112,157,213,.24);
-  background:linear-gradient(145deg,rgba(17,31,58,.92),rgba(11,20,42,.9));
-  color:#eef6ff;
-  border-radius:18px;
-  min-height:82px;
-  padding:14px 16px;
-  text-align:left;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:3px;
-  cursor:pointer;
-  transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease;
-}
-.v205-home-command:hover{
-  transform:translateY(-1px);
-  border-color:rgba(80,220,255,.55);
-  box-shadow:0 10px 28px rgba(0,0,0,.22),0 0 0 1px rgba(80,220,255,.08) inset;
-}
-.v205-home-command.cosmos{
-  background:linear-gradient(145deg,rgba(22,48,80,.94),rgba(31,25,67,.9));
-  border-color:rgba(80,220,255,.32);
-}
-.v205-home-command.ranking{border-color:rgba(255,209,102,.25)}
-.v205-home-command.settings{border-color:rgba(173,188,224,.23)}
-.v205-home-command-kicker{
-  color:#58ddff;
-  font-size:9px;
-  letter-spacing:.18em;
-  font-weight:850;
-}
-.v205-home-command strong{
-  font-size:16px;
-  letter-spacing:.055em;
-}
-.v205-home-command small{
-  color:#95a7c9;
-  font-size:10px;
-  line-height:1.25;
-}
+/* MODE SELECT: keep SETTINGS on the existing gear, put MY COSMOS beside it,
+   and move RANKING to a single dedicated bar below EAR LINK. */
+.v205-home-command-deck{display:none!important}
 .v205-phase10-source-hidden{display:none!important}
+.home-screen .topbar-home .top-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+}
+.v205-home-cosmos-pill{
+  appearance:none;
+  min-height:58px;
+  padding:0 18px;
+  border-radius:17px;
+  border:1px solid rgba(80,220,255,.34);
+  background:linear-gradient(145deg,rgba(20,52,82,.94),rgba(31,25,67,.92));
+  color:#eff9ff;
+  display:grid;
+  grid-template-columns:auto auto;
+  grid-template-rows:auto auto;
+  align-items:center;
+  justify-content:center;
+  column-gap:8px;
+  text-align:left;
+  cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(80,220,255,.04);
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+.v205-home-cosmos-pill>span{
+  grid-row:1/3;
+  color:#63e5ff;
+  font-size:17px;
+  filter:drop-shadow(0 0 8px rgba(80,220,255,.28));
+}
+.v205-home-cosmos-pill strong{font-size:13px;letter-spacing:.075em;line-height:1.1}
+.v205-home-cosmos-pill small{font-size:8px;letter-spacing:.16em;color:#7f99bd;line-height:1.1}
+.v205-home-cosmos-pill:hover{
+  transform:translateY(-1px);
+  border-color:rgba(80,220,255,.62);
+  box-shadow:0 10px 28px rgba(0,0,0,.2),0 0 24px rgba(80,220,255,.08);
+}
+.v205-home-ranking-bar{
+  appearance:none;
+  width:100%;
+  min-height:58px;
+  margin:12px 0 4px;
+  padding:0 18px;
+  border-radius:17px;
+  border:1px solid rgba(255,209,102,.42);
+  background:linear-gradient(90deg,rgba(67,52,19,.5),rgba(35,31,26,.75) 48%,rgba(59,45,16,.48));
+  color:#f9e5a1;
+  display:grid;
+  grid-template-columns:auto auto 1fr auto;
+  align-items:center;
+  gap:10px;
+  text-align:left;
+  cursor:pointer;
+  box-shadow:inset 0 0 24px rgba(255,209,102,.025);
+  transition:border-color .16s ease,background .16s ease,transform .16s ease,box-shadow .16s ease;
+}
+.v205-home-ranking-bar>span{font-size:16px;color:#ffd66f}
+.v205-home-ranking-bar strong{font-size:13px;letter-spacing:.12em;color:#ffe7a2}
+.v205-home-ranking-bar small{font-size:10px;color:#a99b76}
+.v205-home-ranking-bar b{font-size:9px;letter-spacing:.14em;color:#d9bd6f;font-weight:800}
+.v205-home-ranking-bar:hover{
+  transform:translateY(-1px);
+  border-color:rgba(255,209,102,.68);
+  background:linear-gradient(90deg,rgba(77,59,19,.62),rgba(37,32,25,.82) 48%,rgba(69,51,15,.58));
+  box-shadow:0 10px 28px rgba(0,0,0,.18),0 0 24px rgba(255,209,102,.045);
+}
 
-/* SETTINGS becomes a categorized destination rather than one long mixed list. */
+/* SETTINGS becomes a categorized destination rather than one long mixed list.
+   Anchor the card from the top so its header does not jump when category height changes. */
+.settings-modal{
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  padding:clamp(18px,5vh,52px) 12px 18px!important;
+  overflow:auto;
+}
 .settings-modal .modal-card.v205-settings-card{
   width:min(760px,calc(100vw - 32px));
   max-height:min(88dvh,900px);
   overflow:auto;
   padding-bottom:18px;
+  transform-origin:top center;
 }
 .v205-settings-nav{
   display:grid;
@@ -83,6 +114,7 @@
   align-items:flex-start;
   gap:2px;
   text-align:left;
+  transition:border-color .14s ease,background .14s ease,color .14s ease,transform .14s ease;
 }
 .v205-settings-tab strong{font-size:10px;letter-spacing:.08em;color:inherit}
 .v205-settings-tab small{font-size:9px;color:#7385a9}
@@ -94,7 +126,11 @@
 }
 .v205-settings-tab.active small{color:#72dcf5}
 .v205-settings-tab.empty{opacity:.42;pointer-events:none}
-.v205-settings-groups{min-height:210px}
+.v205-settings-groups{
+  min-height:210px;
+  transform-origin:top center;
+  will-change:height,transform,opacity;
+}
 .v205-settings-group>header{
   display:flex;
   justify-content:space-between;
@@ -141,64 +177,123 @@
 .v205-unlock-burst section h2{color:#f7fbff!important;text-shadow:0 2px 16px rgba(0,0,0,.85)}
 .v205-unlock-burst section span{color:#c9d6ed!important}
 
-/* Slightly calmer desktop MODE SELECT hierarchy. */
+/* Calmer desktop MODE SELECT hierarchy. */
 .home-screen .home-panel{padding-top:24px}
 .home-screen .topbar-home{margin-bottom:12px}
 .home-screen .mode-card.practice-top{margin-top:2px}
 .home-screen .mode-grid-home{gap:12px}
-.home-screen .home-footer-rich{margin-top:14px}
+.home-screen .home-footer-rich{margin-top:12px}
 
 /* START screen: preserve the identity while reducing empty vertical drift on short/mobile displays. */
 @media(max-height:760px){
   .hero-wrap{transform:scale(.94);transform-origin:center}
 }
 
+/* Smartphone MODE SELECT is intentionally much denser than desktop: fewer large blocks,
+   shorter descriptions, and two compact STANDARD cards in one row. */
 @media(max-width:700px){
-  .home-screen{align-items:flex-start;padding:10px 0 18px}
+  .home-screen{align-items:flex-start;padding:7px 0 14px}
   .home-screen .home-panel{
-    width:calc(100vw - 20px);
-    padding:16px 14px 18px;
-    border-radius:22px;
+    width:calc(100vw - 16px);
+    padding:13px 12px 15px;
+    border-radius:20px;
   }
-  .home-screen .topbar-home{align-items:center;gap:10px;margin-bottom:8px}
-  .home-screen .topbar-title h1{font-size:clamp(22px,7vw,30px)}
-  .home-screen .topbar-title p{font-size:11px}
-  .v205-home-command-deck{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:7px;
-    margin-bottom:12px;
-  }
-  .v205-home-command{
-    min-height:70px;
-    padding:10px 9px;
+  .home-screen .topbar-home{align-items:center;gap:8px;margin-bottom:10px}
+  .home-screen .topbar-title{min-width:0}
+  .home-screen .topbar-title h1{font-size:clamp(22px,6.7vw,29px);letter-spacing:.035em}
+  .home-screen .topbar-title p{display:none}
+  .home-screen .topbar-home .top-actions{gap:7px}
+  .v205-home-cosmos-pill{
+    min-height:48px;
+    padding:0 11px;
     border-radius:14px;
+    column-gap:6px;
   }
-  .v205-home-command-kicker{font-size:7px;letter-spacing:.11em}
-  .v205-home-command strong{font-size:12px;letter-spacing:.035em}
-  .v205-home-command small{font-size:8px;line-height:1.18}
-  .home-screen .mode-card{border-radius:18px}
-  .home-screen .mode-card.practice-top{min-height:118px;padding:17px 18px}
-  .home-screen .mode-card.big{min-height:128px;padding:17px 18px}
-  .home-screen .mode-card.wide{min-height:126px;padding:17px 18px}
-  .home-screen .mode-title{font-size:clamp(20px,6vw,27px)}
-  .home-screen .mode-desc{font-size:11px;line-height:1.45}
-  .home-screen .home-section-label{margin:12px 2px 7px}
-  .home-screen .expert-divider{margin:14px 0 9px}
-  .home-screen .home-footer-rich{margin-top:10px;gap:8px}
+  .v205-home-cosmos-pill>span{font-size:14px}
+  .v205-home-cosmos-pill strong{font-size:10px;letter-spacing:.055em}
+  .v205-home-cosmos-pill small{font-size:6.5px;letter-spacing:.12em}
+  .home-screen .settings-gear-btn{min-width:48px;width:48px;height:48px;min-height:48px;border-radius:14px}
 
+  .home-screen .mode-card{border-radius:16px}
+  .home-screen .mode-card.practice-top{
+    min-height:88px;
+    padding:13px 15px;
+    margin-top:0;
+  }
+  .home-screen .mode-card.practice-top .mode-desc{
+    display:-webkit-box;
+    -webkit-line-clamp:1;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .home-screen .home-section-label{margin:10px 2px 6px}
+  .home-screen .home-section-label small{display:none}
+  .home-screen .mode-grid-home{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+  .home-screen .mode-card.big{
+    min-height:96px;
+    padding:13px 13px 12px;
+  }
+  .home-screen .mode-grid-home .mode-desc{display:none}
+  .home-screen .mode-grid-home .mode-title{font-size:clamp(17px,4.7vw,21px);white-space:nowrap}
+  .home-screen .mode-grid-home .mode-kicker{font-size:8px}
+  .home-screen .mode-grid-home .mode-badge{font-size:8px}
+
+  .home-screen .mode-card.wide{
+    min-height:96px;
+    padding:14px 15px;
+  }
+  .home-screen .mode-stack{margin-top:9px}
+  .home-screen .mode-card.wide .mode-desc{display:none}
+  .home-screen .mode-title{font-size:clamp(20px,5.8vw,25px)}
+  .home-screen .mode-kicker{font-size:9px;letter-spacing:.13em}
+  .home-screen .mode-badge{font-size:8px}
+  .home-screen .expert-divider{margin:10px 0 7px}
+  .home-screen .expert-divider span{font-size:9px;letter-spacing:.16em}
+
+  .v205-home-ranking-bar{
+    min-height:49px;
+    margin:9px 0 2px;
+    padding:0 13px;
+    border-radius:14px;
+    grid-template-columns:auto auto 1fr auto;
+    gap:7px;
+  }
+  .v205-home-ranking-bar>span{font-size:13px}
+  .v205-home-ranking-bar strong{font-size:10px;letter-spacing:.1em}
+  .v205-home-ranking-bar small{font-size:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .v205-home-ranking-bar b{font-size:7px}
+
+  .home-screen .home-footer-rich{
+    margin-top:9px;
+    gap:7px;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .home-screen .home-footer-rich>.secondary-btn{
+    min-height:46px;
+    padding:8px 10px;
+    font-size:10px;
+  }
+  .home-screen .cloud-note{margin-top:10px}
+
+  .settings-modal{padding:14px 9px 14px!important}
   .settings-modal .modal-card.v205-settings-card{
     width:calc(100vw - 18px);
-    max-height:92dvh;
+    max-height:calc(100dvh - 28px);
     padding:15px 13px 16px;
-    border-radius:22px;
+    border-radius:20px;
   }
+  .settings-modal .modal-head{margin-bottom:8px}
   .v205-settings-nav{
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:7px;
     margin-bottom:10px;
     padding-top:6px;
   }
-  .v205-settings-tab{min-height:48px;padding:8px 9px}
+  .v205-settings-tab{min-height:47px;padding:8px 9px;border-radius:12px}
   .v205-settings-tab strong{font-size:9px}
   .v205-settings-tab small{font-size:8px}
   .v205-settings-group>header{padding-bottom:8px}
@@ -206,11 +301,18 @@
 }
 
 @media(max-width:430px){
-  .v205-home-command-deck{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .v205-home-command small{display:none}
-  .v205-home-command{min-height:60px;align-items:center;text-align:center}
-  .v205-home-command-kicker{font-size:6.5px}
-  .v205-home-command strong{font-size:11px}
-  .home-screen .mode-grid-home{grid-template-columns:1fr;gap:8px}
-  .home-screen .mode-card.big{min-height:105px}
+  .home-screen .topbar-title h1{font-size:22px}
+  .v205-home-cosmos-pill{padding:0 9px;min-width:104px}
+  .v205-home-cosmos-pill small{display:none}
+  .home-screen .mode-grid-home{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .home-screen .mode-grid-home .mode-title{font-size:16px}
+  .home-screen .mode-card.practice-top{min-height:82px}
+  .home-screen .mode-card.wide{min-height:90px}
+  .v205-home-ranking-bar small{display:none}
+  .v205-home-ranking-bar{grid-template-columns:auto 1fr auto}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .v205-home-cosmos-pill,.v205-home-ranking-bar,.v205-settings-tab{transition:none}
+  .v205-settings-groups{will-change:auto}
 }
