@@ -8,7 +8,9 @@ const index=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const migrationOrder=fs.readFileSync(path.join(__dirname,'..','sql','V2.0.5_MIGRATION_ORDER.md'),'utf8');
 const migrationRunner=fs.readFileSync(path.join(__dirname,'..','scripts','apply-v2.0.5-db.sh'),'utf8');
 const avatarMigration=fs.readFileSync(path.join(__dirname,'..','sql','avatar-catalog-v2.0.5.sql'),'utf8');
+const avatarFallback=fs.readFileSync(path.join(__dirname,'..','sql','account-avatar-default-v2.0.5.sql'),'utf8');
 const adminManagement=fs.readFileSync(path.join(__dirname,'..','sql','admin-player-management-v2.0.5.sql'),'utf8');
+const securityHardening=fs.readFileSync(path.join(__dirname,'..','sql','security-hardening-v2.0.5.sql'),'utf8');
 
 const currentLayers=[
   'supabase-singleton-v205.js','phase0-wallclock-v205.js','phase9-staff-registration-v205.js',
@@ -22,6 +24,7 @@ const dbChain=[
   'sql/avatar-catalog-v2.0.5.sql',
   'sql/device-link-v2.0.5.sql',
   'sql/account-recovery-v2.0.5.sql',
+  'sql/account-avatar-default-v2.0.5.sql',
   'sql/progression-v2.0.5.sql',
   'sql/assignments-v2.0.5.sql',
   'sql/assignments-admin-only-v2.0.5.sql',
@@ -29,6 +32,7 @@ const dbChain=[
   'sql/admin-dashboard-v2.0.5.sql',
   'sql/staff-self-registration-v2.0.5.sql',
   'sql/admin-player-management-v2.0.5.sql',
+  'sql/security-hardening-v2.0.5.sql',
 ];
 
 const baseParts=Array.from({length:8},(_,i)=>
@@ -49,7 +53,9 @@ const tests=[
   ['database migration runner stops on SQL errors',migrationRunner.includes('ON_ERROR_STOP=1')&&migrationRunner.includes('set -euo pipefail')],
   ['canonical avatar migration includes every current avatar',currentAvatars.every(x=>avatarMigration.includes(`'${x}'`))],
   ['canonical avatar migration retires Phase 1 default and defaults new rows to nova',avatarMigration.includes("where id = 'default'")&&avatarMigration.includes("set default 'nova'")),
+  ['account RPC fallback follows canonical nova',avatarFallback.includes("DEFAULT 'nova'::text")&&avatarFallback.includes("coalesce(nullif(p_avatar_id,''), 'nova')")],
   ['admin final delete is service-role only',adminManagement.includes("v_role <> 'service_role'")&&adminManagement.includes('grant execute on function public.admin_delete_player_application_row(uuid) to service_role')&&adminManagement.includes('from public, anon, authenticated')],
+  ['security hardening is part of release chain',securityHardening.includes('sync_public_profile')&&securityHardening.includes('rls_auto_enable')],
   ['service worker precaches current extension layers',currentLayers.every(x=>sw.includes(x))],
   ['current extension layers are loaded',currentLayers.every(x=>index.includes(x))],
 ];
