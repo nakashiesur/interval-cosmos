@@ -10,6 +10,8 @@ const tests=[
   ['Phase 10 foundation assets are loaded',index.includes('phase10-ui-foundation-v205.js')&&index.includes('phase10-ui-foundation-v205.css')],
   ['service worker caches Phase 10 foundation',sw.includes('phase10-ui-foundation-v205.js')&&sw.includes('phase10-ui-foundation-v205.css')],
   ['home puts MY COSMOS beside existing settings gear',js.includes('v205-home-cosmos-pill')&&js.includes('data-v205-cosmos-open')&&js.includes("querySelector('[data-action=\"settings\"]')")],
+  ['learning history is exposed beside MY COSMOS on desktop and mobile',js.includes('configureHistoryEntry')&&js.includes('v205-home-history-pill')&&js.includes('data-v205-history-open')&&css.includes('.v205-home-history-pill')&&css.includes('.v205-phase10-history-source-hidden{display:none!important}')],
+  ['history source remains mounted in footer to prevent reinjection churn',js.includes("panel?.querySelector('.home-footer [data-v205-history-open]')")&&js.includes("source.classList.add('v205-phase10-history-source-hidden')")],
   ['home moves ranking to a dedicated EAR LINK follow-up bar',js.includes('v205-home-ranking-bar')&&js.includes('earlink-elite')&&js.includes('ONLINE RANKING')],
   ['redundant command deck is removed',js.includes("querySelector('.v205-home-command-deck')?.remove()")&&css.includes('.v205-home-command-deck{display:none!important}')],
   ['legacy footer MY COSMOS and ranking controls are hidden',js.includes('v205-phase10-source-hidden')&&css.includes('.v205-phase10-source-hidden{display:none!important}')],
