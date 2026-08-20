@@ -19,7 +19,7 @@ const tests=[
   ['late-injected settings are re-homed from any category body',js.includes("card.querySelectorAll('.setting-row')")&&js.includes('row.parentElement !== target')],
   ['settings selected category is retained across rerenders',js.includes("let settingsCategory = 'game'")&&js.includes('getSettingsCategory')],
   ['settings category change animates content height from a fixed top anchor',js.includes('animateSettingsCategory')&&js.includes('fromHeight')&&js.includes('toHeight')&&css.includes('align-items:flex-start!important')],
-  ['mobile replaces oversized practice hero with compact PRACTICE entry',js.includes('configureMobilePractice')&&js.includes("shortcut.dataset.action = 'practice'")&&js.includes('PRACTICE MODE')&&css.includes('.home-screen .mode-card.practice-top{display:none!important}')&&css.includes('v205-mobile-practice-entry')],
+  ['desktop and mobile reuse compact practice slot as PRACTICE MODE',js.includes('configurePracticeEntry')&&js.includes("shortcut.dataset.action = 'practice'")&&js.includes('🔰')&&js.includes('PRACTICE MODE')&&js.includes('v205-phase10-practice-source-hidden')&&css.includes('.v205-phase10-practice-source-hidden{display:none!important}')&&css.includes('v205-practice-entry')],
   ['mobile mode select uses compact two-column STANDARD cards',css.includes('@media(max-width:700px)')&&css.includes('grid-template-columns:repeat(2,minmax(0,1fr))')&&css.includes('.home-screen .mode-grid-home .mode-desc{display:none}')],
   ['unlock cut-in contrast baseline is strengthened',css.includes('.v205-unlock-burst section')&&css.includes('text-shadow')],
 ];
