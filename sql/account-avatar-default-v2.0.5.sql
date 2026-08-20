@@ -18,9 +18,9 @@ begin
     raise exception 'create_player_account(text,text,text,text,text,text) is missing';
   end if;
 
-  v_def := replace(v_def, "DEFAULT 'default'::text", "DEFAULT 'nova'::text");
-  v_def := replace(v_def, "default 'default'", "default 'nova'");
-  v_def := replace(v_def, "coalesce(nullif(p_avatar_id,''), 'default')", "coalesce(nullif(p_avatar_id,''), 'nova')");
+  v_def := replace(v_def, $q$DEFAULT 'default'::text$q$, $q$DEFAULT 'nova'::text$q$);
+  v_def := replace(v_def, $q$default 'default'$q$, $q$default 'nova'$q$);
+  v_def := replace(v_def, $q$coalesce(nullif(p_avatar_id,''), 'default')$q$, $q$coalesce(nullif(p_avatar_id,''), 'nova')$q$);
 
   execute v_def;
 end;
