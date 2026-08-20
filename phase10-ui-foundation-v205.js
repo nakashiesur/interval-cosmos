@@ -22,6 +22,25 @@
     return 'game';
   }
 
+  function configureMobilePractice(panel) {
+    const shortcut = panel?.querySelector('.practice-shortcut');
+    if (!shortcut) return;
+    const mobile = Boolean(window.matchMedia?.('(max-width:700px)')?.matches);
+
+    if (!shortcut.dataset.v205OriginalAction) shortcut.dataset.v205OriginalAction = shortcut.dataset.action || 'quick-adaptive';
+    if (!shortcut.dataset.v205OriginalHtml) shortcut.dataset.v205OriginalHtml = shortcut.innerHTML;
+
+    if (mobile) {
+      shortcut.dataset.action = 'practice';
+      shortcut.classList.add('v205-mobile-practice-entry');
+      if (shortcut.innerHTML !== '<strong>PRACTICE MODE</strong>') shortcut.innerHTML = '<strong>PRACTICE MODE</strong>';
+    } else {
+      shortcut.dataset.action = shortcut.dataset.v205OriginalAction || 'quick-adaptive';
+      shortcut.classList.remove('v205-mobile-practice-entry');
+      if (shortcut.dataset.v205OriginalHtml && shortcut.innerHTML !== shortcut.dataset.v205OriginalHtml) shortcut.innerHTML = shortcut.dataset.v205OriginalHtml;
+    }
+  }
+
   function ensureHomeTools() {
     const panel = document.querySelector('.home-panel');
     const topbar = panel?.querySelector('.topbar-home');
@@ -59,6 +78,8 @@
     const legacyRanking = footer?.querySelector('[data-action="records"]');
     if (legacyCosmos) legacyCosmos.classList.add('v205-phase10-source-hidden');
     if (legacyRanking) legacyRanking.classList.add('v205-phase10-source-hidden');
+
+    configureMobilePractice(panel);
   }
 
   function ensureSettingsShell(card) {
@@ -116,22 +137,20 @@
     card.classList.add('v205-settings-card');
 
     const { nav, groups, legacy } = ensureSettingsShell(card);
-    const directRows = [...card.children].filter(node => node.classList?.contains('setting-row'));
-    for (const row of directRows) {
+
+    // Move every real setting row to its semantic category. This intentionally
+    // includes rows injected after another setting row has already been moved
+    // into a category (for example Ranking publication after Online ranking).
+    const rows = [...card.querySelectorAll('.setting-row')];
+    for (const row of rows) {
+      if (row.closest('.v205-settings-legacy-sources')) continue;
       if (row.classList.contains('v205-cosmos-setting')) {
         legacy.appendChild(row);
         continue;
       }
       const category = classifySetting(row);
-      groups.querySelector(`[data-v205-settings-group="${category}"] .v205-settings-group-body`)?.appendChild(row);
-    }
-
-    for (const row of card.querySelectorAll(':scope > .setting-row')) {
-      if (row.classList.contains('v205-cosmos-setting')) legacy.appendChild(row);
-      else {
-        const category = classifySetting(row);
-        groups.querySelector(`[data-v205-settings-group="${category}"] .v205-settings-group-body`)?.appendChild(row);
-      }
+      const target = groups.querySelector(`[data-v205-settings-group="${category}"] .v205-settings-group-body`);
+      if (target && row.parentElement !== target) target.appendChild(row);
     }
 
     const existingCosmos = card.querySelector('.v205-cosmos-setting');
@@ -227,6 +246,7 @@
 
   new MutationObserver(schedule).observe(document.documentElement, { subtree:true, childList:true });
   window.addEventListener('DOMContentLoaded', schedule, { once:true });
+  window.addEventListener('resize', schedule, { passive:true });
   schedule();
 
   window.IntervalCosmosPhase10UIV205 = {
