@@ -116,6 +116,43 @@
     min-height:50px!important;
     padding:0!important;
   }
+
+  /* Runtime geometry guard: JS applies this only when the real rendered title
+     and action rectangles still overlap or leave the panel. */
+  .home-screen .topbar-home.v205-header-auto-tight{gap:8px}
+  .home-screen .topbar-home.v205-header-auto-tight .topbar-title h1{
+    font-size:24px!important;
+    letter-spacing:0!important;
+  }
+  .home-screen .topbar-home.v205-header-auto-tight .top-actions{
+    grid-template-columns:112px 106px 44px!important;
+    gap:4px!important;
+    width:270px!important;
+  }
+  .home-screen .topbar-home.v205-header-auto-tight .v205-home-cosmos-pill{
+    width:112px!important;
+    min-height:44px!important;
+    padding:0 7px!important;
+    grid-template-columns:14px minmax(0,1fr)!important;
+    column-gap:5px!important;
+  }
+  .home-screen .topbar-home.v205-header-auto-tight .v205-home-history-pill{
+    width:106px!important;
+    min-height:44px!important;
+    padding:0 7px!important;
+    grid-template-columns:14px minmax(0,1fr)!important;
+    column-gap:5px!important;
+  }
+  .home-screen .topbar-home.v205-header-auto-tight .v205-home-cosmos-pill strong,
+  .home-screen .topbar-home.v205-header-auto-tight .v205-home-history-pill strong{font-size:8px!important}
+  .home-screen .topbar-home.v205-header-auto-tight .v205-home-cosmos-pill small,
+  .home-screen .topbar-home.v205-header-auto-tight .v205-home-history-pill small{font-size:5.5px!important}
+  .home-screen .topbar-home.v205-header-auto-tight .settings-gear-btn{
+    min-width:44px!important;
+    width:44px!important;
+    height:44px!important;
+    min-height:44px!important;
+  }
 }
 
 /* The smallest desktop widths are where the previous layout could overflow.
