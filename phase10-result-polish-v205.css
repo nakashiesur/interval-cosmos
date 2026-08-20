@@ -1,0 +1,248 @@
+/* INTERVAL COSMOS v2.0.5 — Phase 10 RESULT responsive polish */
+
+.result-panel{
+  width:min(100%,1040px);
+  padding:clamp(18px,3vw,30px);
+}
+.result-head{
+  max-width:820px;
+  margin:0 auto;
+}
+.result-head .eyebrow{
+  margin-bottom:6px;
+}
+.result-head h1{
+  font-size:clamp(1.7rem,4vw,2.65rem);
+  margin-bottom:4px;
+}
+.result-mode{
+  font-size:.7rem;
+  letter-spacing:.04em;
+}
+.score-big{
+  font-size:clamp(3.6rem,9vw,6.7rem);
+  margin:14px 0 5px;
+  line-height:.92;
+}
+.score-caption{
+  font-size:.58rem;
+}
+.v205-result-rank-grid{
+  margin:14px auto 6px;
+  gap:7px;
+}
+.v205-result-rank-card{
+  min-height:72px;
+  padding:10px 11px;
+  align-content:center;
+}
+.v205-result-rank-card strong{
+  font-size:clamp(.95rem,2vw,1.15rem);
+}
+.ranking-submit{
+  margin-top:12px;
+}
+.stat-grid{
+  margin:18px 0 16px;
+  gap:7px;
+}
+.stat-card{
+  min-height:78px;
+  padding:11px 7px;
+  display:grid;
+  align-content:center;
+}
+.stat-card .label{
+  font-size:.55rem;
+}
+.stat-card .value{
+  font-size:1.12rem;
+}
+.miss-analysis,
+.analysis-section{
+  margin-top:14px;
+}
+.analysis-title{
+  margin-bottom:8px;
+}
+.analysis-title h2{
+  margin:0;
+  font-size:.88rem;
+  letter-spacing:.05em;
+}
+.analysis-title span{
+  font-size:.55rem;
+}
+.miss-grid{
+  gap:7px;
+}
+.miss-card{
+  min-height:100px;
+  padding:11px;
+}
+.mastery-grid{
+  gap:6px;
+}
+.insight-grid{
+  gap:8px;
+  margin-top:10px;
+}
+.insight-card{
+  padding:12px;
+}
+.result-actions{
+  gap:8px;
+  margin-top:18px;
+}
+.result-actions .primary-btn,
+.result-actions .secondary-btn{
+  min-height:52px;
+}
+
+@media (min-width:621px){
+  .result-actions{
+    display:grid;
+    grid-template-columns:1.35fr 1fr 1fr 1fr;
+  }
+  .result-actions .primary-btn,
+  .result-actions .secondary-btn{
+    min-width:0;
+    width:100%;
+  }
+}
+
+@media (max-width:620px){
+  .result-panel{
+    padding:15px 12px 16px;
+    border-radius:20px;
+  }
+  .result-head .eyebrow{
+    font-size:.56rem;
+    letter-spacing:.24em;
+    margin-bottom:4px;
+  }
+  .result-head h1{
+    font-size:1.7rem;
+    letter-spacing:.08em;
+  }
+  .result-mode{
+    font-size:.62rem;
+  }
+  .score-big{
+    font-size:clamp(3.25rem,18vw,5.2rem);
+    margin:11px 0 4px;
+  }
+  .score-caption{
+    font-size:.5rem;
+    letter-spacing:.2em;
+  }
+  .v205-result-rank-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    margin:12px auto 5px;
+    gap:6px;
+  }
+  .v205-result-rank-card{
+    min-height:62px;
+    padding:8px 9px;
+    border-radius:12px;
+  }
+  .v205-result-rank-card span{
+    font-size:.54rem;
+  }
+  .v205-result-rank-card strong{
+    font-size:.98rem;
+  }
+  .v205-result-rank-card small{
+    font-size:.44rem;
+  }
+  .ranking-submit{
+    margin-top:9px;
+  }
+  .stat-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    margin:13px 0;
+    gap:6px;
+  }
+  .stat-card{
+    min-height:64px;
+    padding:8px 5px;
+    border-radius:11px;
+  }
+  .stat-card .label{
+    font-size:.48rem;
+    letter-spacing:.04em;
+  }
+  .stat-card .value{
+    font-size:.92rem;
+    margin-top:2px;
+  }
+  .stat-grid .stat-card:nth-last-child(-n+2){
+    grid-column:span 1;
+  }
+  .analysis-title{
+    align-items:flex-end;
+  }
+  .analysis-title h2{
+    font-size:.75rem;
+  }
+  .analysis-title span{
+    font-size:.48rem;
+  }
+  .miss-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .miss-card{
+    min-height:88px;
+    padding:9px;
+  }
+  .mastery-grid{
+    grid-template-columns:repeat(7,minmax(0,1fr));
+    gap:4px;
+  }
+  .mastery-cell{
+    min-height:46px;
+    padding:5px 2px;
+  }
+  .mastery-cell .key{
+    font-size:.62rem;
+  }
+  .mastery-cell .pct{
+    font-size:.46rem;
+  }
+  .insight-grid{
+    grid-template-columns:1fr;
+    gap:6px;
+  }
+  .insight-card{
+    padding:10px;
+  }
+  .insight-card h3{
+    font-size:.65rem;
+  }
+  .insight-card p{
+    font-size:.62rem;
+    line-height:1.5;
+  }
+  .result-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+    margin-top:14px;
+  }
+  .result-actions .primary-btn,
+  .result-actions .secondary-btn{
+    min-width:0;
+    width:100%;
+    min-height:48px;
+    padding:11px 8px;
+  }
+}
+
+@media (max-width:390px){
+  .stat-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .mastery-grid{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+  }
+}
