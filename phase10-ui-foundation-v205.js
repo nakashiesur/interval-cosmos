@@ -3,6 +3,7 @@
   let arranging = false;
   let settingsCategory = 'game';
   let settingsAnimation = null;
+  let headerFitFrame = 0;
 
   const CATEGORY_ORDER = ['game', 'controls', 'ranking', 'account'];
   const CATEGORY_LABELS = {
@@ -35,9 +36,6 @@
   }
 
   function configureHistoryEntry(panel, topActions, cosmos) {
-    // Phase 4 owns the real launch button and uses its presence in .home-footer
-    // as an injection guard. Keep that source mounted, but hide it and expose a
-    // dedicated header trigger so rerenders cannot create duplicate history buttons.
     const source = panel?.querySelector('.home-footer [data-v205-history-open]');
     if (source) source.classList.add('v205-phase10-history-source-hidden');
 
@@ -58,6 +56,22 @@
       else if (!cosmos && gear && history.nextElementSibling !== gear) topActions.insertBefore(history, gear);
       else if (!history.parentElement) topActions.appendChild(history);
     }
+  }
+
+  function fitHomeHeader(topbar, topActions) {
+    if (!topbar || !topActions) return;
+    cancelAnimationFrame(headerFitFrame);
+    topbar.classList.remove('v205-header-auto-tight');
+    if (window.innerWidth <= 700) return;
+
+    headerFitFrame = requestAnimationFrame(() => {
+      const barRect = topbar.getBoundingClientRect();
+      const titleRect = topbar.querySelector('.topbar-title h1')?.getBoundingClientRect();
+      const actionsRect = topActions.getBoundingClientRect();
+      const overlap = titleRect ? titleRect.right + 10 > actionsRect.left : false;
+      const overflow = actionsRect.right > barRect.right + 1 || actionsRect.left < barRect.left - 1;
+      if (overlap || overflow) topbar.classList.add('v205-header-auto-tight');
+    });
   }
 
   function ensureHomeTools() {
@@ -101,6 +115,7 @@
     if (legacyRanking) legacyRanking.classList.add('v205-phase10-source-hidden');
 
     configurePracticeEntry(panel);
+    fitHomeHeader(topbar, topActions);
   }
 
   function ensureSettingsShell(card) {
@@ -158,10 +173,6 @@
     card.classList.add('v205-settings-card');
 
     const { nav, groups, legacy } = ensureSettingsShell(card);
-
-    // Move every real setting row to its semantic category. This intentionally
-    // includes rows injected after another setting row has already been moved
-    // into a category (for example Ranking publication after Online ranking).
     const rows = [...card.querySelectorAll('.setting-row')];
     for (const row of rows) {
       if (row.closest('.v205-settings-legacy-sources')) continue;
