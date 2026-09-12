@@ -77,7 +77,10 @@
   new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true });
 
   document.addEventListener('click', event => {
-    if (event.target.closest('[data-v205-history-close]')) activeFolder = 'overview';
+    if (event.target.closest('[data-v205-history-close]') ||
+        event.target.matches('.v205-history-overlay')) {
+      activeFolder = 'overview';
+    }
   }, true);
 
   scan();
