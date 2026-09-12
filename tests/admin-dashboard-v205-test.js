@@ -20,7 +20,7 @@ const tests=[
   ['dashboard uses shared singleton only',js.includes('IntervalCosmosSupabaseSingleton') && !js.includes('createClient(')],
   ['student search and course filter',js.includes('v205AdminSearch') && js.includes('v205AdminCourse')],
   ['student drilldown',js.includes('get_admin_student_dashboard') && js.includes('STUDENT DETAIL')],
-  ['play-hour analysis',js.includes('PLAY HOURS') && sql.includes("extract(hour from timezone('Asia/Tokyo'"))],
+  ['play-hour analysis',js.includes('PLAY HOURS') && sql.includes("extract(hour from timezone('Asia/Tokyo'")],
   ['responsive styles included',css.includes('@media(max-width:700px)')],
   ['dashboard assets loaded',index.includes('phase7-admin-dashboard-v205.js') && index.includes('phase7-admin-dashboard-v205.css')],
   ['dashboard assets cached',sw.includes('phase7-admin-dashboard-v205.js') && sw.includes('phase7-admin-dashboard-v205.css')],
@@ -31,7 +31,7 @@ const tests=[
   ['admin dock uses dedicated entry controls',dock.includes('data-v205-admin-dock-dashboard') && dock.includes('data-v205-admin-dock-assignments')],
   ['ordinary player controls restored outside admin',dock.includes('restoreSources') && dock.includes("classList.remove('v205-admin-dock-source')")],
   ['dock observer is guarded',dock.includes('if (queued) return') && dock.includes('if (arranging) return')],
-  ['dashboard injector checks whole document',js.includes("document.querySelector('[data-v205-admin-dashboard-open]')") && !js.includes("footer.querySelector('[data-v205-admin-dashboard-open]')")),
+  ['dashboard injector checks whole document',js.includes("document.querySelector('[data-v205-admin-dashboard-open]')") && !js.includes("footer.querySelector('[data-v205-admin-dashboard-open]')")],
   ['freeze-fix dock revision remains loaded',index.includes('phase7-admin-home-dock-v205.js?v=alpha6.2')],
 ];
 let fail=0;

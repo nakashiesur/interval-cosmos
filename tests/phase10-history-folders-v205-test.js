@@ -13,7 +13,7 @@ const tests=[
   ['three history folders exist',js.includes('overview')&&js.includes('analysis')&&js.includes('sessions')&&js.includes('概要')&&js.includes('音程分析')&&js.includes('プレイ履歴')],
   ['desktop keeps expanded layout',css.includes('.v205-history-folder-pane{display:contents}')],
   ['mobile shows only active pane',css.includes('.v205-history-folder-pane{display:none}')&&css.includes('.v205-history-folder-pane.is-active{display:block}')],
-  ['dynamic history rerenders are enhanced',js.includes('MutationObserver')&&js.includes("dataset.v205HistoryFolders"))],
+  ['dynamic history rerenders are enhanced',js.includes('MutationObserver')&&js.includes("dataset.v205HistoryFolders")],
 ];
 let fail=0;
 for(const [name,ok] of tests){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}

@@ -48,9 +48,9 @@ const tests=[
   ['key config preserves panel and overlay scroll across rerenders',polishJs.includes('bindAndRestoreScroll') && polishJs.includes('panelScrollTop') && polishJs.includes('overlayScrollTop') && polishJs.includes("target.classList.contains('v205-pc-config-panel')")],
   ['key config overlay fully masks underlying mode UI',polishCss.includes('linear-gradient(180deg,#050918 0%,#03060f 100%)') && polishCss.includes('isolation:isolate')],
   ['polish observer is child-list only',polishJs.includes('{ subtree: true, childList: true }') && !polishJs.includes('attributes: true')],
-  ['PC controls load before assignment engine',index.indexOf('phase8-pc-controls-v205.js?v=alpha8.7') < index.indexOf('phase6-assignments-v205.js?v=alpha5.1')],
+  ['PC controls load before assignment engine',index.indexOf('phase8-pc-controls-v205.js?v=alpha8.7') < index.indexOf('phase6-assignments-v205.js?v=alpha5.4')],
   ['PC input-mode assets are loaded',index.includes('phase8-pc-controls-v205.css?v=alpha8.7') && index.includes('phase8-pc-controls-v205.js?v=alpha8.7') && index.includes('phase8-config-polish-v205.css?v=alpha8.7') && index.includes('phase8-config-polish-v205.js?v=alpha8.7')],
-  ['pc assets use new cache version',sw.includes('alpha8-7')],
+  ['pc assets use current cache generation',sw.includes('alpha10-16')],
   ['pc assets cached',sw.includes('phase8-pc-controls-v205.js') && sw.includes('phase8-pc-controls-v205.css') && sw.includes('phase8-config-polish-v205.js') && sw.includes('phase8-config-polish-v205.css')],
   ['observer only watches child list',js.includes("{ subtree: true, childList: true }") && !js.includes('attributes: true')],
 ];
