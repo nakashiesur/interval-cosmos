@@ -65,7 +65,24 @@
   }
   function render(d){const p=d.player||{},av=cloud?.avatarMark?.(p.avatar_id)||'✦',f=frameStatus(d),title=(d.titles||[]).find(t=>t.equipped)?.name||'NO TITLE';getOverlay().innerHTML=`<section class="v205-cosmos-card"><button class="icon-btn v205-cosmos-close" data-v205-cosmos-close>×</button><header class="v205-cosmos-hero"><div class="v205-cosmos-avatar v205-frame-${esc(p.equipped_frame_id||'normal')}">${esc(av)}</div><div class="v205-cosmos-id"><p>MY COSMOS</p><h2>${esc(p.player_name||'PLAYER')}</h2><span>${esc(title)}</span></div><div class="v205-points"><small>COSMOS PT</small><strong>${Number(p.achievement_points||0).toLocaleString('ja-JP')}</strong><span>${esc(f.current?.name||'NORMAL')} FRAME</span></div></header><div class="v205-evolution"><div><span>${esc(f.current?.name||'NORMAL')}</span><b>${f.next?esc(f.next.name):'MAX POINT TIER'}</b></div><div class="v205-progress big"><i style="width:${f.p}%"></i></div><small>${f.next?`${f.pt.toLocaleString('ja-JP')} / ${Number(f.next.points_required||0).toLocaleString('ja-JP')} PT`:'ポイント成長段階を完遂'}</small></div>${dailyHTML(d)}${frameHTML(d)}${titleHTML(d)}${achievementHTML(d)}</section>`}
 
-  async function open(){if(opening)return;opening=true;loading();try{if(cloud?.getCachedPlayer?.()?.is_guest)throw new Error('GUESTではオンライン実績は保存されません。');render(await fetchProgress())}catch(e){console.error('[progress]',e);getOverlay().innerHTML=`<section class="v205-cosmos-card"><button class="icon-btn v205-cosmos-close" data-v205-cosmos-close>×</button><div class="v205-cosmos-error"><p>MY COSMOS</p><h2>PROGRESSION SETUP REQUIRED</h2><span>${esc(e?.message||'進行データを取得できませんでした。')}</span><small>Phase 5のSupabase追加SQLを実行後、再度開いてください。</small></div></section>`}finally{opening=false}}
+  function renderUnavailable(error, guest = false) {
+    const title = guest ? 'GUEST MODE' : '読み込みできませんでした';
+    const message = guest ? '実績・称号・フレームは正式アカウントで利用できます。' : (error?.message || '進行データを取得できませんでした。');
+    const hint = guest ? '設定の「アカウント・端末」から登録できます。' : '接続を確認して、もう一度開いてください。';
+    getOverlay().innerHTML = `<section class="v205-cosmos-card"><button class="icon-btn v205-cosmos-close" data-v205-cosmos-close>×</button><div class="v205-cosmos-error"><p>MY COSMOS</p><h2>${esc(title)}</h2><span>${esc(message)}</span><small>${esc(hint)}</small></div></section>`;
+  }
+  async function open() {
+    if (opening) return;
+    opening = true;
+    try {
+      if (cloud?.getCachedPlayer?.()?.is_guest) { renderUnavailable(null, true); return; }
+      loading();
+      render(await fetchProgress());
+    } catch (error) {
+      console.error('[progress]', error);
+      renderUnavailable(error);
+    } finally { opening = false; }
+  }
   async function refresh(){if(document.querySelector('.v205-cosmos-overlay'))render(await fetchProgress())}
 
   function inject(){

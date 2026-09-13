@@ -25,7 +25,7 @@
   }
   .answer-btn[data-pc-key]:hover::after{color:#dce8ff;border-color:rgba(94,226,255,.58)}
 }
-@media (hover:none), (pointer:coarse){
+@media (hover:none), (pointer:coarse), (max-width:780px){
   .answer-btn[data-pc-key]::after{display:none!important}
 }
 

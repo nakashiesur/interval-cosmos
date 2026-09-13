@@ -276,14 +276,14 @@
     const help = visibility === 'always_public'
       ? '今後の自己ベスト更新を自動で公開します。'
       : visibility === 'always_private'
-        ? 'ランキングには公開しません。公開中の記録も非公開にします。'
+        ? '今後の自己ベスト更新は自動公開しません。現在公開中の過去記録はそのまま残ります。'
         : '自己ベスト更新時に、公開するか毎回確認します。';
 
     const html = `<div class="setting-label"><strong>Ranking publication</strong><span>公開設定</span></div>
       <div class="v205-privacy-tabs">
         <button type="button" class="v205-privacy-btn ${visibility === 'ask' ? 'active' : ''}" data-v205-visibility="ask"><strong>毎回確認</strong><small>ベスト更新時に選択</small></button>
         <button type="button" class="v205-privacy-btn ${visibility === 'always_public' ? 'active' : ''}" data-v205-visibility="always_public"><strong>常に公開</strong><small>今後の更新を自動公開</small></button>
-        <button type="button" class="v205-privacy-btn ${visibility === 'always_private' ? 'active' : ''}" data-v205-visibility="always_private"><strong>常に非公開</strong><small>公開中の記録も隠す</small></button>
+        <button type="button" class="v205-privacy-btn ${visibility === 'always_private' ? 'active' : ''}" data-v205-visibility="always_private"><strong>常に非公開</strong><small>今後の更新を非公開</small></button>
       </div>
       <p class="v205-privacy-help">${help}</p>`;
 
@@ -295,15 +295,12 @@
     const buttons = document.querySelectorAll('[data-v205-visibility]');
     buttons.forEach(b => b.disabled = true);
     try {
-      if (value === 'always_private' && cloud.hideAllMyRankings) {
-        await cloud.hideAllMyRankings();
-      }
       await cloud.updateMyProfile({ rankingVisibility: value });
       await cloud.getMyPlayer?.();
       toast(value === 'always_public'
         ? '今後の自己ベスト更新を自動公開します。'
         : value === 'always_private'
-          ? 'ランキング記録を非公開にしました。'
+          ? '今後の更新を非公開にしました。過去の公開記録は残ります。'
           : '自己ベスト更新時に公開確認を表示します。');
       queueEnhance();
     } catch (error) {

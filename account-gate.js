@@ -132,8 +132,13 @@ function showTargetWaiting(info) {
 }
 
 function showDatabaseRequired(error) {
-  panel(`${header('DEVELOPMENT BUILD', 'DATABASE UPDATE REQUIRED', 'v2.0.5用データベースがまだ適用されていません。')}
-    <div class="ic-dev-note"><strong>現在のv2.0.4には影響ありません。</strong><p>${esc(error?.message || '新しいRPCが見つかりません。')}</p></div>
+  const missingSchema = ['PGRST202', '42P01', '42883'].includes(error?.code);
+  const title = missingSchema ? 'DATABASE UPDATE REQUIRED' : 'CONNECTION ERROR';
+  const message = missingSchema
+    ? 'v2.0.5用データベースの準備を確認してください。'
+    : 'オンライン機能に接続できませんでした。通信状態を確認して再試行してください。';
+  panel(`${header('INTERVAL COSMOS', title, message)}
+    <div class="ic-dev-note"><p>${esc(error?.message || '接続を確認できませんでした。')}</p></div>
     <div class="ic-account-actions"><button class="ic-btn secondary" data-v205-action="offline-start">ゲーム本体だけ起動</button><button class="ic-btn primary" data-v205-action="retry-boot">再確認</button></div>`);
 }
 
@@ -187,7 +192,7 @@ async function submitStudentForm(form) {
   try {
     await cloud.createStudentAccount({ studentNumber: normalized, playerName: name, courseCode: course, avatarId: avatar });
     setMessage('#v205FormMessage', '登録しました。', 'success');
-    setTimeout(() => startApp(), 350);
+    setTimeout(() => appStarted ? location.reload() : startApp(), 350);
   } catch (error) {
     console.error(error);
     const raw = String(error?.message || '登録できませんでした。');
@@ -260,12 +265,14 @@ function renderSourcePin(info, status = 'pending') {
   if (sourceCountdownTimer) clearInterval(sourceCountdownTimer);
   sourceCountdownTimer = setInterval(() => {
     const node = document.querySelector('#v205PinCountdown');
-    if (!node) return;
     const sec = Math.max(0, Math.ceil((expiresAt.getTime()-Date.now())/1000));
-    node.textContent = `有効期限 ${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
+    if (node) node.textContent = `有効期限 ${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
     if (sec <= 0) {
       clearInterval(sourceCountdownTimer); sourceCountdownTimer = null;
-      node.textContent = '有効期限切れ';
+      if (linkPollTimer) clearInterval(linkPollTimer);
+      linkPollTimer = null;
+      sourceLink = null;
+      showTransientModal('PINの有効期限が切れました', '設定から新しいPINを発行してください。');
     }
   }, 1000);
 }
@@ -385,7 +392,7 @@ window.addEventListener('click', event => {
   else if (action === 'staff-info') showStaffInfo();
   else if (action === 'chooser') appStarted ? clearUi() : showChooser();
   else if (action === 'guest') { cloud.setGuestMode(true); startApp(); }
-  else if (action === 'guest-convert') { cloud.setGuestMode(false); showStudentForm({ modal: true }); }
+  else if (action === 'guest-convert') showStudentForm({ modal: true });
   else if (action === 'source-link') openSourceLink();
   else if (action === 'confirm-source-link') confirmSourceLink();
   else if (action === 'cancel-source-link') cancelSourceLink();

@@ -81,6 +81,7 @@ vm.runInContext(code,context,{filename:'phase3-v205.js'});
   assertions.push(['false rank scene removal guard',code.includes('lastSubmitResult && !improved(lastSubmitResult)')&&code.includes('node.remove()')]);
 
   assertions.push(['privacy controls implemented',code.includes('data-v205-visibility="ask"')&&code.includes('always_public')&&code.includes('always_private')]);
+  assertions.push(['base privacy setting preserves existing public records',!code.includes('await cloud.hideAllMyRankings')&&!code.includes('公開中の記録も隠す')&&code.includes('今後の更新を非公開')]);
   assertions.push(['always-private no longer hides previous public records',hotfix.includes("rankingVisibility: 'always_private'")&&!hotfix.includes('await cloud.hideAllMyRankings')&&hotfix.includes('過去の公開記録は残ります')]);
   assertions.push(['private hotfix is loaded before phase3',index.indexOf('phase3-ranking-hotfix-v205.js')>=0&&index.indexOf('phase3-ranking-hotfix-v205.js')<index.indexOf('phase3-v205.js')]);
   assertions.push(['private hotfix is cached',sw.includes('phase3-ranking-hotfix-v205.js')]);
