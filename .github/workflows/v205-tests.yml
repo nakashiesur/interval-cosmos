@@ -46,6 +46,8 @@ jobs:
           node --check tests/phase10-ui-foundation-v205-test.js
       - name: Existing smoke tests
         run: node tests/smoke-test.js
+      - name: Service worker regression
+        run: node tests/service-worker-v205-test.js
       - name: Playback regression
         run: node tests/playback-test.js
       - name: Wall-clock timer regression
