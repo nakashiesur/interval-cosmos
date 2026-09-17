@@ -266,8 +266,16 @@
 
 @media(max-width:360px){
   .v205-cosmos-hero{
-    grid-template-columns:58px minmax(0,1fr) auto;
+    grid-template-columns:58px minmax(0,1fr);
     gap:9px;
+  }
+  .v205-cosmos-id{
+    padding-right:46px;
+  }
+  .v205-points{
+    grid-column:2;
+    grid-row:2;
+    text-align:left;
   }
   .v205-cosmos-avatar{
     width:58px;
