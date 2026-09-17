@@ -11,7 +11,7 @@ const context = {
   caches: {
     open: async () => cache,
     match: async key => saved.get(typeof key === 'string' ? key : key.url),
-    keys: async () => ['unrelated-app', 'interval-cosmos-old', 'interval-cosmos-v2-0-5-alpha10-21'],
+    keys: async () => ['unrelated-app', 'interval-cosmos-old', 'interval-cosmos-v2-0-5-alpha10-22'],
     delete: async key => deleted.push(key),
   },
   self: {location: {origin: 'https://example.test', href: 'https://example.test/cosmos/sw.js'},

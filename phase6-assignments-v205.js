@@ -29,6 +29,11 @@
   const MASTERY_KEY='intervalCosmos.mastery.v2';
   let client=null;
   let currentList=[];
+  const archiveBreakpoint=matchMedia('(min-width:781px)');
+  archiveBreakpoint.addEventListener('change',()=>{
+    const archive=document.querySelector('.v205-assignment-panel.student .v205-a-closed');
+    if(archive)archive.open=archiveBreakpoint.matches;
+  });
   let currentAssignment=null;
   let game=null;
   let raf=0;
@@ -120,10 +125,12 @@
     currentList=await rpc('get_my_assignments');
     const rows=Array.isArray(currentList)?currentList:[];
     const active=rows.filter(a=>statusOf(a)==='active').length;
+    const available=rows.filter(a=>statusOf(a)!=='closed');
+    const closed=rows.filter(a=>statusOf(a)==='closed');
     overlay().innerHTML=`<section class="v205-assignment-panel student">
       ${head('STUDENT MISSIONS','ASSIGNMENTS',active?`挑戦可能 ${active}件`:'現在挑戦できる課題はありません')}
       <div class="v205-a-toolbar"><span>何度でも挑戦できます。採用記録は最高スコアです。</span><button class="secondary-btn" data-a-refresh>↻ 更新</button></div>
-      <div class="v205-a-list">${rows.length?rows.map(studentCard).join(''):'<div class="v205-a-empty">現在公開されている課題はありません。</div>'}</div>
+      <div class="v205-a-list">${available.map(studentCard).join('')}${closed.length?`<details class="v205-a-closed" ${archiveBreakpoint.matches?'open':''}><summary>終了した課題 <span>${closed.length}件</span></summary><div class="v205-a-list">${closed.map(studentCard).join('')}</div></details>`:''}${rows.length?'':'<div class="v205-a-empty">現在公開されている課題はありません。</div>'}</div>
     </section>`;
   }
   function studentCard(a){

@@ -8,7 +8,7 @@ const sw=fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8');
 
 const tests=[
   ['layout stylesheet loaded',index.includes('phase6-game-layout-v205.css?v=alpha5.4')],
-  ['assignment runtime cache-busted',index.includes('phase6-assignments-v205.js?v=alpha5.5')],
+  ['assignment runtime cache-busted',index.includes('phase6-assignments-v205.js?v=alpha5.7')],
   ['layout stylesheet cached',sw.includes("'./phase6-game-layout-v205.css'" )],
   ['game-only overlay scope',css.includes('.v205-assignment-overlay:has(> .v205-a-game)')],
   ['normal play selectors are not globally overridden',!/(^|\n)\.play-shell\s*\{/.test(css)&&!/(^|\n)\.play-screen\s*\{/.test(css)],
