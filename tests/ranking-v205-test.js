@@ -78,6 +78,12 @@ vm.runInContext(code,context,{filename:'phase3-v205.js'});
   const prompt=overlays.get('v205-publication-overlay');
   assertions.push(['publication prompt rendered',Boolean(prompt)&&prompt.innerHTML.includes('このランキングを公開する')&&prompt.innerHTML.includes('非公開のまま続ける')]);
 
+  submitResult={session_id:'s2',publication_required:true,monthly_rank:51,hall_rank:52,monthly_best_improved:true,hall_best_improved:true};
+  await cloud.submitScore({mode:'TEXT',score:800});
+  const fallbackTimer=timers.find(t=>t.ms===180);
+  fallbackTimer?.fn();
+  assertions.push(['outside top 50 retains the separate privacy choice',Boolean(fallbackTimer)&&prompt.innerHTML.includes('51位相当')&&prompt.innerHTML.includes('52位相当')]);
+
   await cloud.fetchRankings({mode:'TEXT',scope:'monthly'});
   assertions.push(['ranking rows cached',windowObj.IntervalCosmosV205.getRankingCache().length===1]);
 
