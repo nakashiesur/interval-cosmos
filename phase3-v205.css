@@ -145,6 +145,37 @@
 .v205-publication-note { margin:12px 0 18px; color:var(--muted); line-height:1.6; font-size:.63rem; }
 .v205-publication-actions { display:grid; grid-template-columns:1fr 1.2fr; gap:8px; }
 
+.rank-burst.v205-rank-privacy-burst {
+  z-index:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  padding:20px 16px max(20px,env(safe-area-inset-bottom));
+  overflow-y:auto;
+  pointer-events:auto;
+  animation:v205RankPrivacyEnter .4s ease-out both;
+}
+.rank-burst.v205-rank-privacy-burst .rank-burst-rings { pointer-events:none; }
+.rank-burst.v205-rank-privacy-burst .rank-burst-rank { font-size:clamp(3.8rem,17vw,7rem); }
+.v205-rank-privacy-panel {
+  position:relative;
+  width:min(100%,520px);
+  padding:16px 18px;
+  border:1px solid rgba(255,215,101,.4);
+  border-radius:20px;
+  background:linear-gradient(150deg,#1c2133,#0a1020);
+  box-shadow:0 18px 55px rgba(0,0,0,.6);
+  color:#f7fbff;
+  text-align:center;
+}
+.v205-rank-privacy-panel h2 { margin:0; font-size:clamp(1.1rem,4.5vw,1.5rem); }
+.v205-rank-privacy-panel .v205-publication-positions { margin:10px 0 8px; }
+.v205-rank-privacy-panel .v205-publication-note { margin:8px 0 12px; }
+.v205-rank-privacy-panel .v205-publication-actions button { font-size:clamp(12px,3.5vw,14px); letter-spacing:.06em; white-space:nowrap; }
+@keyframes v205RankPrivacyEnter { from { opacity:0; transform:scale(.96) } to { opacity:1; transform:scale(1) } }
+
 .v205-profile-card { position:relative; width:min(100%,620px); }
 .v205-profile-close { position:absolute; right:14px; top:14px; z-index:2; }
 .v205-profile-loading { min-height:280px; display:flex; align-items:center; justify-content:center; gap:10px; color:var(--muted); font-size:.72rem; }

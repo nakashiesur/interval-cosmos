@@ -57,6 +57,7 @@ const context = {
 };
 vm.createContext(context);
 const code=fs.readFileSync(path.join(__dirname,'..','phase3-v205.js'),'utf8');
+const appCode=fs.readFileSync(path.join(__dirname,'..','app.js'),'utf8');
 const hotfix=fs.readFileSync(path.join(__dirname,'..','phase3-ranking-hotfix-v205.js'),'utf8');
 const index=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const sw=fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8');
@@ -67,6 +68,10 @@ vm.runInContext(code,context,{filename:'phase3-v205.js'});
 
   submitResult={session_id:'s1',publication_required:true,monthly_rank:1,hall_rank:2,monthly_best_improved:true,hall_best_improved:true};
   await cloud.submitScore({mode:'TEXT',score:1000});
+  const burst=makeNode();
+  const mounted=windowObj.IntervalCosmosRankingPrivacy.mountBurst(burst,submitResult);
+  assertions.push(['publication choice mounts in the rank scene',mounted&&burst.innerHTML.includes('このランキングを公開する')&&burst.innerHTML.includes('非公開のまま続ける')]);
+  assertions.push(['ordinary rank scene remains timed',appCode.includes('mountBurst?.(node, result)')&&appCode.includes('if (!awaitingChoice) window.setTimeout(() => node.remove(), 2300)')]);
   const promptTimer=timers.find(t=>t.ms===2300);
   assertions.push(['publication waits for rank scene',Boolean(promptTimer)]);
   promptTimer?.fn();

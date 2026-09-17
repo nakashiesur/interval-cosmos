@@ -707,7 +707,7 @@ async function submitOnlineScore(finalScore) {
       render();
       animateResultScore(finalScore);
       const bestRank = Math.min(Number(result?.monthly_rank || 9999), Number(result?.hall_rank || 9999));
-      if (bestRank <= 50) showRankBurst(bestRank, finalScore);
+      if (bestRank <= 50) showRankBurst(bestRank, finalScore, result);
     }
   } catch (error) {
     console.error(error);
@@ -716,12 +716,13 @@ async function submitOnlineScore(finalScore) {
   }
 }
 
-function showRankBurst(rank, score) {
+function showRankBurst(rank, score, result) {
   const node = document.createElement('div');
   node.className = 'rank-burst';
   node.innerHTML = `<div class="rank-burst-rings"></div><div class="rank-burst-copy"><div class="rank-burst-kicker">RANK IN</div><div class="rank-burst-rank">${rank}<span>${rank === 1 ? 'st' : rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th'}</span></div><div class="rank-burst-score">${formatNumber(score)} pts</div></div>`;
   overlayRoot.append(node);
-  window.setTimeout(() => node.remove(), 2300);
+  const awaitingChoice = window.IntervalCosmosRankingPrivacy?.mountBurst?.(node, result);
+  if (!awaitingChoice) window.setTimeout(() => node.remove(), 2300);
 }
 
 function showScoreFloater(delta) {
@@ -1363,7 +1364,7 @@ app.addEventListener('pointerleave', cancelHold);
 app.addEventListener('pointercancel', cancelHold);
 
 window.addEventListener('keydown', event => {
-  if (event.repeat) return;
+  if (event.repeat || event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
   if (event.key === 'Escape') {
     if (state.showSettings || state.showRecords || (state.showPlayerSetup && state.profile)) { state.showSettings=false; state.showRecords=false; if (state.profile) state.showPlayerSetup=false; render(); }
     return;

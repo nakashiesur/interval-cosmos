@@ -134,8 +134,40 @@
     window.setTimeout(() => {
       if (lastSubmitResult?.session_id !== result.session_id) return;
       if (!document.querySelector('.result-panel')) return;
+      if (document.querySelector('.rank-burst.v205-rank-privacy-burst')) return;
       showPublicationPrompt(result);
     }, delay);
+  }
+
+  function mountPublicationInRankBurst(node, result) {
+    if (!node || !result?.publication_required || !result?.session_id || !improved(result)) return false;
+    if (lastSubmitResult?.session_id !== result.session_id) return false;
+    node.classList.add('v205-rank-privacy-burst');
+    node.setAttribute('role', 'dialog');
+    node.setAttribute('aria-modal', 'true');
+    node.setAttribute('aria-label', 'ランキング公開設定');
+    node.innerHTML += `<section class="v205-rank-privacy-panel" aria-label="ランキング公開設定">
+      <h2>この記録を公開しますか？</h2>
+      <p class="v205-publication-copy">自己ベストを更新しました。公開しなくても順位相当は自分に表示されます。</p>
+      <div class="v205-publication-positions">
+        <div><span>月間</span><strong>${result.monthly_rank || '-'}${result.monthly_rank ? '位相当' : ''}</strong></div>
+        <div><span>殿堂</span><strong>${result.hall_rank || '-'}${result.hall_rank ? '位相当' : ''}</strong></div>
+      </div>
+      <p class="v205-publication-note">公開されるのはプレイヤー名・コースバッジ・アバター・称号・フレーム・スコア・正答率・最大コンボです。学籍番号は公開されません。</p>
+      <div class="v205-publication-actions">
+        <button type="button" class="secondary-btn" data-v205-publication="private">非公開のまま続ける</button>
+        <button type="button" class="primary-btn" data-v205-publication="public">このランキングを公開する</button>
+      </div>
+    </section>`;
+    node.querySelector('[data-v205-publication="private"]')?.focus();
+    return true;
+  }
+
+  window.IntervalCosmosRankingPrivacy = { mountBurst: mountPublicationInRankBurst };
+
+  function closePublicationPresentation() {
+    closeOverlay('v205-publication-overlay');
+    document.querySelector('.rank-burst.v205-rank-privacy-burst')?.remove();
   }
 
   function showPublicationPrompt(result) {
@@ -172,7 +204,7 @@
         monthly_rank: published?.monthly_rank ?? lastSubmitResult?.monthly_rank,
         hall_rank: published?.hall_rank ?? lastSubmitResult?.hall_rank,
       };
-      closeOverlay('v205-publication-overlay');
+      closePublicationPresentation();
       toast('ランキングを公開しました。');
       queueEnhance();
     } catch (error) {
@@ -185,7 +217,7 @@
 
   function keepCurrentScorePrivate() {
     if (lastSubmitResult) lastSubmitResult.publication_required = false;
-    closeOverlay('v205-publication-overlay');
+    closePublicationPresentation();
     toast('この記録は非公開のまま保存しました。');
     queueEnhance();
   }
@@ -452,7 +484,7 @@
   }, true);
 
   window.addEventListener('keydown', event => {
-    if (event.repeat) return;
+    if (event.repeat || event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
 
     const focusedRow = event.target?.closest?.('.ranking-row[data-v205-player-id]');
     if (focusedRow && (event.key === 'Enter' || event.key === ' ')) {
@@ -461,7 +493,7 @@
       return;
     }
 
-    if (event.key === 'Escape' && document.querySelector('.v205-publication-overlay')) {
+    if (event.key === 'Escape' && document.querySelector('.v205-publication-overlay,.rank-burst.v205-rank-privacy-burst')) {
       event.preventDefault();
       event.stopImmediatePropagation();
       keepCurrentScorePrivate();
