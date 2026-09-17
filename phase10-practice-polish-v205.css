@@ -386,3 +386,12 @@
     letter-spacing:.035em;
   }
 }
+
+/* Keep the guide heading intact while preserving a labelled back button. */
+@media(max-width:780px){
+  .guide-panel>.topbar{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:16px}
+  .guide-panel>.topbar>.secondary-btn{justify-self:start;min-height:44px;padding:9px 14px;white-space:nowrap}
+  .guide-panel>.topbar>span{display:none}
+  .guide-panel>.topbar .topbar-title h1{font-size:1.35rem;letter-spacing:.02em}
+  .guide-panel>.topbar .topbar-title p{margin-top:6px}
+}

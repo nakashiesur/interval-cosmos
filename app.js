@@ -164,6 +164,7 @@ function displayNote(note, midi, intervalKey) {
   return intervalKey === 'P8' ? `${note}${subscriptNumber(Math.floor(midi / 12) - 1)}` : note;
 }
 function cloudStatusLabel() {
+  if (state.cloudStatus === 'offline') return 'OFFLINE · 端末に保存';
   if (state.cloudStatus === 'ready') return 'ONLINE';
   if (state.cloudStatus === 'connecting') return 'CONNECTING';
   if (state.cloudStatus === 'error') return 'CONNECTION ERROR';
@@ -672,7 +673,8 @@ function endGame() {
 async function submitOnlineScore(finalScore) {
   if (!state.game || state.game.onlineSubmitted) return;
   state.game.onlineSubmitted = true;
-  if (state.cloudStatus !== 'ready' || !cloud) {
+  const knownPlayer = state.profile && !state.profile.is_guest && (state.profile.id || state.profile.player_id);
+  if (!cloud || (!['ready','offline'].includes(state.cloudStatus) && !knownPlayer)) {
     state.rankingSubmit = { status: 'unavailable' };
     if (state.screen === 'result') render();
     return;
@@ -700,7 +702,7 @@ async function submitOnlineScore(finalScore) {
       maxCombo: state.game.maxCombo,
       avgResponse: avg,
     });
-    state.rankingSubmit = { status: 'done', ...(result || {}) };
+    state.rankingSubmit = { status: result?.queued ? 'queued' : 'done', ...(result || {}) };
     if (state.screen === 'result') {
       render();
       animateResultScore(finalScore);
@@ -980,6 +982,8 @@ function recommendationText() {
 function rankingSubmitHTML() {
   if (!mode()?.ranked) return '';
   const r = state.rankingSubmit;
+  if (r?.status === 'queued') return `<div class="ranking-submit pending"><strong>端末に保存しました</strong><span>接続後に再送します。「保存・同期」で状況を確認できます。</span></div>`;
+  if (r?.status === 'synced-later') return `<div class="ranking-submit done"><strong>送信が完了しました</strong><span>「保存・同期」で公開状況を確認できます。</span></div>`;
   if (!r || r.status === 'preparing' || r.status === 'sending') return `<div class="ranking-submit pending"><span class="spinner"></span>オンラインランキングへ送信中</div>`;
   if (r.status === 'profile_required') return `<div class="ranking-submit warning">ランキング登録にはプレイヤー名が必要です。</div>`;
   if (r.status === 'unavailable') return `<div class="ranking-submit muted">オンラインランキングは未設定です。</div>`;
@@ -1139,7 +1143,7 @@ async function initializeCloud() {
   state.cloudStatus = 'connecting';
   try {
     const data = await cloud.init();
-    state.cloudStatus = 'ready';
+    state.cloudStatus = data.status === 'offline' ? 'offline' : 'ready';
     state.cloudUserId = data.user?.id || null;
     state.profile = data.profile || null;
     state.playerDraft = state.profile?.player_name || '';
@@ -1374,9 +1378,25 @@ window.addEventListener('keydown', event => {
 });
 
 window.addEventListener('beforeunload', () => { saveSettings(); saveMastery(); });
+window.addEventListener('online', initializeCloud);
+window.addEventListener('offline', () => {
+  if (state.profile && !state.profile.is_guest) state.cloudStatus = 'offline';
+  if (state.screen !== 'play') render();
+});
+window.addEventListener('interval-cosmos-sync', () => {
+  const pending = state.rankingSubmit;
+  if (pending?.status !== 'queued') return;
+  const saved = cloud?.getSavedPlays?.().find(r => r.payload.clientEventId === pending.client_event_id);
+  if (saved?.status === 'synced') {
+    state.rankingSubmit = {...pending,status:'synced-later'};
+    if (state.screen === 'result') render();
+  }
+});
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  const registerWorker = () => navigator.serviceWorker.register('./sw.js').catch(() => {});
+  if (document.readyState === 'complete') registerWorker();
+  else window.addEventListener('load', registerWorker, {once:true});
 }
 
 saveSettings();

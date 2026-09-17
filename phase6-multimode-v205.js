@@ -85,21 +85,10 @@
 
       const clientEventId = payload.clientEventId || eventId();
       const playedAt = payload.playedAt || new Date().toISOString();
-      const result = await rpc('submit_assignment_session_v2', {
-        p_client_event_id: clientEventId,
-        p_assignment_id: payload.assignmentId,
-        p_mode: payload.mode,
-        p_score: Math.max(0, Math.round(payload.score || 0)),
-        p_total_answers: Math.max(0, Math.round(payload.totalAnswers || 0)),
-        p_correct_answers: Math.max(0, Math.round(payload.correctAnswers || 0)),
-        p_max_combo: Math.max(0, Math.round(payload.maxCombo || 0)),
-        p_avg_response: Number(payload.avgResponse || 0),
-        p_interval_stats: payload.intervalStats || {},
-        p_played_at: playedAt,
-      });
+      const result = await originalSubmit({...payload, clientEventId, playedAt});
       lastSubmission = { ...(result || {}), client_event_id: clientEventId, played_at: playedAt };
       window.IntervalCosmosAssignmentMultiModeV205.lastSubmission = lastSubmission;
-      try { window.IntervalCosmosProgressV205?.evaluate?.(); } catch {}
+      if (!result?.queued) try { window.IntervalCosmosProgressV205?.evaluate?.(); } catch {}
       scheduleEnhance();
       return {
         ...(result || {}),

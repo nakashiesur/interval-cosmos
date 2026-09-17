@@ -18,6 +18,7 @@ const files = [
   'sql/staff-self-registration-v2.0.5.sql',
   'sql/admin-player-management-v2.0.5.sql',
   'sql/security-hardening-v2.0.5.sql',
+  'supabase/migrations/20260915032833_offline_submission_guard.sql',
 ];
 
 for (const relative of files) {

@@ -4,6 +4,12 @@
   let client = null;
   let authUser = null;
   let player = null;
+  let syncing = null;
+  const outbox = (() => {try {return window.IntervalCosmosOutboxStore?.create(localStorage);} catch {return null;}})();
+  const offlineProfileKey = `intervalCosmos.offlineProfile.v205:${config.supabaseUrl || ''}`;
+  const playerId = () => player?.player_id || player?.id;
+  const notifySync = () => window.dispatchEvent(new CustomEvent('interval-cosmos-sync'));
+  const temporaryFailure = error => !error?.code || /^(08|53|57|PGRST00)/.test(error.code);
 
   const configured = () =>
     Boolean(config.supabaseUrl && (config.supabasePublishableKey || config.supabaseAnonKey));
@@ -96,7 +102,10 @@
       script.async = true;
       script.dataset.supabaseSdk = 'true';
       script.onload = resolve;
-      script.onerror = () => reject(new Error('Supabase SDKを読み込めませんでした。'));
+      script.onerror = () => {
+        script.remove(); // A failed script must not leave later init calls waiting forever.
+        reject(new Error('Supabase SDKを読み込めませんでした。'));
+      };
       document.head.appendChild(script);
     });
   }
@@ -156,6 +165,9 @@
     if (error) throw error;
 
     player = firstRow(data);
+    if (player) {
+      try { localStorage.setItem(offlineProfileKey, JSON.stringify({authId: authUser.id, player})); } catch {}
+    }
     if (player) setGuestMode(false);
     return player;
   }
@@ -170,8 +182,21 @@
       return { configured: false, status: 'unconfigured', user: null, profile: null, player: null };
     }
 
-    await ensureAuth();
-    const profile = await getMyPlayer();
+    let profile;
+    try {
+      if (navigator.onLine === false) throw new Error('Offline');
+      await ensureAuth();
+      profile = await getMyPlayer();
+    } catch (error) {
+      if (!temporaryFailure(error) || isGuestMode()) throw error;
+      const saved = JSON.parse(localStorage.getItem(offlineProfileKey) || 'null');
+      if (!saved?.player || (authUser?.id && authUser.id !== saved.authId)) throw error;
+      // This snapshot grants no server access. Replay verifies the live session and binding.
+      player = saved.player;
+      authUser = {id: saved.authId};
+      return {configured: true, status: 'offline', user: authUser, profile: normalizePlayer(player)};
+    }
+    syncSavedPlays().catch(() => {});
 
     return {
       configured: true,
@@ -280,9 +305,6 @@
   }
 
   async function submitScore(payload) {
-    await ensureAuth();
-    if (!player) await loadActualPlayer();
-
     if (!player && isGuestMode()) {
       return {
         guest: true,
@@ -295,34 +317,78 @@
         hall_improved: false,
       };
     }
+    if (!player) await loadActualPlayer();
     if (!player) throw new Error('プレイヤー情報が未設定です。');
+    if (!outbox || !authUser?.id) throw new Error('端末に記録を保存できません。');
 
     const clientEventId = payload.clientEventId || createClientEventId();
     const playedAt = payload.playedAt || new Date().toISOString();
+    const row = {authId: authUser.id, playerId: playerId(), visibility: player.ranking_visibility || 'ask',
+      status: 'pending', payload: {...payload, clientEventId, playedAt,
+        source: payload.source || 'ranked', score: Math.max(0,Math.round(payload.score || 0)),
+        totalAnswers: Math.max(0,Math.round(payload.totalAnswers || 0)),
+        correctAnswers: Math.max(0,Math.round(payload.correctAnswers || 0)),
+        maxCombo: Math.max(0,Math.round(payload.maxCombo || 0)), avgResponse: Number(payload.avgResponse || 0)}};
+    try {
+      const existing = outbox.get(row);
+      if (existing && existing.playerId !== row.playerId) throw new Error('Different owner');
+      if (!existing) outbox.save(row);
+    }
+    catch { throw new Error('端末に保存できません。ブラウザの保存領域を確認してください。'); }
+    await syncSavedPlays();
+    const saved = outbox.get(row);
+    return saved.status === 'synced' ? saved.result : {queued: true, client_event_id: clientEventId, played_at: playedAt};
+  }
 
-    const { data, error } = await client.rpc('submit_play_session', {
-      p_client_event_id: clientEventId,
-      p_source: payload.source || 'ranked',
-      p_mode: payload.mode,
-      p_score: Math.max(0, Math.round(payload.score || 0)),
-      p_total_answers: Math.max(0, Math.round(payload.totalAnswers || 0)),
-      p_correct_answers: Math.max(0, Math.round(payload.correctAnswers || 0)),
-      p_max_combo: Math.max(0, Math.round(payload.maxCombo || 0)),
-      p_avg_response: Number(payload.avgResponse || 0),
-      p_interval_stats: payload.intervalStats || {},
-      p_played_at: playedAt,
-      p_assignment_id: payload.assignmentId || null,
-    });
-    if (error) throw error;
+  function getSavedPlays() { return outbox?.list(authUser?.id, playerId()) || []; }
 
-    const result = firstRow(data) || {};
-    return {
-      ...result,
-      monthly_improved: Boolean(result.monthly_best_improved),
-      hall_improved: Boolean(result.hall_best_improved),
-      client_event_id: clientEventId,
-      played_at: playedAt,
-    };
+  async function syncSavedPlays() {
+    if (syncing) { await syncing; return syncSavedPlays(); }
+    if (!outbox || !authUser?.id || !playerId() || navigator.onLine === false) return;
+    const owner = {authId: authUser.id, playerId: playerId()};
+    syncing = (async () => {
+      if (!getSavedPlays().some(r => r.status === 'pending')) return;
+      await ensureClient();
+      const {data, error} = await client.auth.getSession();
+      if (error) throw error;
+      if (data.session?.user?.id !== owner.authId) return;
+      const {data: actual, error: profileError} = await client.rpc('get_my_player');
+      if (profileError) throw profileError;
+      const live = firstRow(actual);
+      if ((live?.player_id || live?.id) !== owner.playerId) return;
+      let sent = false;
+      for (const row of outbox.list(owner.authId, owner.playerId).filter(r => r.status === 'pending')) {
+        const {data: result, error: sendError} = await client.rpc('submit_saved_play', {
+          p_player_id: row.playerId, p_visibility: row.visibility, p_payload: row.payload,
+        });
+        if (sendError) {
+          if (temporaryFailure(sendError)) break;
+          if (outbox.get(row)?.status !== 'synced') outbox.save({...row, status: 'blocked', errorCode: sendError.code, error: sendError.message});
+          continue;
+        }
+        const r = firstRow(result) || {};
+        outbox.save({...row, status: 'synced', result: {...r,
+          monthly_improved: Boolean(r.monthly_best_improved), hall_improved: Boolean(r.hall_best_improved),
+          client_event_id: row.payload.clientEventId, played_at: row.payload.playedAt}});
+        sent = true;
+      }
+      if (sent) window.IntervalCosmosProgressV205?.evaluate?.().catch(() => {});
+    })().catch(error => { console.warn('[saved plays]', error.message); }).finally(() => {syncing = null; notifySync();});
+    return syncing;
+  }
+
+  async function retrySavedPlay(eventId, acceptVisibility = null) {
+    const row = getSavedPlays().find(r => r.payload.clientEventId === eventId);
+    if (!row || row.status === 'synced') return;
+    // Explicit user action only: never adopt a new publication policy in background.
+    if (acceptVisibility) {
+      await loadActualPlayer();
+      if (row.authId !== authUser?.id || row.playerId !== playerId()) throw new Error('アカウントが変わりました。');
+      if (acceptVisibility !== player.ranking_visibility) throw new Error('公開設定が変わりました。');
+      row.visibility = acceptVisibility;
+    }
+    outbox.save({...row, status: 'pending', error: null, errorCode: null});
+    return syncSavedPlays();
   }
 
   async function publishPlaySession(sessionId) {
@@ -331,6 +397,10 @@
       p_session_id: sessionId,
     });
     if (error) throw error;
+    for (const row of getSavedPlays()) {
+      if (row.result?.session_id === sessionId) outbox.save({...row,result:{...row.result,publication_required:false}});
+    }
+    notifySync();
     return firstRow(data);
   }
 
@@ -496,6 +566,9 @@
     updateMyProfile,
     saveProfile,
     submitScore,
+    getSavedPlays,
+    syncSavedPlays,
+    retrySavedPlay,
     publishPlaySession,
     hideAllMyRankings,
     fetchRankings,
@@ -518,4 +591,7 @@
     getCachedPlayer,
     getAuthUser,
   };
+  window.addEventListener('online', () => syncSavedPlays());
+  window.addEventListener('visibilitychange', () => { if (!document.hidden) syncSavedPlays(); });
+  window.setInterval(() => syncSavedPlays(), 30000);
 })();

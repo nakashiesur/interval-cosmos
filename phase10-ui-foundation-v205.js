@@ -87,6 +87,7 @@
       cosmos = document.createElement('button');
       cosmos.type = 'button';
       cosmos.className = 'v205-home-cosmos-pill';
+      cosmos.setAttribute('aria-label', 'MY COSMOS プロフィール');
       cosmos.dataset.v205CosmosOpen = '1';
       cosmos.innerHTML = '<span aria-hidden="true">✦</span><strong>MY COSMOS</strong><small>PROFILE</small>';
       const gear = topActions.querySelector('[data-action="settings"]');

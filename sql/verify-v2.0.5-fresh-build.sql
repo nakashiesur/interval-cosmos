@@ -111,7 +111,7 @@ begin
   select string_agg(req.name, ', ' order by req.name) into v_missing
   from unnest(array[
     'current_player_id','is_current_admin','create_player_account','get_my_player','update_my_profile',
-    'submit_play_session','publish_play_session','get_public_rankings','get_public_profile_card',
+    'submit_play_session','submit_saved_play','publish_play_session','get_public_rankings','get_public_profile_card',
     'create_device_link_request','claim_device_link_request','confirm_device_link_request',
     'get_device_link_source_status','get_device_link_target_status','cancel_device_link_request',
     'set_my_recovery_code','get_my_recovery_status','recover_student_account',
