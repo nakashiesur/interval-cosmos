@@ -11,7 +11,7 @@ const context = {
   caches: {
     open: async () => cache,
     match: async key => saved.get(typeof key === 'string' ? key : key.url),
-    keys: async () => ['unrelated-app', 'interval-cosmos-old', 'interval-cosmos-v2-0-5-alpha10-24'],
+    keys: async () => ['unrelated-app', 'interval-cosmos-old', 'interval-cosmos-v2-0-5-alpha10-25'],
     delete: async key => deleted.push(key),
   },
   self: {location: {origin: 'https://example.test', href: 'https://example.test/cosmos/sw.js'},
@@ -49,6 +49,6 @@ async function request(route, response, mode = 'navigate') {
   await request('cloud-config.js', new Response('unavailable', {status:503}), 'cors');
   assert.equal(await (await request('cloud-config.js', new Error('offline'), 'cors')).text(), 'public configuration');
   let activated; handlers.activate({waitUntil: p => activated = p}); await activated;
-  assert.deepEqual(deleted, ['interval-cosmos-old', 'interval-cosmos-v2-0-5-alpha10-24']);
+  assert.deepEqual(deleted, ['interval-cosmos-old', 'interval-cosmos-v2-0-5-alpha10-25']);
   console.log('PASS app-only navigation cache, offline fallback, HTTP errors, and scoped cleanup');
 })().catch(error => {console.error(error); process.exitCode = 1;});

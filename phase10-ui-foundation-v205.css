@@ -228,13 +228,17 @@
 /* Phase 10 readability baseline for progression cut-ins. */
 .v205-unlock-burst section,
 .v205-unlock-burst section.v205-phase10-readable{
-  background:linear-gradient(145deg,rgba(7,13,29,.96),rgba(18,24,50,.94));
+  box-sizing:border-box;
+  width:min(560px,calc(100vw - 32px));
+  padding:24px 18px;
+  border-radius:20px;
+  background:linear-gradient(145deg,#070d1d,#121832);
   border:1px solid rgba(111,225,255,.45);
   box-shadow:0 24px 72px rgba(0,0,0,.48),0 0 38px rgba(80,220,255,.14);
   text-shadow:0 2px 12px rgba(0,0,0,.78);
 }
 .v205-unlock-burst section p{color:#72e5ff!important}
-.v205-unlock-burst section h2{color:#f7fbff!important;text-shadow:0 2px 16px rgba(0,0,0,.85)}
+.v205-unlock-burst section h2{color:#f7fbff!important;font-size:clamp(26px,7vw,58px);line-height:1.06;overflow-wrap:anywhere;text-shadow:0 2px 16px rgba(0,0,0,.85)}
 .v205-unlock-burst section span{color:#c9d6ed!important}
 
 /* Calmer desktop MODE SELECT hierarchy. */
