@@ -8,6 +8,12 @@
     HD_KEYS:{label:'HYPER DRIVE / KEYS',duration:75,view:'keys',hyper:true},
     EAR_LINK:{label:'EAR LINK',duration:60,view:'ear',hyper:false},
   });
+  const COURSE_LABELS = Object.freeze({
+    piano:'ピアノコース', orchestral:'管弦打楽コース', vocal_musical:'声楽・ミュージカルコース',
+    composition:'作曲コース', rock_pops:'ロック＆ポップスコース', electronic_organ:'電子オルガンコース',
+    sound_design:'サウンドデザインコース', music_education:'音楽教育コース', music_therapy:'音楽療法コース',
+    child_culture:'こども文化コース', voice_actor:'声優コース',
+  });
   const INTERVALS = Object.freeze([
     {key:'P1',n:1,semitones:0,jp:'完全1度',formula:'0半音'},
     {key:'m2',n:2,semitones:1,jp:'短2度',formula:'1半音'},
@@ -210,7 +216,7 @@
         ${head('TEACHER RESULTS',a?.title||'ASSIGNMENT',`${Array.isArray(rows)?rows.length:0} students`)}
         <div class="v205-a-toolbar"><button class="secondary-btn" data-a-back-teacher>← 課題一覧</button></div>
         <div class="v205-a-results">${(rows||[]).map(r=>`<div class="v205-a-result-row ${r.achieved?'achieved':''}">
-          <div><strong>${esc(r.student_number||'—')}　${esc(r.player_name||'PLAYER')}</strong><span>${esc(r.course_code||'')}</span></div>
+          <div><strong>${esc(r.student_number||'—')}　${esc(r.player_name||'PLAYER')}</strong><span>${esc(COURSE_LABELS[r.course_code]||r.course_code||'所属未設定')}</span></div>
           <div><small>ATTEMPTS</small><b>${Number(r.attempts||0)}</b></div><div><small>BEST</small><b>${r.best_score==null?'—':fmt(r.best_score)}</b></div><div><small>ACC.</small><b>${r.best_accuracy==null?'—':`${Number(r.best_accuracy).toFixed(1).replace('.0','')}%`}</b></div>
           <em>${r.achieved?'ACHIEVED':r.attempts?'IN PROGRESS':'NOT STARTED'}</em>
         </div>`).join('')}</div>
