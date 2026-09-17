@@ -111,9 +111,9 @@
   .v205-history-close{
     right:12px;
     top:12px;
-    width:42px;
-    min-width:42px;
-    height:42px;
+    width:44px;
+    min-width:44px;
+    height:44px;
   }
   .v205-history-head{
     padding-right:48px;
@@ -172,8 +172,8 @@
   .v205-history-title .v205-weak-button{
     width:auto;
     min-width:0;
-    min-height:34px;
-    padding:7px 9px;
+    min-height:44px;
+    padding:10px 9px;
     font-size:9px;
     white-space:nowrap;
   }

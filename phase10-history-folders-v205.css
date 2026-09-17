@@ -19,8 +19,8 @@
   .v205-history-folder-nav button{
     appearance:none;
     min-width:0;
-    min-height:38px;
-    padding:7px 5px;
+    min-height:44px;
+    padding:10px 5px;
     border:1px solid rgba(125,151,205,.22);
     border-radius:11px;
     background:rgba(255,255,255,.025);
