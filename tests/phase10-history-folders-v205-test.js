@@ -9,7 +9,7 @@ const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
 const tests=[
   ['folder stylesheet loaded',index.includes('phase10-history-folders-v205.css?v=alpha10.2')],
   ['folder script loaded',index.includes('phase10-history-folders-v205.js?v=alpha10.2')],
-  ['folder assets cached',sw.includes('phase10-history-folders-v205.css')&&sw.includes('phase10-history-folders-v205.js')&&sw.includes('alpha10-34')],
+  ['folder assets cached',sw.includes('phase10-history-folders-v205.css')&&sw.includes('phase10-history-folders-v205.js')&&sw.includes('alpha10-35')],
   ['three history folders exist',js.includes('overview')&&js.includes('analysis')&&js.includes('sessions')&&js.includes('概要')&&js.includes('音程分析')&&js.includes('プレイ履歴')],
   ['desktop keeps expanded layout',css.includes('.v205-history-folder-pane{display:contents}')],
   ['mobile shows only active pane',css.includes('.v205-history-folder-pane{display:none}')&&css.includes('.v205-history-folder-pane.is-active{display:block}')],

@@ -1,7 +1,7 @@
 const cloud = window.IntervalCosmosCloud || null;
 const appRoot = document.querySelector('#app');
 
-const VERSION = '2.0.5-alpha10.24';
+const VERSION = '2.0.5-alpha10.25';
 const COURSES = [
   { code: 'piano', department: '音楽学科', name: 'ピアノコース' },
   { code: 'orchestral', department: '音楽学科', name: '管弦打楽コース' },
@@ -130,6 +130,7 @@ function showTargetWaiting(info) {
   panel(`${header('DEVICE LINK', '承認待ち', `${name} の既存端末で接続を承認してください。`)}
     <div class="ic-wait-orbit"><span></span><i></i></div>
     <p class="ic-account-footnote">PINを入力しただけでは接続されません。既存端末側の確認が必要です。</p>
+    <div class="ic-form-message" id="v205TargetMessage" aria-live="polite"></div>
     <div class="ic-account-actions"><button class="ic-btn secondary" data-v205-action="cancel-target-link">キャンセル</button></div>`);
 }
 
@@ -241,22 +242,50 @@ async function submitLinkForm(form) {
 function pollTargetLink() {
   if (linkPollTimer) clearInterval(linkPollTimer);
   linkPollTimer = setInterval(async () => {
-    if (!targetLink?.id) return;
+    const request = targetLink;
+    if (!request?.id || request.cancelling) return;
     try {
-      const status = await cloud.getDeviceLinkTargetStatus(targetLink.id);
-      if (!status) return;
+      const status = await cloud.getDeviceLinkTargetStatus(request.id);
+      if (!status || targetLink !== request || request.cancelling) return;
       if (status.status === 'confirmed') {
         clearInterval(linkPollTimer); linkPollTimer = null;
         cloud.setGuestMode(false);
         await cloud.getMyPlayer();
+        if (targetLink !== request || request.cancelling) return;
+        targetLink = null;
         await startApp();
       } else if (['cancelled','expired'].includes(status.status)) {
         clearInterval(linkPollTimer); linkPollTimer = null;
+        targetLink = null;
         showLinkInput();
         setMessage('#v205LinkMessage', status.status === 'expired' ? 'PINの有効期限が切れました。新しいPINを発行してください。' : '接続がキャンセルされました。', 'error');
       }
     } catch (error) { console.warn('[device link target poll]', error); }
   }, 1200);
+}
+
+async function cancelTargetLink() {
+  const request = targetLink;
+  if (!request?.id || request.cancelling) return;
+  request.cancelling = true;
+  const button = document.querySelector('[data-v205-action="cancel-target-link"]');
+  if (button) button.disabled = true;
+  setMessage('#v205TargetMessage', 'キャンセルしています…');
+  try {
+    await cloud.cancelDeviceLink(request.id);
+    if (targetLink !== request) return;
+    targetLink = null;
+    if (linkPollTimer) clearInterval(linkPollTimer);
+    linkPollTimer = null;
+    showLinkInput();
+    setMessage('#v205LinkMessage', '接続をキャンセルしました。');
+  } catch (error) {
+    if (targetLink !== request) return;
+    request.cancelling = false;
+    if (button) button.disabled = false;
+    setMessage('#v205TargetMessage', 'キャンセルできませんでした。接続状態を確認し、もう一度お試しください。', 'error');
+    pollTargetLink();
+  }
 }
 
 async function openSourceLink() {
@@ -299,15 +328,22 @@ function renderSourcePin(info, status = 'pending') {
 function pollSourceLink() {
   if (linkPollTimer) clearInterval(linkPollTimer);
   linkPollTimer = setInterval(async () => {
-    if (!sourceLink?.request_id) return;
+    const request = sourceLink;
+    if (!request?.request_id) return;
     try {
-      const status = await cloud.getDeviceLinkSourceStatus(sourceLink.request_id);
-      if (!status) return;
+      const status = await cloud.getDeviceLinkSourceStatus(request.request_id);
+      if (!status || sourceLink !== request) return;
       if (status.status === 'awaiting_confirmation') {
-        clearInterval(linkPollTimer); linkPollTimer = null;
-        renderSourcePin(sourceLink, 'awaiting_confirmation');
+        if (request.status !== 'awaiting_confirmation') {
+          request.status = 'awaiting_confirmation';
+          renderSourcePin(request, 'awaiting_confirmation');
+        }
       } else if (['expired','cancelled','confirmed'].includes(status.status)) {
         clearInterval(linkPollTimer); linkPollTimer = null;
+        sourceLink = null;
+        if (sourceCountdownTimer) clearInterval(sourceCountdownTimer);
+        sourceCountdownTimer = null;
+        if (status.status !== 'confirmed') showTransientModal(status.status === 'expired' ? 'PINの有効期限が切れました' : '接続がキャンセルされました', '設定から新しいPINを発行してください。');
         if (status.status === 'confirmed') showTransientModal('接続完了', '新しい端末でも同じアカウントを使用できます。');
       }
     } catch (error) { console.warn('[device link source poll]', error); }
@@ -332,6 +368,7 @@ async function cancelSourceLink() {
 }
 
 function showTransientModal(title, text) {
+  clearUi();
   panel(`${header('INTERVAL COSMOS', title, text)}<div class="ic-account-actions"><button class="ic-btn primary" data-v205-action="close-account-ui">OK</button></div>`, { modal: true });
 }
 
@@ -415,7 +452,7 @@ window.addEventListener('click', event => {
   else if (action === 'source-link') openSourceLink();
   else if (action === 'confirm-source-link') confirmSourceLink();
   else if (action === 'cancel-source-link') cancelSourceLink();
-  else if (action === 'cancel-target-link') { targetLink = null; showLinkInput(); }
+  else if (action === 'cancel-target-link') cancelTargetLink();
   else if (action === 'close-account-ui') clearUi();
   else if (action === 'offline-start') startApp();
   else if (action === 'retry-boot') { appStarted = false; boot(); }

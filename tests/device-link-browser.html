@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="ja"><head><base href="../"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Device link cancellation fixture</title><link rel="stylesheet" href="account-v205.css"></head>
+<body><div id="app"></div><output id="qa-result" style="position:fixed;bottom:0;z-index:999999;background:white;color:black"></output>
+<script>
+// Local mock only: no cloud client, credentials, or database access.
+const failure = new URLSearchParams(location.search).has('failure');
+window.IntervalCosmosCloud = {
+ configured:()=>true, init:async()=>({profile:null}), getCachedPlayer:()=>null,
+ claimDeviceLinkPin:async()=>({request_id:'fixture-request',player_name:'QA LOCAL'}),
+ getDeviceLinkTargetStatus:async()=>({status:'awaiting_confirmation'}),
+ cancelDeviceLink:async id=>{
+   document.querySelector('#qa-result').textContent='Cancel RPC: '+id;
+   if(failure) throw Error('simulated offline');
+ },
+};
+</script><script type="module" src="account-gate.js?v=alpha5.9"></script></body></html>
