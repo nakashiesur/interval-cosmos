@@ -4,6 +4,7 @@ const path = require('path');
 
 const overlays = new Map();
 const timers = [];
+const listeners = {};
 
 function makeNode() {
   return {
@@ -28,6 +29,7 @@ const document = {
   createElement(){ return makeNode(); },
   querySelector(sel){
     if(sel==='.result-panel') return resultPanel;
+    if(sel.includes(',')) return sel.split(',').map(s=>overlays.get(s.slice(1))).find(Boolean)||null;
     if(sel.startsWith('.')) return overlays.get(sel.slice(1)) || null;
     return null;
   },
@@ -47,7 +49,7 @@ const cloud = {
 
 const windowObj = {
   IntervalCosmosCloud:cloud,
-  addEventListener(){},
+  addEventListener(type,fn){listeners[type]=fn;},
   setTimeout(fn,ms){ timers.push({fn,ms}); return timers.length; },
 };
 const context = {
@@ -83,6 +85,15 @@ vm.runInContext(code,context,{filename:'phase3-v205.js'});
   const fallbackTimer=timers.find(t=>t.ms===180);
   fallbackTimer?.fn();
   assertions.push(['outside top 50 retains the separate privacy choice',Boolean(fallbackTimer)&&prompt.innerHTML.includes('51位相当')&&prompt.innerHTML.includes('52位相当')]);
+
+  let retries=0,consumed=false;
+  resultPanel.querySelector=sel=>sel==='[data-action="retry"]'?{click(){retries++}}:null;
+  const retryKey=()=>({key:'r',target:{closest(){return null}},preventDefault(){},stopImmediatePropagation(){consumed=true}});
+  listeners.keydown(retryKey());
+  assertions.push(['privacy prompt blocks background retry',retries===0&&consumed]);
+  overlays.delete('v205-publication-overlay');
+  listeners.keydown(retryKey());
+  assertions.push(['retry still works after the prompt closes',retries===1]);
 
   await cloud.fetchRankings({mode:'TEXT',scope:'monthly'});
   assertions.push(['ranking rows cached',windowObj.IntervalCosmosV205.getRankingCache().length===1]);

@@ -172,6 +172,9 @@
 
   function showPublicationPrompt(result) {
     const overlay = createOverlay('v205-publication-overlay');
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'ランキング公開設定');
     const signature = `publish:${result.session_id}:${result.monthly_rank}:${result.hall_rank}`;
     const html = `<section class="v205-publication-card">
       <p class="v205-kicker">RANKING PRIVACY</p>
@@ -188,6 +191,7 @@
       </div>
     </section>`;
     writeHTML(overlay, html, signature);
+    overlay.querySelector('[data-v205-publication="private"]')?.focus();
   }
 
   async function publishCurrentScore(button) {
@@ -503,6 +507,13 @@
       event.preventDefault();
       event.stopImmediatePropagation();
       closeOverlay('v205-profile-overlay');
+      return;
+    }
+
+    // A foreground privacy choice must not trigger retry behind the dialog.
+    if (event.key.toLowerCase() === 'r' && document.querySelector('.v205-publication-overlay,.rank-burst.v205-rank-privacy-burst,.v205-profile-overlay')) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
       return;
     }
 

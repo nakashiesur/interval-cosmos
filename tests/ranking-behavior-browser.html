@@ -1,0 +1,20 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ranking behavior regression</title>
+<link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../phase3-v205.css"></head>
+<body><main style="max-width:780px;margin:20px auto;padding:16px">
+<h1>LOCAL RANKING TEST</h1><p>Mock backend only; no account or public ranking changes.</p>
+<button id="outside" class="secondary-btn">圏外の自己ベスト更新</button><button id="nonbest" class="secondary-btn">自己ベスト未更新</button>
+<section class="result-panel"><div class="result-head"><h2>RESULT</h2><strong id="resultScore">800</strong><div class="ranking-submit done"></div><button data-action="retry" onclick="retries++;showCounts()">RETRY</button></div></section>
+<div class="cloud-setting"></div><output id="counts"></output></main>
+<script>
+let visibility='ask',seq=0,publishes=0,hides=0,updates=0,retries=0;
+const showCounts=()=>document.querySelector('#counts').textContent=`retry=${retries}; publish=${publishes}; hide=${hides}; updates=${updates}; policy=${visibility}; old public best=1000`;
+window.IntervalCosmosCloud={configured:()=>true,getCachedPlayer:()=>({is_guest:false,ranking_visibility:visibility}),getMyPlayer:async()=>({ranking_visibility:visibility}),
+ submitScore:async payload=>({session_id:'fixture-'+(++seq),publication_required:visibility==='ask'&&payload.improved,monthly_rank:51,hall_rank:52,hall_best_score:1000,monthly_best_improved:payload.improved,hall_best_improved:payload.improved}),
+ publishPlaySession:async()=>{publishes++;showCounts();return{monthly_rank:51,hall_rank:52}},hideAllMyRankings:async()=>{hides++;showCounts()},
+ updateMyProfile:async p=>{visibility=p.rankingVisibility;updates++;showCounts()}};
+showCounts();
+</script><script src="../phase8-pc-controls-v205.js?v=alpha8.8"></script><script src="../phase3-ranking-hotfix-v205.js"></script><script src="../phase3-v205.js?v=alpha3.5"></script>
+<script>
+document.querySelector('#outside').onclick=()=>window.IntervalCosmosCloud.submitScore({mode:'TEXT',score:800,improved:true});
+document.querySelector('#nonbest').onclick=()=>window.IntervalCosmosCloud.submitScore({mode:'TEXT',score:100,improved:false}).then(()=>{document.querySelector('#resultScore').textContent='100'});
+</script></body></html>

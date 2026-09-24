@@ -499,6 +499,8 @@
     }
     if (event.repeat || event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
     if (isEditable(event.target)) return;
+    // Ranking dialogs own Escape and must shield underlying game shortcuts.
+    if (document.querySelector('.v205-publication-overlay,.rank-burst.v205-rank-privacy-burst,.v205-profile-overlay')) return;
 
     if (event.key === 'Escape') {
       handleEscape(event);
