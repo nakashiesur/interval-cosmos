@@ -54,3 +54,26 @@ for(const method of ['text','keys']){
 }
 const cancelled=focusHarness();cancelled.start('M7','keys');cancelled.guide('guide-back');cancelled.guide('guide-complete');assert.equal(cancelled.result().screen,'practice','cancelled focus must not resume later');
 console.log('PASS first-visit guide preserves TEXT/KEYS focus, returning flow, and cancellation');
+
+(async()=>{
+  const vm=require('vm'),assert=require('assert');
+  const requests=[],renders=[];
+  const ctx={opening:false,historyRequest:0,historyCache:[],console,
+    cloud:{getCachedPlayer:()=>({id:'fixture'}),fetchLearningHistory:()=>new Promise((resolve,reject)=>requests.push({resolve,reject}))},
+    window:{IntervalCosmosLearningSync:{fetchAnalysis:async()=>({rows:[]})}},
+    document:{querySelector:()=>({remove(){}})},renderLoading(){},renderHistory:rows=>renders.push(rows),
+    createOverlay(){throw Error('stale error reopened overlay')},esc:String};
+  vm.createContext(ctx);
+  vm.runInContext(phase4.slice(phase4.indexOf('  function closeHistory()'),phase4.indexOf('  function renderLoading()'))+
+    phase4.slice(phase4.indexOf('  async function openHistory()'),phase4.indexOf('  function injectButtons()')),ctx);
+  const old=ctx.openHistory();ctx.closeHistory();const current=ctx.openHistory();
+  requests[0].resolve(['old']);await old;assert.equal(ctx.opening,true);assert.equal(renders.length,0);
+  requests[1].resolve(['current']);await current;assert.deepEqual(renders,[['current']]);assert.deepEqual(ctx.historyCache,['current']);
+  const failing=ctx.openHistory();ctx.closeHistory();requests[2].reject(Error('late failure'));await failing;assert.equal(renders.length,1);
+  let analysisResolve,analysisStarted;
+  const started=new Promise(r=>analysisStarted=r);
+  ctx.window.IntervalCosmosLearningSync.fetchAnalysis=()=>{analysisStarted();return new Promise(r=>analysisResolve=r)};
+  const analysisPending=ctx.openHistory();requests[3].resolve(['next']);await started;ctx.closeHistory();analysisResolve({rows:[]});await analysisPending;
+  assert.equal(renders.length,1);assert.deepEqual(ctx.historyCache,['current']);
+  console.log('PASS closing/reopening history discards late history, analysis, and error responses');
+})().catch(error=>{console.error(error);process.exitCode=1});

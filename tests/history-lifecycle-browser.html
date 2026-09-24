@@ -1,0 +1,8 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><title>History lifecycle regression</title><link rel="stylesheet" href="../phase4-v205.css">
+<body><button data-v205-history-open>学習履歴を開く</button><button id="resolve">保留中の応答を返す</button><output id="state"></output>
+<script>
+const pending=[];
+window.IntervalCosmosCloud={getCachedPlayer:()=>({id:'local-fixture',player_name:'LOCAL FIXTURE'}),fetchLearningHistory:()=>new Promise(resolve=>pending.push(resolve))};
+window.IntervalCosmosLearningSync={fetchAnalysis:async()=>({rows:[]}),legacy:()=>({})};
+document.querySelector('#resolve').onclick=()=>{pending.shift()?.([]);document.querySelector('#state').textContent='応答を返しました';};
+</script><script src="../phase4-v205.js?v=alpha3.3"></script></body></html>

@@ -15,6 +15,7 @@
   let historyCache = [];
   let analysisRowsCache = [];
   let opening = false;
+  let historyRequest = 0;
   let queued = false;
 
   const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => (
@@ -162,6 +163,8 @@
   }
 
   function closeHistory() {
+    historyRequest++;
+    opening = false;
     document.querySelector('.v205-history-overlay')?.remove();
   }
 
@@ -272,19 +275,25 @@
   async function openHistory() {
     if (opening) return;
     opening = true;
+    const request = ++historyRequest;
     renderLoading();
     try {
       const profile = cloud?.getCachedPlayer?.();
+      let sessions;
       if (profile?.is_guest || !cloud?.fetchLearningHistory) {
-        historyCache = [];
+        sessions = [];
       } else {
-        historyCache = await cloud.fetchLearningHistory({limit:500});
+        sessions = await cloud.fetchLearningHistory({limit:500});
       }
+      if (request !== historyRequest) return;
       let shared;
       try { shared = await window.IntervalCosmosLearningSync.fetchAnalysis(); }
       catch { shared = {error:true}; }
+      if (request !== historyRequest) return;
+      historyCache = sessions;
       renderHistory(historyCache, shared);
     } catch (error) {
+      if (request !== historyRequest) return;
       console.error('[v2.0.5 history]', error);
       const overlay = createOverlay();
       overlay.innerHTML = `<section class="v205-history-card">
@@ -292,7 +301,7 @@
         <div class="empty-state">学習履歴を取得できませんでした。<br><small>${esc(error?.message || '')}</small></div>
       </section>`;
     } finally {
-      opening = false;
+      if (request === historyRequest) opening = false;
     }
   }
 
