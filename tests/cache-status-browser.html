@@ -1,0 +1,19 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><title>Cache revision diagnostic</title>
+<body><h1>アプリキャッシュの確認</h1><p>キャッシュ名と保存済みHTMLのスクリプト版だけを表示します。アカウント情報は読み取りません。</p><button id="inspect">確認</button><button id="update">登録済みWorkerを更新</button><pre id="result"></pre>
+<script>
+async function inspect(){
+ const rows=[];
+ for(const r of await navigator.serviceWorker.getRegistrations())rows.push('Worker: '+r.scope+' active='+r.active?.state);
+ for(const name of await caches.keys()){
+  if(!name.startsWith('interval-cosmos'))continue;
+  rows.push('Cache: '+name);
+  const cache=await caches.open(name);
+  const response=await cache.match(new URL('../index.html',location.href).href);
+  if(response){const html=await response.text();rows.push(...[...html.matchAll(/src="((?:phase4-v205|learning-sync-v205|account-gate)[^"]*)"/g)].map(m=>m[1]));}
+ }
+ document.querySelector('#result').textContent=rows.join('\n');
+}
+document.querySelector('#inspect').onclick=inspect;
+document.querySelector('#update').onclick=async()=>{for(const r of await navigator.serviceWorker.getRegistrations())await r.update();await inspect()};
+inspect();
+</script></body></html>

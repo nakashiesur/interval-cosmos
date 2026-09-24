@@ -35,3 +35,23 @@ const assertions = [
 let fail=0;
 for(const [name,ok] of assertions){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
 process.exitCode=fail?1:0;
+
+(async()=>{
+  const vm=require('vm'),assert=require('assert');
+  const requests=[],renders=[];let visible=false;
+  const ctx={cosmosRequest:0,opening:false,cache:null,console,
+    cloud:{getCachedPlayer:()=>({id:'fixture'})},rpc:()=>new Promise((resolve,reject)=>requests.push({resolve,reject})),
+    document:{querySelector:()=>visible?{remove(){visible=false}}:null},loading(){visible=true},
+    render:data=>renders.push(data),renderUnavailable(){throw Error('stale error rendered')}};
+  vm.createContext(ctx);
+  vm.runInContext(js.slice(js.indexOf('  async function fetchProgress()'),js.indexOf('  function rankingPresentationBusy()'))+
+    js.slice(js.indexOf('  function close()'),js.indexOf('  function loading()'))+
+    js.slice(js.indexOf('  async function open()'),js.indexOf('  function inject()')),ctx);
+  const old=ctx.open();ctx.close();const current=ctx.open();
+  requests[0].resolve({label:'old'});await old;assert.equal(ctx.opening,true);assert.equal(ctx.cache,null);
+  requests[1].resolve({label:'current'});await current;assert.equal(ctx.cache.label,'current');assert.equal(renders.length,1);
+  const refreshing=ctx.refresh();ctx.close();requests[2].resolve({label:'closed-refresh'});await refreshing;
+  assert.equal(renders.length,1);assert.equal(ctx.cache.label,'current');
+  const failing=ctx.open();ctx.close();requests[3].reject(Error('late error'));await failing;assert.equal(renders.length,1);
+  console.log('PASS closed/reopened MY COSMOS ignores stale loads, refreshes, errors and cache writes');
+})().catch(error=>{console.error(error);process.exitCode=1});

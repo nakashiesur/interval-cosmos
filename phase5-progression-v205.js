@@ -4,6 +4,7 @@
   const POINT_FRAMES = new Set(['normal','bronze','silver','gold','platinum','cosmic']);
   const LABELS = {basic:'BASIC',accuracy:'ACCURACY',combo:'COMBO',mode:'MODE',interval:'INTERVAL',streak:'STREAK',ranking:'RANKING',assignment:'ASSIGNMENT',hidden:'SECRET'};
   let client=null, cache=null, opening=false, queued=false, unlockQueue=[], showing=false, unlockTimer=null;
+  let cosmosRequest=0;
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const percent=(v,m)=>m>0?Math.max(0,Math.min(100,Math.round(v/m*100))):0;
 
@@ -17,7 +18,7 @@
   }
   async function rpc(name,args){const c=await progressClient();const {data,error}=await c.rpc(name,args);if(error)throw error;return data;}
   async function evaluate(){const r=await rpc('evaluate_my_progress');try{await cloud?.getMyPlayer?.();}catch{}queueUnlocks(r);return r;}
-  async function fetchProgress(){cache=await rpc('get_my_cosmos_progress');return cache;}
+  async function fetchProgress(){const request=cosmosRequest;const data=await rpc('get_my_cosmos_progress');if(request===cosmosRequest)cache=data;return data;}
 
   function rankingPresentationBusy(){
     const lastRankedResult=window.IntervalCosmosV205?.getLastSubmitResult?.();
@@ -48,7 +49,7 @@
   }
 
   function getOverlay(){let n=document.querySelector('.v205-cosmos-overlay');if(!n){n=document.createElement('div');n.className='v205-cosmos-overlay';document.body.appendChild(n)}return n}
-  function close(){document.querySelector('.v205-cosmos-overlay')?.remove()}
+  function close(){cosmosRequest++;opening=false;document.querySelector('.v205-cosmos-overlay')?.remove()}
   function loading(){getOverlay().innerHTML='<section class="v205-cosmos-card"><button class="icon-btn v205-cosmos-close" data-v205-cosmos-close>×</button><div class="v205-cosmos-loading"><span class="spinner"></span><strong>CALCULATING COSMOS PROGRESS...</strong><small>実績・フレーム・デイリーミッションを同期しています</small></div></section>'}
 
   function frameStatus(d){
@@ -74,16 +75,24 @@
   async function open() {
     if (opening) return;
     opening = true;
+    const request = ++cosmosRequest;
     try {
       if (cloud?.getCachedPlayer?.()?.is_guest) { renderUnavailable(null, true); return; }
       loading();
-      render(await fetchProgress());
+      const data = await fetchProgress();
+      if (request === cosmosRequest) render(data);
     } catch (error) {
+      if (request !== cosmosRequest) return;
       console.error('[progress]', error);
       renderUnavailable(error);
-    } finally { opening = false; }
+    } finally { if (request === cosmosRequest) opening = false; }
   }
-  async function refresh(){if(document.querySelector('.v205-cosmos-overlay'))render(await fetchProgress())}
+  async function refresh(){
+    if(!document.querySelector('.v205-cosmos-overlay'))return;
+    const request=++cosmosRequest;
+    const data=await fetchProgress();
+    if(request===cosmosRequest&&document.querySelector('.v205-cosmos-overlay'))render(data);
+  }
 
   function inject(){
     const footer=document.querySelector('.home-footer');if(footer&&!footer.querySelector('[data-v205-cosmos-open]')){const b=document.createElement('button');b.className='secondary-btn v205-cosmos-launch';b.type='button';b.dataset.v205CosmosOpen='1';b.innerHTML='✦ MY COSMOS';footer.appendChild(b)}

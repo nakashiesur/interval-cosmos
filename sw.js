@@ -1,4 +1,4 @@
-const CACHE = 'interval-cosmos-v2-0-5-alpha10-41';
+const CACHE = 'interval-cosmos-v2-0-5-alpha10-42';
 const ASSETS = [
   './offline-outbox-v205.js', './offline-sync-ui-v205.js', './offline-sync-v205.css',
   './phase10-cosmos-folders-v205.js', './phase10-cosmos-folders-v205.css',
