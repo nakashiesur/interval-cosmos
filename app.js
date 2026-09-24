@@ -470,6 +470,7 @@ function updateMastery(correctKey, chosenKey, ok, takenMs) {
     m.confusions[chosenKey] = (m.confusions[chosenKey] || 0) + 1;
   }
   saveMastery();
+  window.IntervalCosmosLearningSync?.record(correctKey, chosenKey, takenMs);
 }
 
 function masteryScore(key) {

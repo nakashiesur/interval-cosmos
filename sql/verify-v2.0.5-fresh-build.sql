@@ -20,10 +20,10 @@ begin
       'daily_mission_catalog','players','player_devices','public_profiles',
       'device_link_requests','assignments','play_sessions','ranking_bests',
       'assignment_bests','player_achievements','player_titles','player_frames',
-      'player_daily_mission_progress','player_recovery_credentials','assignment_mode_bests'
+      'player_daily_mission_progress','player_recovery_credentials','assignment_mode_bests','learning_answers'
     ]);
-  if v_count <> 20 then
-    raise exception 'Expected 20 current application tables, found %', v_count;
+  if v_count <> 21 then
+    raise exception 'Expected 21 current application tables, found %', v_count;
   end if;
 
   if exists (
@@ -101,7 +101,7 @@ begin
       'daily_mission_catalog','players','player_devices','public_profiles',
       'device_link_requests','assignments','play_sessions','ranking_bests',
       'assignment_bests','player_achievements','player_titles','player_frames',
-      'player_daily_mission_progress','player_recovery_credentials','assignment_mode_bests'
+      'player_daily_mission_progress','player_recovery_credentials','assignment_mode_bests','learning_answers'
     ])
     and not c.relrowsecurity;
   if v_missing is not null then

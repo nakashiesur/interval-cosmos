@@ -13,6 +13,7 @@
   });
 
   let historyCache = [];
+  let analysisRowsCache = [];
   let opening = false;
   let queued = false;
 
@@ -77,8 +78,7 @@
     return { plays:rows.length, ranked, total, correct, accuracy:pct(correct,total), best, combo, modes };
   }
 
-  function intervalRows() {
-    const mastery = readMastery();
+  function intervalRows(mastery = readMastery()) {
     return INTERVAL_ORDER.map(key => {
       const row = mastery[key] || {};
       const seen = Number(row.seen || 0);
@@ -92,6 +92,21 @@
         confusion: confusions[0] || null,
       };
     });
+  }
+
+  function sharedRows(groups) {
+    const mastery = {};
+    for (const group of groups || []) {
+      if (!INTERVAL_ORDER.includes(group.interval_key) || !INTERVAL_ORDER.includes(group.chosen_key)) continue;
+      const row = mastery[group.interval_key] ||= {seen:0,correct:0,wrong:0,ms:0,confusions:{}};
+      const count = Number(group.answers || 0);
+      row.seen += count;
+      row.ms += Number(group.response_ms || 0);
+      if (group.interval_key === group.chosen_key) row.correct += count;
+      else { row.wrong += count; row.confusions[group.chosen_key] = (row.confusions[group.chosen_key] || 0) + count; }
+    }
+    for (const row of Object.values(mastery)) row.emaMs = row.seen ? row.ms / row.seen : 0;
+    return intervalRows(mastery);
   }
 
   function weakest(rows) {
@@ -158,10 +173,12 @@
     </section>`;
   }
 
-  function renderHistory(sessions) {
+  function renderHistory(sessions, shared = {}) {
     const overlay = createOverlay();
     const summary = summarize(sessions);
-    const intervals = intervalRows();
+    const intervals = shared.guest ? intervalRows() : sharedRows(shared.rows);
+    analysisRowsCache = intervals;
+    const legacyRows = intervalRows(window.IntervalCosmosLearningSync?.legacy?.() || {});
     const weak = weakest([...intervals]);
     const strong = strongest([...intervals]);
     const daily = dailyRows(sessions);
@@ -228,15 +245,20 @@
 
       <section class="v205-history-section">
         <div class="v205-history-title">
-          <div><h3>INTERVAL ANALYSIS</h3><span>音程別・現在の端末を含む習熟分析</span></div>
+          <div><h3>INTERVAL ANALYSIS</h3><span>${shared.guest ? 'ゲストの音程分析（この端末のみ）' : '共通の音程分析（同期開始後の回答）'}</span></div>
           ${weak ? `<button class="secondary-btn v205-weak-button" data-v205-practice-interval="${weak.key}">この苦手を練習</button>` : ''}
         </div>
+        <p class="v205-history-note">${shared.error ? '共通分析を取得できませんでした。接続後に開き直してください。' : shared.guest ? '登録前の回答は共通分析へ送信されません。' : 'すべての端末から同期済みの回答を集計します。過去の端末内分析は下に別枠で保存されています。'}${shared.pending ? ` 未同期 ${shared.pending}回答。接続後に再送します。` : ''}${shared.storageError ? ' 一部の回答を端末に保存できませんでした。ブラウザの保存領域を確認してください。' : ''}</p>
         <div class="v205-history-insights">
           <article class="weak"><span>WEAK POINT</span><strong>${weak ? `${weak.key} / ${INTERVAL_NAMES[weak.key]}` : 'データ不足'}</strong><small>${weak ? `正答率 ${weak.accuracy}%・${weak.seen}回答` : 'まず数問プレイしてください'}</small></article>
           <article class="strong"><span>STRONG POINT</span><strong>${strong ? `${strong.key} / ${INTERVAL_NAMES[strong.key]}` : 'データ不足'}</strong><small>${strong ? `正答率 ${strong.accuracy}%・${strong.seen}回答` : '3回答以上で判定'}</small></article>
           <article><span>CONFUSION</span><strong>${weak?.confusion ? `${weak.key} → ${weak.confusion[0]}` : '—'}</strong><small>${weak?.confusion ? `${weak.confusion[1]}回混同` : '明確な混同は未検出'}</small></article>
         </div>
         <div class="v205-history-intervals">${intervalCards}</div>
+        <details class="v205-legacy-analysis"><summary>過去の端末内分析（共通集計には含めません）</summary>
+          <p class="v205-history-note">この端末で同期機能を導入する前の記録です。他の端末とは合算しません。</p>
+          <div class="v205-history-intervals">${legacyRows.map(r => `<button class="v205-history-interval" data-v205-practice-interval="${r.key}" title="${esc(INTERVAL_NAMES[r.key])}"><strong>${r.key}</strong><span>${r.seen ? `${r.accuracy}%` : '—'}</span><small>${r.seen} answers</small></button>`).join('')}</div>
+        </details>
         <p class="v205-history-note">音程カードを選ぶと、その音程だけのFOCUS練習へ移動できます。回答方法はTEXT / KEYSを選択できます。</p>
       </section>
 
@@ -258,7 +280,10 @@
       } else {
         historyCache = await cloud.fetchLearningHistory({limit:500});
       }
-      renderHistory(historyCache);
+      let shared;
+      try { shared = await window.IntervalCosmosLearningSync.fetchAnalysis(); }
+      catch { shared = {error:true}; }
+      renderHistory(historyCache, shared);
     } catch (error) {
       console.error('[v2.0.5 history]', error);
       const overlay = createOverlay();
@@ -397,5 +422,7 @@
     getCache: () => historyCache,
     summarize,
     masterySnapshot,
+    sharedRows,
+    getAnalysisRows: () => analysisRowsCache,
   };
 })();

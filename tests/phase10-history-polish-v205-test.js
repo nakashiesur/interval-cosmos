@@ -6,8 +6,8 @@ const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
 
 const tests=[
-  ['HISTORY polish stylesheet is loaded',index.includes('phase10-history-polish-v205.css?v=alpha10.2')],
-  ['HISTORY polish is cached',sw.includes('phase10-history-polish-v205.css')&&sw.includes('alpha10-35')],
+  ['HISTORY polish stylesheet is loaded',index.includes('phase10-history-polish-v205.css?v=alpha10.3')],
+  ['HISTORY polish is cached',sw.includes('phase10-history-polish-v205.css')&&sw.includes('alpha10-36')],
   ['mobile summary uses compact 2x2 grid',css.includes('.v205-history-summary')&&css.includes('repeat(2,minmax(0,1fr))')],
   ['mobile mode analysis uses two columns',css.includes('.v205-history-modes')&&css.includes('repeat(2,minmax(0,1fr))')],
   ['mobile insights use three compact columns',css.includes('.v205-history-insights')&&css.includes('repeat(3,minmax(0,1fr))')],

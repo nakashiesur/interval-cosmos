@@ -15,7 +15,7 @@ class Handler(module.FreshHandler):
         if urlsplit(self.path).path == '/tests/offline-app/':
             html = (ROOT / 'index.html').read_text()
             html = html.replace('<head>', '<head><base href="/">')
-            html = html.replace('</body>', '<script src="/tests/offline-app/controls.js"></script></body>')
+            html = html.replace('</body>', '<script src="/tests/offline-app/controls.js?v=2"></script></body>')
             body = html.encode()
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
@@ -26,6 +26,10 @@ class Handler(module.FreshHandler):
         return super().send_head()
 
 if __name__ == '__main__':
-    server = module.ThreadingHTTPServer(('127.0.0.1',8877),partial(Handler,directory=str(ROOT)))
-    print('Offline app fixture: http://127.0.0.1:8877/tests/offline-app/',flush=True)
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--port', type=int, default=8877)
+    args = parser.parse_args()
+    server = module.ThreadingHTTPServer(('127.0.0.1',args.port),partial(Handler,directory=str(ROOT)))
+    print(f'Offline app fixture: http://127.0.0.1:{args.port}/tests/offline-app/',flush=True)
     server.serve_forever()

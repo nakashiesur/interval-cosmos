@@ -302,3 +302,7 @@
     min-height:64px;
   }
 }
+
+/* The archived local analysis stays a compact, accessible disclosure. */
+.v205-legacy-analysis { margin-top: 14px; border-top: 1px solid rgba(130,180,220,.16); }
+.v205-legacy-analysis > summary { min-height: 44px; padding: 12px 0; box-sizing: border-box; cursor: pointer; font-size: 12px; font-weight: 700; color: #c5dced; }

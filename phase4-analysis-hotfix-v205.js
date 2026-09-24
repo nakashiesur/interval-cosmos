@@ -9,6 +9,8 @@
   let queued = false;
 
   function rows() {
+    const shared = window.IntervalCosmosHistoryV205?.getAnalysisRows?.();
+    if (shared) return shared;
     let mastery = {};
     try { mastery = JSON.parse(localStorage.getItem(MASTERY_KEY) || '{}') || {}; } catch {}
     return ORDER.map(key => {

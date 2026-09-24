@@ -247,7 +247,7 @@
     return{id:String(Date.now()),intervalKey:'M3',base:'C',target:'E',baseMidi:60,targetMidi:64};
   }
   function readMastery(){try{return JSON.parse(localStorage.getItem(MASTERY_KEY)||'{}')}catch{return{}}}
-  function updateMastery(key,chosen,ok,ms){const m=readMastery(),row=m[key]||{seen:0,correct:0,wrong:0,emaMs:0,streak:0,lastSeen:0,confusions:{}};row.seen=(row.seen||0)+1;row.lastSeen=Date.now();row.emaMs=row.emaMs?Math.round(row.emaMs*.72+ms*.28):Math.round(ms);row.confusions=row.confusions||{};if(ok){row.correct=(row.correct||0)+1;row.streak=(row.streak||0)+1}else{row.wrong=(row.wrong||0)+1;row.streak=0;row.confusions[chosen]=(row.confusions[chosen]||0)+1}m[key]=row;localStorage.setItem(MASTERY_KEY,JSON.stringify(m))}
+  function updateMastery(key,chosen,ok,ms){const m=readMastery(),row=m[key]||{seen:0,correct:0,wrong:0,emaMs:0,streak:0,lastSeen:0,confusions:{}};row.seen=(row.seen||0)+1;row.lastSeen=Date.now();row.emaMs=row.emaMs?Math.round(row.emaMs*.72+ms*.28):Math.round(ms);row.confusions=row.confusions||{};if(ok){row.correct=(row.correct||0)+1;row.streak=(row.streak||0)+1}else{row.wrong=(row.wrong||0)+1;row.streak=0;row.confusions[chosen]=(row.confusions[chosen]||0)+1}m[key]=row;localStorage.setItem(MASTERY_KEY,JSON.stringify(m));window.IntervalCosmosLearningSync?.record(key,chosen,ms)}
   function calcPoints(sec,ok,combo){if(!ok)return-50;const base=sec<=1?150:sec<=2?130:sec<=3?120:sec<=4?110:sec<=5?100:sec<=8?80:sec<=10?60:50;return base+Math.min(combo*5,150)}
   function accBonus(a){return a===100?3000:a>=95?1000:a>=90?500:a>=85?300:a>=80?200:0}
   function finalScore(){const a=accuracy(game.correct,game.total);return Math.max(0,Math.round(game.score+(game.def.hyper?game.maxCombo*50+accBonus(a):0)))}

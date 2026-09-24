@@ -479,6 +479,20 @@
     return data || [];
   }
 
+  async function submitLearningAnswers(owner, events) {
+    await ensureAuth();
+    if (authUser?.id !== owner.authId || playerId() !== owner.playerId) throw new Error('Account changed');
+    const {error} = await client.rpc('submit_learning_answers', {p_player_id:owner.playerId,p_events:events});
+    if (error) throw error;
+  }
+
+  async function fetchLearningAnalysis() {
+    await ensureAuth();
+    const {data,error} = await client.rpc('get_my_learning_analysis');
+    if (error) throw error;
+    return data || [];
+  }
+
   async function fetchLearningHistory({ limit = 200 } = {}) {
     await ensureAuth();
     if (!player) await loadActualPlayer();
@@ -576,6 +590,8 @@
     fetchCatalogs,
     fetchAssignments,
     fetchLearningHistory,
+    submitLearningAnswers,
+    fetchLearningAnalysis,
     createDeviceLinkPin,
     claimDeviceLinkPin,
     getDeviceLinkSourceStatus,
