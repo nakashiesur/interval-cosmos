@@ -49,3 +49,22 @@ const tests=[
 let fail=0;
 for(const [name,ok] of tests){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
 process.exitCode=fail?1:0;
+
+// Exercise the module's internal route, including uncached profiles. Abort calls
+// this directly and does not pass through the outer click-policy wrapper.
+(async()=>{
+  const vm=require('vm'),assert=require('assert');
+  const source=fs.readFileSync(path.join(__dirname,'..','phase6-assignments-v205.js'),'utf8');
+  const route=source.slice(source.indexOf('  async function openAssignments(){'),source.indexOf('  async function renderStudent(){'));
+  for(const cached of [true,false]){
+    for(const profile of [{account_type:'staff',is_admin:false},{account_type:'student',is_admin:false},{account_type:'staff',is_admin:true},{account_type:'student',is_admin:true}]){
+      let destination='';
+      const ctx={raf:1,audio:null,game:{},currentAssignment:{},cancelAnimationFrame(){},loading(){},console,
+        cloud:{getCachedPlayer:()=>cached?profile:null,getMyPlayer:async()=>profile},
+        renderTeacher:async()=>{destination='admin'},renderStudent:async()=>{destination='player'},errorView:e=>{throw e}};
+      vm.createContext(ctx);vm.runInContext(route,ctx);await ctx.openAssignments();
+      assert.equal(destination,profile.is_admin?'admin':'player');assert.equal(ctx.game,null);
+    }
+  }
+  console.log('PASS internal assignment return routes use admin permission for cached and refreshed profiles');
+})().catch(e=>{console.error(e);process.exitCode=1});
