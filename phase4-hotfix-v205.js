@@ -1,4 +1,5 @@
 (() => {
+  let pendingGuideFocus = null;
   const INTERVALS = new Set(['P1','m2','M2','m3','M3','P4','TT','P5','m6','M6','m7','M7','P8']);
 
   function later(fn, ms = 40) {
@@ -38,6 +39,11 @@
 
   function enterFocus(intervalKey, preferredView) {
     const finishFromPractice = () => {
+      if (document.querySelector('[data-action="guide-complete"]')) {
+        pendingGuideFocus = { intervalKey, preferredView };
+        hideFocusVeil();
+        return;
+      }
       document.querySelector(`[data-view="${preferredView}"]`)?.click();
       const manual = document.querySelector('[data-practice="manual"]');
       if (manual) {
@@ -73,6 +79,7 @@
   function start(intervalKey, preferredView) {
     if (!INTERVALS.has(intervalKey)) return;
 
+    pendingGuideFocus = null;
     showFocusVeil();
     document.querySelector('.v205-practice-choice')?.remove();
     document.querySelector('.v205-history-overlay')?.remove();
@@ -90,6 +97,16 @@
   // Loaded before phase4-v205.js so this capture handler can consume the
   // focus-choice click before the older Phase 4 navigation handler runs.
   window.addEventListener('click', event => {
+    const action = event.target.closest?.('[data-action]')?.dataset.action;
+    if (action === 'guide-back') pendingGuideFocus = null;
+    if (action === 'guide-complete' && pendingGuideFocus) {
+      const { intervalKey, preferredView } = pendingGuideFocus;
+      pendingGuideFocus = null;
+      showFocusVeil();
+      // Let the normal guide handler open PRACTICE before resuming the selection.
+      later(() => enterFocus(intervalKey, preferredView), 0);
+      return;
+    }
     const view = event.target.closest?.('[data-v205-focus-view]');
     if (!view) return;
 
