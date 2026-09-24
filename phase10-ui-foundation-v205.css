@@ -248,6 +248,20 @@
 .home-screen .mode-grid-home{gap:12px}
 .home-screen .home-footer-rich{margin-top:12px}
 
+/* Keep the animated HYPER DRIVE border behind an opaque, readable card face. */
+.mode-card.hyper-animated::before{z-index:0}
+.mode-card.hyper-animated::after{
+  inset:2px;
+  width:auto;
+  height:auto;
+  z-index:1;
+  background:linear-gradient(125deg,#421b18,#2b132c,#0d142d);
+}
+.mode-card.hyper-animated>*{z-index:3}
+.mode-card.hyper-animated>:not(.hyper-flame):not(.mode-badge){position:relative}
+.mode-card.hyper-animated .hyper-flame{z-index:2}
+.mode-card.hyper-animated .mode-desc{color:#d5dded}
+
 /* START screen: preserve the identity while reducing empty vertical drift on short/mobile displays. */
 @media(max-height:760px){
   .hero-wrap{transform:scale(.94);transform-origin:center}
