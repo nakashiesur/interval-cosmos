@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Boot recovery fixture</title>
+<link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../account-v205.css">
+</head><body><canvas id="starfield"></canvas><div id="app"></div><div id="overlay-root"></div>
+<script>
+// Deliberately delayed local mock. This fixture never loads cloud.js or contacts a database.
+let calls = 0;
+const retry = new URLSearchParams(location.search).get('scenario') === 'retry';
+window.IntervalCosmosCloud = {
+  configured: () => true,
+  getCachedPlayer: () => null,
+  init: () => {
+    if (++calls === 1) return new Promise(resolve => setTimeout(() => resolve({profile:null}), 25000));
+    return Promise.resolve(retry ? {profile:null} : {status:'offline',profile:{is_guest:true,player_name:'QA Guest'}});
+  },
+};
+</script>
+<script type="module" src="../account-gate.js?v=alpha5.8"></script>
+</body></html>

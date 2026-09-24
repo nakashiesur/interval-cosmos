@@ -1,7 +1,7 @@
 const cloud = window.IntervalCosmosCloud || null;
 const appRoot = document.querySelector('#app');
 
-const VERSION = '2.0.5-alpha10.23';
+const VERSION = '2.0.5-alpha10.24';
 const COURSES = [
   { code: 'piano', department: '音楽学科', name: 'ピアノコース' },
   { code: 'orchestral', department: '音楽学科', name: '管弦打楽コース' },
@@ -22,6 +22,8 @@ const AVATARS = [
 ];
 
 let appStarted = false;
+let bootAttempt = 0;
+const BOOT_TIMEOUT_MS = 15000;
 let linkPollTimer = null;
 let sourceLink = null;
 let targetLink = null;
@@ -146,26 +148,43 @@ async function startApp() {
   if (appStarted) return;
   appStarted = true;
   clearUi();
-  await import(`./app.js?v=${encodeURIComponent(VERSION)}`);
-  installAppEnhancements();
+  try {
+    await import(`./app.js?v=${encodeURIComponent(VERSION)}`);
+    installAppEnhancements();
+  } catch (error) {
+    appStarted = false;
+    throw error;
+  }
 }
 
 async function boot() {
+  const attempt = ++bootAttempt;
   loadingScreen();
   if (!cloud?.configured?.()) {
     await startApp();
     return;
   }
+  let timeout;
   try {
-    const data = await cloud.init();
+    // The browser/SDK can wait for minutes on a stalled network. Keep recovery reachable.
+    const data = await Promise.race([
+      cloud.init(),
+      new Promise((_, reject) => {
+        timeout = setTimeout(() => reject(new Error('接続に時間がかかっています。再確認するか、ゲーム本体だけ起動してください。')), BOOT_TIMEOUT_MS);
+      }),
+    ]);
+    if (attempt !== bootAttempt || appStarted) return;
     if (data?.profile) {
       await startApp();
     } else {
       showChooser();
     }
   } catch (error) {
+    if (attempt !== bootAttempt || appStarted) return;
     console.error('[v2.0.5 boot]', error);
     showDatabaseRequired(error);
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
