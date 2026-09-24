@@ -9,6 +9,13 @@
       localStorage.setItem(legacyKey, localStorage.getItem('intervalCosmos.mastery.v2') || '{}');
     }
   } catch { storageError = true; }
+  function bounded(request) {
+    let timeout;
+    return Promise.race([
+      Promise.resolve(request),
+      new Promise((_,reject)=>{timeout=setTimeout(()=>reject(Error('Learning sync timed out')),15000);}),
+    ]).finally(()=>clearTimeout(timeout));
+  }
   function owner() {
     const profile = cloud?.getCachedPlayer?.();
     const authId = cloud?.getAuthUser?.()?.id;
@@ -48,7 +55,7 @@
         while ((batch=pending(identity).slice(0,100)).length) {
           const current=owner();
           if (!current || current.authId!==identity.authId || current.playerId!==identity.playerId) return;
-          await cloud.submitLearningAnswers(identity,batch.map(row=>row.event));
+          await bounded(cloud.submitLearningAnswers(identity,batch.map(row=>row.event)));
           for (const row of batch) localStorage.removeItem(row.key);
         }
         syncError=false;
@@ -63,7 +70,7 @@
     await flush();
     const identity=owner();
     if (!identity) return {rows:[],guest:true,pending:0,storageError};
-    const rows=await cloud.fetchLearningAnalysis();
+    const rows=await bounded(cloud.fetchLearningAnalysis());
     const current=owner();
     if (!current || current.playerId!==identity.playerId || current.authId!==identity.authId) throw Error('Account changed');
     return {rows,pending:pending(identity).length,storageError,syncError};
