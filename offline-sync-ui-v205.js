@@ -2,6 +2,9 @@
   const cloud = window.IntervalCosmosCloud;
   const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const policy = v => ({ask:'毎回確認',always_public:'常に公開',always_private:'常に非公開'}[v] || v);
+  const errorText = error => error === 'Assignment is outside the allowed time window'
+    ? '課題の受付期間外のため送信できません。課題の開始日時と期限を確認してください。'
+    : error || '送信できませんでした。';
   let dialog, busy = false, renderedRows = '';
   function update() {
     const footer = document.querySelector('.home-footer');
@@ -23,7 +26,7 @@
     dialog.innerHTML = `<section class="sync-card" role="dialog" aria-modal="true" aria-labelledby="sync-title"><header><h2 id="sync-title">保存・同期</h2><button class="icon-btn" data-sync-close aria-label="閉じる">×</button></header><p>この端末に保存した記録です。送信待ちは接続後に自動で再送します。ブラウザのデータを消去すると、未送信の記録も失われます。</p><button class="secondary-btn" data-sync-refresh>今すぐ同期</button><p data-sync-message role="status"></p><div class="sync-list">${rows.length ? rows.map(r => {
       const changed = r.errorCode === 'IC001';
       const text = r.status === 'synced' ? '送信済み' : r.status === 'blocked' ? '確認が必要' : '送信待ち';
-      return `<article><div><strong>${esc(r.payload.mode)} · ${esc(r.payload.score)} pts</strong><small>${esc(new Date(r.payload.playedAt).toLocaleString('ja-JP'))}</small></div><b>${text}</b>${r.status === 'blocked' ? `<p>${changed ? `公開設定が変わったため停止しました。保存時：${esc(policy(r.visibility))}。現在の設定を確認して再送してください。` : `記録は端末に保持しています。${esc(r.error || '送信できませんでした。')}`}</p><button class="secondary-btn" data-sync-retry="${esc(r.payload.clientEventId)}" ${changed ? 'data-sync-policy' : ''}>${changed ? '公開設定を確認' : '再送を試す'}</button>` : ''}${r.result?.publication_required ? `<p>この記録は非公開です。</p><button class="secondary-btn" data-sync-publish="${esc(r.result.session_id)}">この記録を公開する</button>` : ''}</article>`;
+      return `<article><div><strong>${esc(r.payload.mode)} · ${esc(r.payload.score)} pts</strong><small>${esc(new Date(r.payload.playedAt).toLocaleString('ja-JP'))}</small></div><b>${text}</b>${r.status === 'blocked' ? `<p>${changed ? `公開設定が変わったため停止しました。保存時：${esc(policy(r.visibility))}。現在の設定を確認して再送してください。` : `記録は端末に保持しています。${esc(errorText(r.error))}`}</p><button class="secondary-btn" data-sync-retry="${esc(r.payload.clientEventId)}" ${changed ? 'data-sync-policy' : ''}>${changed ? '公開設定を確認' : '再送を試す'}</button>` : ''}${r.result?.publication_required ? `<p>この記録は非公開です。</p><button class="secondary-btn" data-sync-publish="${esc(r.result.session_id)}">この記録を公開する</button>` : ''}</article>`;
     }).join('') : '<p>保存した記録はまだありません。</p>'}</div></section>`;
   }
   document.addEventListener('click', async e => {
@@ -56,7 +59,7 @@
         else await cloud.syncSavedPlays();
         render();
       }
-    } catch (error) { if (dialog) dialog.querySelector('[data-sync-message]').textContent = error.message; }
+    } catch (error) { if (dialog) dialog.querySelector('[data-sync-message]').textContent = errorText(error.message); }
     finally {busy = false; b.disabled = false; update();}
   });
   document.addEventListener('keydown', e => {

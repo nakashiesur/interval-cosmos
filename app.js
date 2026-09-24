@@ -1,4 +1,4 @@
-const APP_VERSION = 'ver.2.0.4';
+const APP_VERSION = `ver.${window.IntervalCosmosVersion || '2.0.4'}`;
 const CLOUD_CONFIG = window.INTERVAL_COSMOS_CLOUD || {};
 const cloud = window.IntervalCosmosCloud || null;
 

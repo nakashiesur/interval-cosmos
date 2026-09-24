@@ -1,5 +1,4 @@
 (() => {
-  const VERSION = 'ver.2.0.5-alpha3';
   let splashStartedAt = null;
   let lastSubmitResult = null;
   const cloud = window.IntervalCosmosCloud;
@@ -20,10 +19,6 @@
   }
 
   function enhance() {
-    document.querySelectorAll('.splash-version,.settings-version').forEach(node => {
-      if (node.textContent !== VERSION) node.textContent = VERSION;
-    });
-
     const splash = document.querySelector('.splash');
     if (splash) {
       const now = performance.now();

@@ -379,9 +379,6 @@
     queueMicrotask(() => {
       queued = false;
       injectButtons();
-      document.querySelectorAll('.splash-version,.settings-version').forEach(node => {
-        if (node.textContent !== VERSION) node.textContent = VERSION;
-      });
     });
   }
 
