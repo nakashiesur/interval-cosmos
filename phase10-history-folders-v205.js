@@ -18,8 +18,21 @@
     });
 
     if (moveToTop && window.matchMedia('(max-width:780px)').matches) {
-      card.scrollTo({ top: 0, behavior: 'smooth' });
+      card.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth' });
     }
+  }
+
+  function navigate(card, nav, event) {
+    if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+    const current = event.target.closest('[data-v205-history-folder-tab]');
+    if (!current) return;
+    const names = [...VALID];
+    let index = names.indexOf(current.dataset.v205HistoryFolderTab);
+    index = event.key === 'Home' ? 0 : event.key === 'End' ? names.length - 1 :
+      (index + (event.key === 'ArrowRight' ? 1 : names.length - 1)) % names.length;
+    event.preventDefault();
+    setActive(card, names[index], true);
+    nav.querySelector(`[data-v205-history-folder-tab="${names[index]}"]`).focus();
   }
 
   function enhance(card) {
@@ -44,7 +57,12 @@
       const pane = document.createElement('div');
       pane.className = 'v205-history-folder-pane';
       pane.dataset.v205HistoryFolderPane = name;
+      pane.id = `history-pane-${name}`;
       pane.setAttribute('role', 'tabpanel');
+      const tab = nav.querySelector(`[data-v205-history-folder-tab="${name}"]`);
+      tab.id = `history-tab-${name}`;
+      tab.setAttribute('aria-controls', pane.id);
+      pane.setAttribute('aria-labelledby', tab.id);
       return pane;
     };
 
@@ -65,6 +83,7 @@
       if (!button) return;
       setActive(card, button.dataset.v205HistoryFolderTab, true);
     });
+    nav.addEventListener('keydown', event => navigate(card, nav, event));
 
     card.dataset.v205HistoryFolders = '1';
     setActive(card, activeFolder, false);
