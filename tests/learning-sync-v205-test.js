@@ -2,10 +2,10 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert');
 const code=fs.readFileSync(require('path').join(__dirname,'../learning-sync-v205.js'),'utf8');
 const data=new Map([['intervalCosmos.mastery.v2',JSON.stringify({M3:{seen:7,correct:5}})]]);
 const storage={get length(){return data.size},key:i=>[...data.keys()][i],getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,v),removeItem:k=>data.delete(k)};
-function harness(){
+function harness(backend='test'){
  let user='auth-a',player='player-a',seq=0,fail=false,hold=null;
  const sent=new Map();const ctx={localStorage:storage,navigator:{onLine:true},Date,Math,JSON,console,setTimeout:()=>1};
- ctx.window={INTERVAL_COSMOS_CLOUD:{supabaseUrl:'test'},addEventListener(){},setInterval(){},IntervalCosmosCloud:{
+ ctx.window={INTERVAL_COSMOS_CLOUD:{supabaseUrl:backend},addEventListener(){},setInterval(){},IntervalCosmosCloud:{
   getCachedPlayer:()=>({id:player,is_guest:!player}),getAuthUser:()=>({id:user}),createClientEventId:()=>`event-${++seq}`,
   submitLearningAnswers:async(owner,events)=>{if(hold)await hold;for(const e of events)sent.set(e.event_id,e);if(fail)throw Error('lost acknowledgement')},
   fetchLearningAnalysis:async()=>[]}};
@@ -23,6 +23,11 @@ function harness(){
  h.identity('guest',null);h.api.record('P1','P1',20);assert.equal(h.api.pending().length,0);
  h.identity('auth-a','player-a');let release;h.hold(new Promise(r=>release=r));h.api.record('P1','P1',80);const running=h.api.flush();h.api.record('P5','P4',300);release();await running;assert.equal(h.sent.size,3);assert.equal(h.api.pending().length,0);
  const restored=harness();assert.equal(restored.api.legacy().M3.seen,7);
+ h.hold(null);h.ctx.navigator.onLine=false;h.api.record('M2','M2',500);
+ const pendingId=h.api.pending()[0].event.event_id;
+ const otherBackend=harness('other-test');await otherBackend.api.flush();assert.equal(otherBackend.sent.size,0);
+ const reloaded=harness();assert.equal(reloaded.api.pending()[0].event.event_id,pendingId);
+ await reloaded.api.flush();assert.equal(reloaded.sent.size,1);assert.ok(reloaded.sent.has(pendingId));assert.equal(h.api.pending().length,0);
  console.log('PASS new answers persist offline, retry with stable IDs, isolate accounts, preserve legacy, and retain answers added during sync');
 })().catch(e=>{console.error(e);process.exitCode=1});
 
