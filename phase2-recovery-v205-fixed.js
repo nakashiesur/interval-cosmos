@@ -156,7 +156,7 @@
           <div class="ic-account-actions"><button type="button" class="ic-btn secondary" data-v205-recovery-back>戻る</button><button type="submit" class="ic-btn primary">復旧する</button></div>
         </form>
       </section>
-      <div class="ic-account-version">${VERSION}</div>
+      <div class="ic-account-version">${esc(window.IntervalCosmosVersion ? `ver.${window.IntervalCosmosVersion}` : VERSION)}</div>
     </div>`;
   }
 
@@ -173,7 +173,7 @@
           <div class="ic-account-actions"><button type="button" class="ic-btn secondary" data-v205-recovery-close>キャンセル</button><button type="submit" class="ic-btn primary">保存する</button></div>
         </form>
       </section>
-      <div class="ic-account-version">${VERSION}</div>
+      <div class="ic-account-version">${esc(window.IntervalCosmosVersion ? `ver.${window.IntervalCosmosVersion}` : VERSION)}</div>
     </div>`;
   }
 

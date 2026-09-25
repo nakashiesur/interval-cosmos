@@ -18,7 +18,7 @@ const assertions = [
   ['settings can change code', sql.includes('set_my_recovery_code') && js.includes('v205RecoverySettingsForm')],
   ['PIN path remains available', js.includes('v205LinkForm') && js.includes('data-v205-recovery-open')],
   ['cookie loss copy present', js.includes('Cookie') && js.includes('学習履歴・ランキング・COSMOS PT・フレーム')],
-  ['recovery assets loaded', index.includes('phase2-recovery-v205-fixed.js?v=alpha4.2.1') && index.includes('phase2-recovery-v205.css?v=alpha4.2.1')],
+  ['recovery assets loaded', index.includes('phase2-recovery-v205-fixed.js?v=alpha4.2.2') && index.includes('phase2-recovery-v205.css?v=alpha4.2.1')],
   ['recovery assets cached', sw.includes('phase2-recovery-v205-fixed.js') && sw.includes('phase2-recovery-v205.css')],
   ['settings version ownership isolated', !js.includes("querySelectorAll('.settings-version')") && !js.includes('updateVersionLabels')],
   ['settings injection idempotent', js.includes("settings.querySelector('.v205-recovery-setting')") && js.includes("row.dataset.statusLoaded === '1'")],

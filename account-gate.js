@@ -235,7 +235,10 @@ async function submitLinkForm(form) {
     pollTargetLink();
   } catch (error) {
     console.error(error);
-    setMessage('#v205LinkMessage', error?.message || 'PINを確認できませんでした。', 'error');
+    const message = error?.message || '';
+    setMessage('#v205LinkMessage', /PIN is invalid or expired/i.test(message)
+      ? 'このPINは使用できません。入力内容を確認し、使用済み・期限切れの場合は元の端末で新しいPINを発行してください。'
+      : message || 'PINを確認できませんでした。', 'error');
     if (submit) { submit.disabled = false; submit.textContent = 'この端末を接続'; }
   }
 }
