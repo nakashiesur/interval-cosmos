@@ -1,0 +1,828 @@
+{
+  "status": "planning_only_not_runtime_manifest",
+  "catalogVerified": "2026-09-26 dedicated Fresh Build Test and canonical SQL",
+  "baseDesignCount": 64,
+  "items": [
+    {
+      "family": "courses",
+      "id": "piano",
+      "status": "not_generated",
+      "exportSizes": [
+        48,
+        64,
+        96,
+        192
+      ],
+      "proposedPath": "assets/art/v1/courses/piano-{size}.webp"
+    },
+    {
+      "family": "courses",
+      "id": "orchestral",
+      "status": "not_generated",
+      "exportSizes": [
+        48,
+        64,
+        96,
+        192
+      ],
+      "proposedPath": "assets/art/v1/courses/orchestral-{size}.webp"
+    },
+    {
+      "family": "courses",
+      "id": "vocal_musical",
+      "status": "not_generated",
+      "exportSizes": [
+        48,
+        64,
+        96,
+        192
+      ],
+      "proposedPath": "assets/art/v1/courses/vocal_musical-{size}.webp"
+    },
+    {
+      "family": "courses",
+      "id": "composition",
+      "status": "not_generated",
+      "exportSizes": [
+        48,
+        64,
+        96,
+        192
+      ],
+      "proposedPath": "assets/art/v1/courses/composition-{size}.webp"
+    },
+    {
+      "family": "courses",
+      "id": "rock_pops",
+      "status": "not_generated",
+      "exportSizes": [
+        48,
+        64,
+        96,
+        192
+      ],
+      "proposedPath": "assets/art/v1/courses/rock_pops-{size}.webp"
+    },
+    {
+      "family": "courses",
+      "id": "electronic_organ",
+      "status": "not_generated",
+      "exportSizes": [
+        48,
+        64,
+        96,
+        192
+      ],
+      "proposedPath": "assets/art/v1/courses/electronic_organ-{size}.webp"
+    },
+    {
+      "family": "courses",
+      "id": "sound_design",
+      "status": "not_generated",
+      "exportSizes": [
+        48,
+        64,
+        96,
+        192
+      ],
+      "proposedPath": "assets/art/v1/courses/sound_design-{size}.webp"
+    },
+    {
+      "family": "courses",
+      "id": "music_education",
+      "status": "not_generated",
+      "exportSizes": [
+        48,
+        64,
+        96,
+        192
+      ],
+      "proposedPath": "assets/art/v1/courses/music_education-{size}.webp"
+    },
+    {
+      "family": "courses",
+      "id": "music_therapy",
+      "status": "not_generated",
+      "exportSizes": [
+        48,
+        64,
+        96,
+        192
+      ],
+      "proposedPath": "assets/art/v1/courses/music_therapy-{size}.webp"
+    },
+    {
+      "family": "courses",
+      "id": "child_culture",
+      "status": "not_generated",
+      "exportSizes": [
+        48,
+        64,
+        96,
+        192
+      ],
+      "proposedPath": "assets/art/v1/courses/child_culture-{size}.webp"
+    },
+    {
+      "family": "courses",
+      "id": "voice_actor",
+      "status": "not_generated",
+      "exportSizes": [
+        48,
+        64,
+        96,
+        192
+      ],
+      "proposedPath": "assets/art/v1/courses/voice_actor-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "nova",
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/avatars/nova-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "orbit",
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/avatars/orbit-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "pulse",
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/avatars/pulse-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "prism",
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/avatars/prism-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "comet",
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/avatars/comet-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "nebula",
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/avatars/nebula-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "vector",
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/avatars/vector-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "echo",
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/avatars/echo-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "quasar",
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/avatars/quasar-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "lumen",
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/avatars/lumen-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "wave",
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/avatars/wave-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "aster",
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/avatars/aster-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "teacher",
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/avatars/teacher-{size}.webp"
+    },
+    {
+      "family": "frames",
+      "id": "normal",
+      "status": "not_generated",
+      "exportSizes": [
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/frames/normal-{size}.webp"
+    },
+    {
+      "family": "frames",
+      "id": "bronze",
+      "status": "not_generated",
+      "exportSizes": [
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/frames/bronze-{size}.webp"
+    },
+    {
+      "family": "frames",
+      "id": "silver",
+      "status": "not_generated",
+      "exportSizes": [
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/frames/silver-{size}.webp"
+    },
+    {
+      "family": "frames",
+      "id": "gold",
+      "status": "not_generated",
+      "exportSizes": [
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/frames/gold-{size}.webp"
+    },
+    {
+      "family": "frames",
+      "id": "platinum",
+      "status": "not_generated",
+      "exportSizes": [
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/frames/platinum-{size}.webp"
+    },
+    {
+      "family": "frames",
+      "id": "cosmic",
+      "status": "not_generated",
+      "exportSizes": [
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/frames/cosmic-{size}.webp"
+    },
+    {
+      "family": "frames",
+      "id": "aurora",
+      "status": "not_generated",
+      "exportSizes": [
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/frames/aurora-{size}.webp"
+    },
+    {
+      "family": "frames",
+      "id": "supernova",
+      "status": "not_generated",
+      "exportSizes": [
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/frames/supernova-{size}.webp"
+    },
+    {
+      "family": "frames",
+      "id": "event_horizon",
+      "status": "not_generated",
+      "exportSizes": [
+        128,
+        256,
+        512
+      ],
+      "proposedPath": "assets/art/v1/frames/event_horizon-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "first_signal",
+      "displayName": "FIRST SIGNAL",
+      "category": "basic",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/first_signal-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "sessions_5",
+      "displayName": "ORBIT STARTER",
+      "category": "basic",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/sessions_5-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "sessions_20",
+      "displayName": "ORBIT REGULAR",
+      "category": "basic",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/sessions_20-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "sessions_50",
+      "displayName": "STAR TRACKER",
+      "category": "basic",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/sessions_50-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "sessions_100",
+      "displayName": "STELLAR VETERAN",
+      "category": "basic",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/sessions_100-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "perfect_5",
+      "displayName": "CLEAN CONTACT",
+      "category": "accuracy",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/perfect_5-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "perfect_10",
+      "displayName": "CLEAR ORBIT",
+      "category": "accuracy",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/perfect_10-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "perfect_20",
+      "displayName": "PRECISION PILOT",
+      "category": "accuracy",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/perfect_20-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "combo_5",
+      "displayName": "COMBO 5",
+      "category": "combo",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/combo_5-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "combo_10",
+      "displayName": "COMBO DRIVER",
+      "category": "combo",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/combo_10-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "combo_20",
+      "displayName": "CHAIN 20",
+      "category": "combo",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/combo_20-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "combo_30",
+      "displayName": "CHAIN REACTOR",
+      "category": "combo",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/combo_30-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "text_10",
+      "displayName": "TEXT SPECIALIST",
+      "category": "mode",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/text_10-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "keys_10",
+      "displayName": "KEYS SPECIALIST",
+      "category": "mode",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/keys_10-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "hyper_first",
+      "displayName": "HYPER IGNITION",
+      "category": "mode",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/hyper_first-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "ear_first",
+      "displayName": "EAR CONTACT",
+      "category": "mode",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/ear_first-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "all_modes",
+      "displayName": "COSMOS EXPLORER",
+      "category": "mode",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/all_modes-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "interval_all_seen",
+      "displayName": "13 SIGNALS",
+      "category": "interval",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/interval_all_seen-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "interval_80",
+      "displayName": "INTERVAL NAVIGATOR",
+      "category": "interval",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/interval_80-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "interval_90",
+      "displayName": "INTERVAL MASTER",
+      "category": "interval",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/interval_90-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "streak_3",
+      "displayName": "THREE DAY ORBIT",
+      "category": "streak",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/streak_3-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "streak_7",
+      "displayName": "SEVEN DAY ORBIT",
+      "category": "streak",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/streak_7-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "streak_14",
+      "displayName": "FOURTEEN DAY ORBIT",
+      "category": "streak",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/streak_14-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "public_record",
+      "displayName": "OPEN CHANNEL",
+      "category": "ranking",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/public_record-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "rank_top10",
+      "displayName": "TOP TEN",
+      "category": "ranking",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/rank_top10-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "rank_podium",
+      "displayName": "PODIUM",
+      "category": "ranking",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/rank_podium-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "rank_first",
+      "displayName": "NUMBER ONE",
+      "category": "ranking",
+      "hidden": false,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/rank_first-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "hidden_ear_perfect",
+      "displayName": "INNER EAR",
+      "category": "hidden",
+      "hidden": true,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/hidden_ear_perfect-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "hidden_all_mode_perfect",
+      "displayName": "FIVE PERFECT ORBITS",
+      "category": "hidden",
+      "hidden": true,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/hidden_all_mode_perfect-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "hidden_combo_50",
+      "displayName": "GRAVITY CHAIN",
+      "category": "hidden",
+      "hidden": true,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/hidden_combo_50-{size}.webp"
+    },
+    {
+      "family": "achievements",
+      "id": "hidden_singularity",
+      "displayName": "SINGULARITY",
+      "category": "hidden",
+      "hidden": true,
+      "status": "not_generated",
+      "exportSizes": [
+        64,
+        128,
+        256
+      ],
+      "proposedPath": "assets/art/v1/achievements/hidden_singularity-{size}.webp"
+    }
+  ]
+}
