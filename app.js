@@ -663,6 +663,11 @@ function endGame() {
   state.phase = 'ending';
   audio.stopPending();
   const finalScore = currentFinalScore();
+  if (state.profile?.is_guest) window.IntervalCosmosGuestSessions?.save({
+    mode: rankingKeyForMode() || state.modeId, score: finalScore,
+    total_answers: state.game.total, correct_answers: state.game.correct,
+    max_combo: state.game.maxCombo, played_at: new Date().toISOString()
+  });
   state.rankingSubmit = mode()?.ranked ? { status: 'preparing' } : null;
   state.screen = 'result';
   starfield.set(finalScore, state.game.maxCombo, 'result');

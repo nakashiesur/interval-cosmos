@@ -1,0 +1,10 @@
+const assert=require('assert'),fs=require('fs'),vm=require('vm');
+const storage=new Map();const ctx={window:{},localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)}};
+const code=fs.readFileSync('guest-sessions-v205.js','utf8');vm.runInNewContext(code,ctx);
+const store=ctx.window.IntervalCosmosGuestSessions;
+assert.equal(store.read().length,0);store.save({mode:'TEXT',score:123,total_answers:4,correct_answers:3,played_at:new Date().toISOString()});
+const reloaded={window:{},localStorage:ctx.localStorage};vm.runInNewContext(code,reloaded);assert.equal(reloaded.window.IntervalCosmosGuestSessions.read()[0].score,123);
+for(let i=0;i<510;i++)store.save({mode:'KEYS',score:i});assert.equal(store.read().length,500);assert.equal(store.read()[0].score,509);
+ctx.localStorage.setItem=()=>{throw Error('quota')};assert.equal(store.save({mode:'TEXT',score:1}),false);
+const app=fs.readFileSync('app.js','utf8');assert(app.includes('if (state.profile?.is_guest) window.IntervalCosmosGuestSessions?.save'));
+console.log('PASS guest session persistence, newest-first bound, storage failure, guest-only save guard');

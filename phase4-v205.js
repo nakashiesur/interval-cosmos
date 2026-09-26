@@ -228,7 +228,7 @@
       </header>
 
       <div class="v205-history-summary">
-        <div><span>PLAY SESSIONS</span><strong>${summary.plays}</strong><small>オンライン保存</small></div>
+        <div><span>PLAY SESSIONS</span><strong>${summary.plays}</strong><small>${shared.guest ? 'この端末に保存' : 'オンライン保存'}</small></div>
         <div><span>ACCURACY</span><strong>${summary.accuracy}%</strong><small>${summary.correct}/${summary.total}</small></div>
         <div><span>BEST SCORE</span><strong>${nfmt(summary.best)}</strong><small>全モード</small></div>
         <div><span>MAX COMBO</span><strong>${summary.combo}</strong><small>全期間</small></div>
@@ -244,7 +244,7 @@
 
       <section class="v205-history-section">
         <div class="v205-history-title"><div><h3>MODE ANALYSIS</h3><span>モード別</span></div></div>
-        <div class="v205-history-modes">${modeCards || '<div class="empty-state">まだオンライン履歴がありません。</div>'}</div>
+        <div class="v205-history-modes">${modeCards || '<div class="empty-state">まだプレイ履歴がありません。</div>'}</div>
       </section>
 
       <section class="v205-history-section">
@@ -286,7 +286,7 @@
       const profile = cloud?.getCachedPlayer?.();
       let sessions;
       if (profile?.is_guest || !cloud?.fetchLearningHistory) {
-        sessions = [];
+        sessions = window.IntervalCosmosGuestSessions?.read() || [];
       } else {
         sessions = await cloud.fetchLearningHistory({limit:500});
       }

@@ -1,5 +1,6 @@
-const CACHE = 'interval-cosmos-v2-0-5-alpha10-58';
+const CACHE = 'interval-cosmos-v2-0-5-alpha10-59';
 const ASSETS = [
+  './guest-sessions-v205.js', './phase10-device-fixes-v205.css',
   './assets/art/v1/frames/normal.svg',
   './assets/art/v1/frames/normal-still.svg',
   './assets/art/v1/frames/bronze.svg',
