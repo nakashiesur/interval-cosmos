@@ -281,7 +281,7 @@
   }
   function gameTick(){if(!game||game.finished)return;if(Date.now()>=game.wallDeadline){finishGame();return}const t=document.querySelector('.v205-a-timer');if(t)t.textContent=String(Math.ceil((game.wallDeadline-Date.now())/1000));raf=requestAnimationFrame(gameTick)}
   async function startGame(a){
-    const st=statusOf(a);if(st!=='active')return;currentAssignment=a;const def=MODE_MAP[a.mode];if(!def)return alert('未対応モードです。');const keys=(a.interval_keys||[]).filter(k=>IV[k]);if(!keys.length)keys.push(...INTERVALS.map(x=>x.key));audio ||= new AssignmentAudio();try{await audio.unlock()}catch{}
+    const st=statusOf(a);if(st!=='active')return openAssignments();currentAssignment=a;const def=MODE_MAP[a.mode];if(!def)return alert('未対応モードです。');const keys=(a.interval_keys||[]).filter(k=>IV[k]);if(!keys.length)keys.push(...INTERVALS.map(x=>x.key));audio ||= new AssignmentAudio();try{await audio.unlock()}catch{}
     game={def,keys,score:0,combo:0,maxCombo:0,total:0,correct:0,response:[],previous:null,locked:true,reveal:false,flash:null,feedback:'',feedbackType:null,chosenKey:null,finished:false,labelSymbol:Math.random()<.5,wallDeadline:Date.now()+def.duration*1000,question:null,questionAt:0};
     let c=3;overlay().innerHTML=`<div class="v205-a-countdown"><small>${esc(a.title)}</small><strong id="v205ACount">3</strong></div>`;
     const tick=()=>{const el=document.querySelector('#v205ACount');if(!game)return;if(c>0){if(el)el.textContent=String(c--);setTimeout(tick,650)}else{if(el)el.textContent='START';setTimeout(()=>{if(!game)return;game.locked=false;game.question=makeQuestion(keys,null);game.questionAt=performance.now();renderGame();audio.play(game.question).catch(()=>{});gameTick()},450)}};tick();

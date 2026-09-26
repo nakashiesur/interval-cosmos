@@ -216,6 +216,10 @@
     try {
       const a = await fetchStudentAssignment(id);
       if (!a) throw new Error('課題が見つかりません。');
+      const now = Date.now();
+      if (now < new Date(a.start_at).getTime() || now > new Date(a.deadline_at).getTime()) {
+        return window.IntervalCosmosAssignmentsV205?.open?.();
+      }
       const modes = allowedModes(a);
       if (modes.length > 1) renderModeChooser(a);
       else startWithMode(a, modes[0]);
