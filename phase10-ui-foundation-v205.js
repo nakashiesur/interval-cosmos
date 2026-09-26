@@ -141,9 +141,11 @@
       nav = document.createElement('div');
       nav.className = 'v205-settings-nav';
       nav.setAttribute('role', 'tablist');
+      nav.setAttribute('aria-label', '設定のカテゴリ');
+      nav.addEventListener('keydown', handleSettingsTabKey);
       nav.innerHTML = CATEGORY_ORDER.map(id => {
         const [tabTitle, sub] = CATEGORY_LABELS[id];
-        return `<button type="button" class="v205-settings-tab" role="tab" data-v205-settings-category="${id}"><strong>${tabTitle}</strong><small>${sub}</small></button>`;
+        return `<button type="button" class="v205-settings-tab" role="tab" id="settings-tab-${id}" aria-controls="settings-panel-${id}" data-v205-settings-category="${id}"><strong>${tabTitle}</strong><small>${sub}</small></button>`;
       }).join('');
     }
 
@@ -153,7 +155,7 @@
       groups.className = 'v205-settings-groups';
       groups.innerHTML = CATEGORY_ORDER.map(id => {
         const [groupTitle, sub] = CATEGORY_LABELS[id];
-        return `<section class="v205-settings-group" data-v205-settings-group="${id}"><header><span>${groupTitle}</span><small>${sub}</small></header><div class="v205-settings-group-body"></div></section>`;
+        return `<section class="v205-settings-group" role="tabpanel" id="settings-panel-${id}" aria-labelledby="settings-tab-${id}" data-v205-settings-group="${id}"><header><span>${groupTitle}</span><small>${sub}</small></header><div class="v205-settings-group-body"></div></section>`;
       }).join('');
     }
 
@@ -200,6 +202,7 @@
       const on = tab.dataset.v205SettingsCategory === active;
       tab.classList.toggle('active', on);
       tab.setAttribute('aria-selected', String(on));
+      tab.tabIndex = on ? 0 : -1;
     }
     for (const group of groups.querySelectorAll('[data-v205-settings-group]')) {
       const hasRows = Boolean(group.querySelector('.setting-row'));
@@ -242,6 +245,20 @@
       groups.style.overflow = '';
       settingsAnimation = null;
     };
+  }
+
+  function handleSettingsTabKey(event) {
+    if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+    const tab = event.target.closest?.('[data-v205-settings-category]');
+    if (!tab) return;
+    const tabs = [...event.currentTarget.querySelectorAll('[data-v205-settings-category]')].filter(t => !t.classList.contains('empty'));
+    const index = tabs.indexOf(tab);
+    if (index < 0 || !tabs.length) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+    animateSettingsCategory(tabs[next].dataset.v205SettingsCategory);
+    tabs[next].focus();
   }
 
   function improveUnlockContrast() {
