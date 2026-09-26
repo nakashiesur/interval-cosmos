@@ -112,3 +112,6 @@ jobs:
 
       - name: Assignment deadline UI regression
         run: node tests/assignment-deadline-ui-v205-test.js
+
+      - name: Approved artwork regression
+        run: node tests/art-v205-test.js

@@ -1,295 +1,175 @@
 {
-  "status": "planning_only_not_runtime_manifest",
-  "catalogVerified": "2026-09-26 dedicated Fresh Build Test and canonical SQL",
-  "baseDesignCount": 64,
+  "status": "partial_runtime_art_2026_09_27",
+  "catalogVerified": "2026-09-27 Fresh Build Test: 24 student + 1 teacher; 11 courses",
+  "baseDesignCount": 76,
   "items": [
     {
       "family": "courses",
       "id": "piano",
-      "status": "not_generated",
-      "exportSizes": [
-        48,
-        64,
-        96,
-        192
-      ],
-      "proposedPath": "assets/art/v1/courses/piano-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/courses/piano.svg",
+      "assetPath": "assets/art/v1/courses/piano.svg"
     },
     {
       "family": "courses",
       "id": "orchestral",
-      "status": "not_generated",
-      "exportSizes": [
-        48,
-        64,
-        96,
-        192
-      ],
-      "proposedPath": "assets/art/v1/courses/orchestral-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/courses/orchestral.svg",
+      "assetPath": "assets/art/v1/courses/orchestral.svg"
     },
     {
       "family": "courses",
       "id": "vocal_musical",
-      "status": "not_generated",
-      "exportSizes": [
-        48,
-        64,
-        96,
-        192
-      ],
-      "proposedPath": "assets/art/v1/courses/vocal_musical-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/courses/vocal_musical.svg",
+      "assetPath": "assets/art/v1/courses/vocal_musical.svg"
     },
     {
       "family": "courses",
       "id": "composition",
-      "status": "not_generated",
-      "exportSizes": [
-        48,
-        64,
-        96,
-        192
-      ],
-      "proposedPath": "assets/art/v1/courses/composition-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/courses/composition.svg",
+      "assetPath": "assets/art/v1/courses/composition.svg"
     },
     {
       "family": "courses",
       "id": "rock_pops",
-      "status": "not_generated",
-      "exportSizes": [
-        48,
-        64,
-        96,
-        192
-      ],
-      "proposedPath": "assets/art/v1/courses/rock_pops-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/courses/rock_pops.svg",
+      "assetPath": "assets/art/v1/courses/rock_pops.svg"
     },
     {
       "family": "courses",
       "id": "electronic_organ",
-      "status": "not_generated",
-      "exportSizes": [
-        48,
-        64,
-        96,
-        192
-      ],
-      "proposedPath": "assets/art/v1/courses/electronic_organ-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/courses/electronic_organ.svg",
+      "assetPath": "assets/art/v1/courses/electronic_organ.svg"
     },
     {
       "family": "courses",
       "id": "sound_design",
-      "status": "not_generated",
-      "exportSizes": [
-        48,
-        64,
-        96,
-        192
-      ],
-      "proposedPath": "assets/art/v1/courses/sound_design-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/courses/sound_design.svg",
+      "assetPath": "assets/art/v1/courses/sound_design.svg"
     },
     {
       "family": "courses",
       "id": "music_education",
-      "status": "not_generated",
-      "exportSizes": [
-        48,
-        64,
-        96,
-        192
-      ],
-      "proposedPath": "assets/art/v1/courses/music_education-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/courses/music_education.svg",
+      "assetPath": "assets/art/v1/courses/music_education.svg"
     },
     {
       "family": "courses",
       "id": "music_therapy",
-      "status": "not_generated",
-      "exportSizes": [
-        48,
-        64,
-        96,
-        192
-      ],
-      "proposedPath": "assets/art/v1/courses/music_therapy-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/courses/music_therapy.svg",
+      "assetPath": "assets/art/v1/courses/music_therapy.svg"
     },
     {
       "family": "courses",
       "id": "child_culture",
-      "status": "not_generated",
-      "exportSizes": [
-        48,
-        64,
-        96,
-        192
-      ],
-      "proposedPath": "assets/art/v1/courses/child_culture-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/courses/child_culture.svg",
+      "assetPath": "assets/art/v1/courses/child_culture.svg"
     },
     {
       "family": "courses",
       "id": "voice_actor",
-      "status": "not_generated",
-      "exportSizes": [
-        48,
-        64,
-        96,
-        192
-      ],
-      "proposedPath": "assets/art/v1/courses/voice_actor-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/courses/voice_actor.svg",
+      "assetPath": "assets/art/v1/courses/voice_actor.svg"
     },
     {
       "family": "avatars",
       "id": "nova",
-      "status": "not_generated",
-      "exportSizes": [
-        64,
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/avatars/nova-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/nova.svg",
+      "assetPath": "assets/art/v1/avatars/nova.svg"
     },
     {
       "family": "avatars",
       "id": "orbit",
-      "status": "not_generated",
-      "exportSizes": [
-        64,
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/avatars/orbit-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/orbit.svg",
+      "assetPath": "assets/art/v1/avatars/orbit.svg"
     },
     {
       "family": "avatars",
       "id": "pulse",
-      "status": "not_generated",
-      "exportSizes": [
-        64,
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/avatars/pulse-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/pulse.svg",
+      "assetPath": "assets/art/v1/avatars/pulse.svg"
     },
     {
       "family": "avatars",
       "id": "prism",
-      "status": "not_generated",
-      "exportSizes": [
-        64,
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/avatars/prism-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/prism.svg",
+      "assetPath": "assets/art/v1/avatars/prism.svg"
     },
     {
       "family": "avatars",
       "id": "comet",
-      "status": "not_generated",
-      "exportSizes": [
-        64,
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/avatars/comet-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/comet.svg",
+      "assetPath": "assets/art/v1/avatars/comet.svg"
     },
     {
       "family": "avatars",
       "id": "nebula",
-      "status": "not_generated",
-      "exportSizes": [
-        64,
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/avatars/nebula-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/nebula.svg",
+      "assetPath": "assets/art/v1/avatars/nebula.svg"
     },
     {
       "family": "avatars",
       "id": "vector",
-      "status": "not_generated",
-      "exportSizes": [
-        64,
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/avatars/vector-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/vector.svg",
+      "assetPath": "assets/art/v1/avatars/vector.svg"
     },
     {
       "family": "avatars",
       "id": "echo",
-      "status": "not_generated",
-      "exportSizes": [
-        64,
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/avatars/echo-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/echo.svg",
+      "assetPath": "assets/art/v1/avatars/echo.svg"
     },
     {
       "family": "avatars",
       "id": "quasar",
-      "status": "not_generated",
-      "exportSizes": [
-        64,
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/avatars/quasar-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/quasar.svg",
+      "assetPath": "assets/art/v1/avatars/quasar.svg"
     },
     {
       "family": "avatars",
       "id": "lumen",
-      "status": "not_generated",
-      "exportSizes": [
-        64,
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/avatars/lumen-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/lumen.svg",
+      "assetPath": "assets/art/v1/avatars/lumen.svg"
     },
     {
       "family": "avatars",
       "id": "wave",
-      "status": "not_generated",
-      "exportSizes": [
-        64,
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/avatars/wave-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/wave.svg",
+      "assetPath": "assets/art/v1/avatars/wave.svg"
     },
     {
       "family": "avatars",
       "id": "aster",
-      "status": "not_generated",
-      "exportSizes": [
-        64,
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/avatars/aster-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/aster.svg",
+      "assetPath": "assets/art/v1/avatars/aster.svg"
     },
     {
       "family": "avatars",
       "id": "teacher",
-      "status": "not_generated",
-      "exportSizes": [
-        64,
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/avatars/teacher-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/teacher.svg",
+      "assetPath": "assets/art/v1/avatars/teacher.svg"
     },
     {
       "family": "frames",
@@ -371,24 +251,16 @@
     {
       "family": "frames",
       "id": "supernova",
-      "status": "not_generated",
-      "exportSizes": [
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/frames/supernova-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/frames/supernova.svg",
+      "assetPath": "assets/art/v1/frames/supernova.svg"
     },
     {
       "family": "frames",
       "id": "event_horizon",
-      "status": "not_generated",
-      "exportSizes": [
-        128,
-        256,
-        512
-      ],
-      "proposedPath": "assets/art/v1/frames/event_horizon-{size}.webp"
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/frames/event_horizon.svg",
+      "assetPath": "assets/art/v1/frames/event_horizon.svg"
     },
     {
       "family": "achievements",
@@ -823,6 +695,90 @@
         256
       ],
       "proposedPath": "assets/art/v1/achievements/hidden_singularity-{size}.webp"
+    },
+    {
+      "family": "avatars",
+      "id": "luna",
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/luna.svg",
+      "assetPath": "assets/art/v1/avatars/luna.svg"
+    },
+    {
+      "family": "avatars",
+      "id": "flora",
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/flora.svg",
+      "assetPath": "assets/art/v1/avatars/flora.svg"
+    },
+    {
+      "family": "avatars",
+      "id": "lyra",
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/lyra.svg",
+      "assetPath": "assets/art/v1/avatars/lyra.svg"
+    },
+    {
+      "family": "avatars",
+      "id": "ribbon",
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/ribbon.svg",
+      "assetPath": "assets/art/v1/avatars/ribbon.svg"
+    },
+    {
+      "family": "avatars",
+      "id": "aria",
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/aria.svg",
+      "assetPath": "assets/art/v1/avatars/aria.svg"
+    },
+    {
+      "family": "avatars",
+      "id": "gem",
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/gem.svg",
+      "assetPath": "assets/art/v1/avatars/gem.svg"
+    },
+    {
+      "family": "avatars",
+      "id": "charm",
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/charm.svg",
+      "assetPath": "assets/art/v1/avatars/charm.svg"
+    },
+    {
+      "family": "avatars",
+      "id": "bloom",
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/bloom.svg",
+      "assetPath": "assets/art/v1/avatars/bloom.svg"
+    },
+    {
+      "family": "avatars",
+      "id": "sonata",
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/sonata.svg",
+      "assetPath": "assets/art/v1/avatars/sonata.svg"
+    },
+    {
+      "family": "avatars",
+      "id": "parfait",
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/parfait.svg",
+      "assetPath": "assets/art/v1/avatars/parfait.svg"
+    },
+    {
+      "family": "avatars",
+      "id": "letter",
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/letter.svg",
+      "assetPath": "assets/art/v1/avatars/letter.svg"
+    },
+    {
+      "family": "avatars",
+      "id": "auris",
+      "status": "implemented_vector",
+      "proposedPath": "assets/art/v1/avatars/auris.svg",
+      "assetPath": "assets/art/v1/avatars/auris.svg"
     }
   ]
 }

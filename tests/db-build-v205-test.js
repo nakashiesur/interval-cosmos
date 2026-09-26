@@ -39,7 +39,7 @@ check('generated bundle has no psql include commands',!/^\\ir\s/m.test(bundle));
 check('generated bundle includes every Phase 1 part marker',baseParts.every((_,i)=>bundle.includes(`part-${String(i+1).padStart(2,'0')}.sql`)));
 check('generated bundle includes every current migration marker',currentMigrations.every(file=>bundle.includes(file)));
 check('generated bundle includes current avatar seed',[
-  'nova','orbit','pulse','prism','comet','nebula','vector','echo','quasar','lumen','wave','aster','teacher'
+  'nova','orbit','pulse','prism','comet','nebula','vector','echo','quasar','lumen','wave','aster','luna','flora','lyra','ribbon','aria','gem','charm','bloom','sonata','parfait','letter','auris','teacher'
 ].every(id=>bundle.includes(`'${id}'`)));
 check('account creation fallback is canonical nova',bundle.includes("DEFAULT 'nova'::text")||bundle.includes("default 'nova'"));
 check('generated bundle includes admin management RPCs',[

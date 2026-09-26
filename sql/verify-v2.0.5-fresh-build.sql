@@ -41,9 +41,9 @@ begin
   select count(*) into v_count
   from public.avatar_catalog
   where is_active
-    and id = any(array['nova','orbit','pulse','prism','comet','nebula','vector','echo','quasar','lumen','wave','aster','teacher']);
-  if v_count <> 13 then
-    raise exception 'Expected 13 active v2.0.5 avatars, found %', v_count;
+    and id = any(array['nova','orbit','pulse','prism','comet','nebula','vector','echo','quasar','lumen','wave','aster','luna','flora','lyra','ribbon','aria','gem','charm','bloom','sonata','parfait','letter','auris','teacher']);
+  if v_count <> 25 then
+    raise exception 'Expected 25 active v2.0.5 avatars, found %', v_count;
   end if;
 
   if not exists (

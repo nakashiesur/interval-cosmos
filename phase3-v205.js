@@ -363,13 +363,19 @@
       node.classList.add(`v205-frame-${row.equipped_frame_id || 'normal'}`);
 
       const avatar = node.querySelector('.rank-avatar');
-      if (avatar) avatar.classList.add('v205-profile-frame', `v205-frame-${row.equipped_frame_id || 'normal'}`);
+      if (avatar) {
+        avatar.classList.add('v205-profile-frame', `v205-frame-${row.equipped_frame_id || 'normal'}`);
+        if (window.IntervalCosmosArt && avatar.dataset.artAvatar !== (row.avatar_id || 'nova')) {
+          avatar.innerHTML = window.IntervalCosmosArt.avatarHTML(row.avatar_id);
+          avatar.dataset.artAvatar = row.avatar_id || 'nova';
+        }
+      }
 
       const player = node.querySelector('.rank-player');
       if (player && !player.querySelector('.v205-rank-meta')) {
         const meta = document.createElement('div');
         meta.className = 'v205-rank-meta';
-        meta.innerHTML = `<span class="v205-course-badge">${esc(courseLabel(row.course_code))}</span><small>${esc(titleLabel(row.main_title_id))}</small>`;
+        meta.innerHTML = `<span class="v205-course-badge">${window.IntervalCosmosArt?.courseHTML(row.course_code)||''}${esc(courseLabel(row.course_code))}</span><small>${esc(titleLabel(row.main_title_id))}</small>`;
         player.appendChild(meta);
       }
 
@@ -419,9 +425,9 @@
     const signature = `profile:${card.player_id}:${card.updated_at || ''}:${records.length}:${achievements.length}`;
     const html = `<button class="icon-btn v205-profile-close" data-v205-close-profile>×</button>
       <div class="v205-profile-hero">
-        <div class="v205-profile-avatar v205-profile-frame v205-frame-${esc(frame)}">${esc(mark)}</div>
+        <div class="v205-profile-avatar v205-profile-frame v205-frame-${esc(frame)}">${window.IntervalCosmosArt?.avatarHTML(card.avatar_id)||esc(mark)}</div>
         <div class="v205-profile-identity">
-          <span class="v205-course-badge">${esc(courseLabel(card.course_code))}</span>
+          <span class="v205-course-badge">${window.IntervalCosmosArt?.courseHTML(card.course_code)||''}${esc(courseLabel(card.course_code))}</span>
           <h2>${esc(card.player_name || 'PLAYER')}</h2>
           <div class="v205-profile-title">${esc(titleLabel(card.main_title_id))}</div>
           <div class="v205-profile-frame-name">${esc(frameLabel(frame))} FRAME</div>

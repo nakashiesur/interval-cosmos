@@ -2,7 +2,7 @@
 -- Canonical avatar catalog used by the v2.0.5 account UI.
 --
 -- The Phase 1 base schema originally contained only `default + teacher` as
--- placeholders. The v2.0.5 client registration UI uses the 12 student avatar
+-- placeholders. The v2.0.5 client registration UI uses the 24 student avatar
 -- IDs below, in this exact display order. Keep this migration idempotent so it
 -- can safely normalize an already-running development database.
 
@@ -23,6 +23,18 @@ values
   ('lumen',   'LUMEN',   null, false, true,  100),
   ('wave',    'WAVE',    null, false, true,  110),
   ('aster',   'ASTER',   null, false, true,  120),
+  ('luna', 'LUNA', 'assets/art/v1/avatars/luna.svg', false, true, 130),
+  ('flora', 'FLORA', 'assets/art/v1/avatars/flora.svg', false, true, 140),
+  ('lyra', 'LYRA', 'assets/art/v1/avatars/lyra.svg', false, true, 150),
+  ('ribbon', 'RIBBON', 'assets/art/v1/avatars/ribbon.svg', false, true, 160),
+  ('aria', 'ARIA', 'assets/art/v1/avatars/aria.svg', false, true, 170),
+  ('gem', 'GEM', 'assets/art/v1/avatars/gem.svg', false, true, 180),
+  ('charm', 'CHARM', 'assets/art/v1/avatars/charm.svg', false, true, 190),
+  ('bloom', 'BLOOM', 'assets/art/v1/avatars/bloom.svg', false, true, 200),
+  ('sonata', 'SONATA', 'assets/art/v1/avatars/sonata.svg', false, true, 210),
+  ('parfait', 'PARFAIT', 'assets/art/v1/avatars/parfait.svg', false, true, 220),
+  ('letter', 'LETTER', 'assets/art/v1/avatars/letter.svg', false, true, 230),
+  ('auris', 'AURIS', 'assets/art/v1/avatars/auris.svg', false, true, 240),
   ('teacher', 'TEACHER', null, true,  true,  1000)
 on conflict (id) do update
 set display_name = excluded.display_name,
@@ -43,5 +55,7 @@ where id = 'default';
 -- explicitly, but the DB default should be internally valid as well.
 alter table public.players
   alter column avatar_id set default 'nova';
+
+update public.avatar_catalog set asset_path = 'assets/art/v1/avatars/' || id || '.svg' where is_active;
 
 commit;

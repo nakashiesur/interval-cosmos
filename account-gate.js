@@ -1,7 +1,7 @@
 const cloud = window.IntervalCosmosCloud || null;
 const appRoot = document.querySelector('#app');
 
-const VERSION = '2.0.5-alpha10.28';
+const VERSION = '2.0.5-alpha10.29';
 window.IntervalCosmosVersion = VERSION;
 const COURSES = [
   { code: 'piano', department: '音楽学科', name: 'ピアノコース' },
@@ -20,6 +20,7 @@ const AVATARS = [
   ['nova','NOVA'], ['orbit','ORBIT'], ['pulse','PULSE'], ['prism','PRISM'],
   ['comet','COMET'], ['nebula','NEBULA'], ['vector','VECTOR'], ['echo','ECHO'],
   ['quasar','QUASAR'], ['lumen','LUMEN'], ['wave','WAVE'], ['aster','ASTER'],
+  ['luna','LUNA'], ['flora','FLORA'], ['lyra','LYRA'], ['ribbon','RIBBON'], ['aria','ARIA'], ['gem','GEM'], ['charm','CHARM'], ['bloom','BLOOM'], ['sonata','SONATA'], ['parfait','PARFAIT'], ['letter','LETTER'], ['auris','AURIS'],
 ];
 
 let appStarted = false;
@@ -68,8 +69,8 @@ function header(kicker, title, text = '') {
 }
 
 function avatarTile(id, label, selected = false) {
-  return `<button type="button" class="ic-avatar-choice ${selected ? 'active' : ''}" data-v205-avatar="${id}">
-    <span class="ic-avatar-art avatar-${id}" aria-hidden="true"><i></i><b></b></span><small>${esc(label)}</small>
+  return `<button type="button" class="ic-avatar-choice ${selected ? 'active' : ''}" data-v205-avatar="${id}" aria-pressed="${selected}">
+    ${window.IntervalCosmosArt?.avatarHTML(id) || `<span class="ic-avatar-art avatar-${id}" aria-hidden="true"><i></i><b></b></span>`}<small>${esc(label)}</small><small class="v205-avatar-caption">${esc(window.IntervalCosmosArt?.avatarLabel(id)||'')}</small>
   </button>`;
 }
 
@@ -112,7 +113,7 @@ function showStudentForm({ modal = false } = {}) {
 
 function showStaffInfo() {
   panel(`${header('STAFF ACCESS', '教職員アカウント', '学生による教職員アカウントの誤登録を防ぐため、教職員アカウントは管理者から発行します。')}
-    <div class="ic-staff-card"><span class="ic-avatar-art avatar-teacher"><i></i><b></b></span><div><strong>TEACHER IDENTITY</strong><p>教職員は専用アイコン固定。学籍番号・教職員番号の入力は不要です。</p></div></div>
+    <div class="ic-staff-card">${window.IntervalCosmosArt?.avatarHTML('teacher')||'<span class="ic-avatar-art avatar-teacher"><i></i><b></b></span>'}<div><strong>TEACHER IDENTITY</strong><p>教職員は専用アイコン固定。学籍番号・教職員番号の入力は不要です。</p></div></div>
     <p class="ic-account-footnote">管理画面の実装後、ここから発行済み教職員アカウントへ接続できるようにします。</p>
     <div class="ic-account-actions"><button class="ic-btn secondary" data-v205-action="chooser">戻る</button></div>`);
 }
@@ -466,7 +467,7 @@ window.addEventListener('click', event => {
   const avatar = event.target.closest?.('[data-v205-avatar]');
   if (!avatar) return;
   const scope = avatar.closest('form') || avatar.closest('.ic-account-panel');
-  scope?.querySelectorAll('[data-v205-avatar]').forEach(btn => btn.classList.toggle('active', btn === avatar));
+  scope?.querySelectorAll('[data-v205-avatar]').forEach(btn => { btn.classList.toggle('active', btn === avatar); btn.setAttribute('aria-pressed', String(btn === avatar)); });
   const input = scope?.querySelector('#v205Avatar, #v205EditAvatar');
   if (input) input.value = avatar.dataset.v205Avatar;
 });
