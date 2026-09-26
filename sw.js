@@ -1,5 +1,6 @@
-const CACHE = 'interval-cosmos-v2-0-5-alpha10-52';
+const CACHE = 'interval-cosmos-v2-0-5-alpha10-53';
 const ASSETS = [
+  './phase11-frames-v205.css', './assets/art/v1/frames/supernova.svg', './assets/art/v1/frames/supernova-still.svg', './assets/art/v1/frames/event_horizon.svg', './assets/art/v1/frames/event_horizon-still.svg',
   './offline-outbox-v205.js', './offline-sync-ui-v205.js', './offline-sync-v205.css',
   './phase10-cosmos-folders-v205.js', './phase10-cosmos-folders-v205.css',
   './', './index.html', './styles.css', './account-v205.css', './phase2-recovery-v205.css', './phase3-v205.css', './phase4-v205.css', './phase4-hotfix-v205.css', './phase5-v205.css', './phase6-assignments-v205.css', './phase6-multimode-v205.css', './phase6-game-layout-v205.css', './phase7-admin-dashboard-v205.css', './phase8-admin-player-management-v205.css', './phase8-pc-controls-v205.css', './phase8-config-polish-v205.css', './phase10-ui-foundation-v205.css', './phase10-header-polish-v205.css', './phase10-practice-polish-v205.css', './phase10-result-polish-v205.css', './phase10-cosmos-polish-v205.css', './phase10-history-polish-v205.css', './phase10-history-folders-v205.css', './phase10-assignment-polish-v205.css',
