@@ -10,7 +10,7 @@ const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
 
 const tests=[
   ['Phase 10 foundation assets are loaded',index.includes('phase10-ui-foundation-v205.js?v=alpha10.7')&&index.includes('phase10-ui-foundation-v205.css')],
-  ['Phase 10 header polish is loaded and cached',index.includes('phase10-header-polish-v205.css?v=alpha10.10')&&sw.includes('phase10-header-polish-v205.css')&&sw.includes('alpha10-44')],
+  ['Phase 10 header polish is loaded and cached',index.includes('phase10-header-polish-v205.css?v=alpha10.10')&&sw.includes('phase10-header-polish-v205.css')&&sw.includes('alpha10-45')],
   ['Phase 10 practice polish is loaded and cached',index.includes('phase10-practice-polish-v205.css?v=alpha10.2')&&sw.includes('phase10-practice-polish-v205.css')],
   ['service worker caches Phase 10 foundation',sw.includes('phase10-ui-foundation-v205.js')&&sw.includes('phase10-ui-foundation-v205.css')],
   ['home puts MY COSMOS beside existing settings gear',js.includes('v205-home-cosmos-pill')&&js.includes('data-v205-cosmos-open')&&js.includes("querySelector('[data-action=\"settings\"]')")],

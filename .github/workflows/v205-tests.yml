@@ -52,6 +52,7 @@ jobs:
         run: |
           node tests/offline-outbox-v205-test.js
           node tests/offline-result-v205-test.js
+          node tests/offline-dialog-v205-test.js
       - name: Playback regression
         run: node tests/playback-test.js
       - name: Wall-clock timer regression

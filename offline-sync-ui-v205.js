@@ -31,16 +31,19 @@
   }
   document.addEventListener('click', async e => {
     if (e.target.closest('[data-sync-open]')) {
+      if (dialog) {dialog.querySelector('[data-sync-close]').focus(); return;}
       dialog = document.createElement('div'); dialog.className = 'sync-overlay'; document.body.append(dialog); render();
       dialog.querySelector('[data-sync-close]').focus(); return;
     }
-    if (e.target.closest('[data-sync-close]') || e.target === dialog) {dialog?.remove(); dialog = null; document.querySelector('[data-sync-open]')?.focus(); return;}
+    if (e.target.closest('[data-sync-close]') || e.target === dialog) {dialog?.remove(); dialog = null; busy = false; document.querySelector('[data-sync-open]')?.focus(); return;}
     const b = e.target.closest('[data-sync-refresh],[data-sync-retry],[data-sync-publish],[data-sync-accept]');
     if (!b || busy || !dialog?.contains(b)) return;
+    const requestDialog = dialog;
     busy = true; b.disabled = true;
     try {
       if (b.hasAttribute('data-sync-policy')) {
         const p = await cloud.getMyPlayer();
+        if (dialog !== requestDialog) return;
         const message = dialog.querySelector('[data-sync-message]');
         message.textContent = `現在：${policy(p.ranking_visibility)}。この設定で記録を送信します。`;
         const confirm = document.createElement('button'); confirm.className = 'secondary-btn';
@@ -52,19 +55,20 @@
       } else {
         if (b.dataset.syncAccept) {
           const p = await cloud.getMyPlayer();
+          if (dialog !== requestDialog) return;
           if (p.ranking_visibility !== b.dataset.visibility) throw new Error('公開設定が再び変わりました。もう一度確認してください。');
           await cloud.retrySavedPlay(b.dataset.syncAccept, b.dataset.visibility);
         } else if (b.dataset.syncRetry) await cloud.retrySavedPlay(b.dataset.syncRetry);
         else if (b.dataset.syncPublish) await cloud.publishPlaySession(b.dataset.syncPublish);
         else await cloud.syncSavedPlays();
-        render();
+        if (dialog === requestDialog) render();
       }
-    } catch (error) { if (dialog) dialog.querySelector('[data-sync-message]').textContent = errorText(error.message); }
-    finally {busy = false; b.disabled = false; update();}
+    } catch (error) { if (dialog === requestDialog) dialog.querySelector('[data-sync-message]').textContent = errorText(error.message); }
+    finally {if (dialog === requestDialog) busy = false; b.disabled = false; update();}
   });
   document.addEventListener('keydown', e => {
     if (!dialog) return;
-    if (e.key === 'Escape') {e.stopImmediatePropagation();dialog.remove();dialog=null;document.querySelector('[data-sync-open]')?.focus();}
+    if (e.key === 'Escape') {e.stopImmediatePropagation();dialog.remove();dialog=null;busy=false;document.querySelector('[data-sync-open]')?.focus();}
     if (e.key === 'Tab') {
       const buttons = [...dialog.querySelectorAll('button:not(:disabled)')];
       const first = buttons[0], last = buttons[buttons.length-1];
