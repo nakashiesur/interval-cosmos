@@ -15,3 +15,8 @@
 .v205-achievement-mark .v205-achievement-image{width:100%;height:auto;aspect-ratio:1}
 .v205-achievement-item.locked .v205-achievement-image{filter:grayscale(1);opacity:.35}
 .v205-achievement>.v205-achievement-image{margin-bottom:6px}
+.v205-achievement:has(>.v205-achievement-image){grid-template-columns:40px minmax(0,1fr) auto;align-items:center}
+.v205-achievement>.v205-achievement-image{grid-column:1;grid-row:1/3;margin:0}
+.v205-achievement:has(>.v205-achievement-image)>strong{grid-column:2;grid-row:1;overflow-wrap:anywhere}
+.v205-achievement:has(>.v205-achievement-image)>span{grid-column:3;grid-row:1;white-space:nowrap}
+.v205-achievement:has(>.v205-achievement-image)>small{grid-column:2/4;grid-row:2}
