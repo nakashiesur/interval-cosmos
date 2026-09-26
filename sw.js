@@ -1,5 +1,20 @@
-const CACHE = 'interval-cosmos-v2-0-5-alpha10-55';
+const CACHE = 'interval-cosmos-v2-0-5-alpha10-56';
 const ASSETS = [
+  './assets/art/v1/frames/normal.svg',
+  './assets/art/v1/frames/normal-still.svg',
+  './assets/art/v1/frames/bronze.svg',
+  './assets/art/v1/frames/bronze-still.svg',
+  './assets/art/v1/frames/silver.svg',
+  './assets/art/v1/frames/silver-still.svg',
+  './assets/art/v1/frames/gold.svg',
+  './assets/art/v1/frames/gold-still.svg',
+  './assets/art/v1/frames/platinum.svg',
+  './assets/art/v1/frames/platinum-still.svg',
+  './assets/art/v1/frames/cosmic.svg',
+  './assets/art/v1/frames/cosmic-still.svg',
+  './assets/art/v1/frames/aurora.svg',
+  './assets/art/v1/frames/aurora-still.svg',
+
   './assets/art/v1/achievements/first_signal.svg',
   './assets/art/v1/achievements/sessions_5.svg',
   './assets/art/v1/achievements/sessions_20.svg',

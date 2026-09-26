@@ -174,79 +174,86 @@
     {
       "family": "frames",
       "id": "normal",
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         128,
         256,
         512
       ],
-      "proposedPath": "assets/art/v1/frames/normal-{size}.webp"
+      "proposedPath": "assets/art/v1/frames/normal-{size}.webp",
+      "assetPath": "assets/art/v1/frames/normal.svg"
     },
     {
       "family": "frames",
       "id": "bronze",
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         128,
         256,
         512
       ],
-      "proposedPath": "assets/art/v1/frames/bronze-{size}.webp"
+      "proposedPath": "assets/art/v1/frames/bronze-{size}.webp",
+      "assetPath": "assets/art/v1/frames/bronze.svg"
     },
     {
       "family": "frames",
       "id": "silver",
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         128,
         256,
         512
       ],
-      "proposedPath": "assets/art/v1/frames/silver-{size}.webp"
+      "proposedPath": "assets/art/v1/frames/silver-{size}.webp",
+      "assetPath": "assets/art/v1/frames/silver.svg"
     },
     {
       "family": "frames",
       "id": "gold",
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         128,
         256,
         512
       ],
-      "proposedPath": "assets/art/v1/frames/gold-{size}.webp"
+      "proposedPath": "assets/art/v1/frames/gold-{size}.webp",
+      "assetPath": "assets/art/v1/frames/gold.svg"
     },
     {
       "family": "frames",
       "id": "platinum",
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         128,
         256,
         512
       ],
-      "proposedPath": "assets/art/v1/frames/platinum-{size}.webp"
+      "proposedPath": "assets/art/v1/frames/platinum-{size}.webp",
+      "assetPath": "assets/art/v1/frames/platinum.svg"
     },
     {
       "family": "frames",
       "id": "cosmic",
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         128,
         256,
         512
       ],
-      "proposedPath": "assets/art/v1/frames/cosmic-{size}.webp"
+      "proposedPath": "assets/art/v1/frames/cosmic-{size}.webp",
+      "assetPath": "assets/art/v1/frames/cosmic.svg"
     },
     {
       "family": "frames",
       "id": "aurora",
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         128,
         256,
         512
       ],
-      "proposedPath": "assets/art/v1/frames/aurora-{size}.webp"
+      "proposedPath": "assets/art/v1/frames/aurora-{size}.webp",
+      "assetPath": "assets/art/v1/frames/aurora.svg"
     },
     {
       "family": "frames",
