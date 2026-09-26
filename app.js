@@ -269,13 +269,14 @@ function buildQuestion() {
 class AudioEngine {
   constructor() { this.ctx = null; this.master = null; this.generation = 0; }
   async unlock() {
-    if (!this.ctx) {
+    if (!this.ctx || this.ctx.state === 'closed') {
       this.ctx = new (window.AudioContext || window.webkitAudioContext)();
       this.master = this.ctx.createGain();
       this.master.gain.value = state.settings.volume;
       this.master.connect(this.ctx.destination);
     }
-    if (this.ctx.state === 'suspended') await this.ctx.resume();
+    // Safari uses interrupted after another app takes the audio session.
+    if (this.ctx.state !== 'running') await this.ctx.resume();
     this.master.gain.setTargetAtTime(state.settings.volume, this.ctx.currentTime, 0.02);
   }
   setVolume(value) {
