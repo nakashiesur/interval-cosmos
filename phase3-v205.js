@@ -29,6 +29,7 @@
   let rankingCacheScope = null;
   let promptScheduledFor = null;
   let enhanceQueued = false;
+  let publicationPending = false;
   const publishedSessions = new Set();
 
   const esc = value => String(value ?? '').replace(/[&<>'\"]/g, c => (
@@ -132,7 +133,7 @@
     const delay = bestRank <= 50 ? 2300 : 180;
 
     window.setTimeout(() => {
-      if (lastSubmitResult?.session_id !== result.session_id) return;
+      if (lastSubmitResult?.session_id !== result.session_id || !lastSubmitResult.publication_required) return;
       if (!document.querySelector('.result-panel')) return;
       if (document.querySelector('.rank-burst.v205-rank-privacy-burst')) return;
       showPublicationPrompt(result);
@@ -196,7 +197,9 @@
 
   async function publishCurrentScore(button) {
     const sessionId = lastSubmitResult?.session_id;
-    if (!sessionId || !cloud?.publishPlaySession) return;
+    if (!sessionId || !cloud?.publishPlaySession || publicationPending) return;
+    publicationPending = true;
+    document.querySelectorAll('[data-v205-publication]').forEach(control => { control.disabled = true; });
     button.disabled = true;
     button.textContent = 'PUBLISHING...';
     try {
@@ -215,11 +218,16 @@
       console.error('[v2.0.5 publish]', error);
       button.disabled = false;
       button.textContent = 'このランキングを公開する';
+      document.querySelectorAll('[data-v205-publication]').forEach(control => { control.disabled = false; });
       toast(`公開できませんでした：${error?.message || ''}`);
+    } finally {
+      publicationPending = false;
     }
   }
 
   function keepCurrentScorePrivate() {
+    // An already dispatched publication cannot be cancelled by a local close.
+    if (publicationPending) return;
     if (lastSubmitResult) lastSubmitResult.publication_required = false;
     closePublicationPresentation();
     toast('この記録は非公開のまま保存しました。');

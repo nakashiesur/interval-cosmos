@@ -9,7 +9,7 @@ const listeners = {};
 function makeNode() {
   return {
     className:'', innerHTML:'', textContent:'', dataset:{}, style:{}, disabled:false,
-    appendChild(){}, append(){}, remove(){},
+    appendChild(){}, append(){}, remove(){for(const [key,value] of overlays)if(value===this)overlays.delete(key);},
     querySelector(){ return null; }, querySelectorAll(){ return []; },
     setAttribute(){}, addEventListener(){}, closest(){ return null; },
     classList:{ add(){}, remove(){}, toggle(){} },
@@ -86,6 +86,28 @@ vm.runInContext(code,context,{filename:'phase3-v205.js'});
   fallbackTimer?.fn();
   assertions.push(['outside top 50 retains the separate privacy choice',Boolean(fallbackTimer)&&prompt.innerHTML.includes('51位相当')&&prompt.innerHTML.includes('52位相当')]);
 
+  listeners.click({target:{closest:selector=>selector==='[data-v205-publication]'?{dataset:{v205Publication:'private'}}:null}});
+  fallbackTimer?.fn();
+  assertions.push(['resolved private decision is not reopened by delayed fallback',!overlays.has('v205-publication-overlay')]);
+  submitResult={session_id:'s3',publication_required:true,monthly_rank:3,monthly_best_improved:true};
+  await cloud.submitScore({});
+  const publicTimer=timers[timers.length-1];
+  const publicButton={dataset:{v205Publication:'public'}};
+  listeners.click({target:{closest:selector=>selector==='[data-v205-publication]'?publicButton:null}});
+  await new Promise(setImmediate);
+  publicTimer.fn();
+  assertions.push(['resolved public decision is not reopened by delayed fallback',!overlays.has('v205-publication-overlay')]);
+  submitResult={session_id:'s4',publication_required:true,monthly_rank:51,monthly_best_improved:true};
+  await cloud.submitScore({});timers[timers.length-1].fn();
+  let completePublish;
+  cloud.publishPlaySession=()=>new Promise(resolve=>{completePublish=resolve});
+  listeners.click({target:{closest:selector=>selector==='[data-v205-publication]'?{dataset:{v205Publication:'public'}}:null}});
+  listeners.keydown({key:'Escape',target:{closest(){return null}},preventDefault(){},stopImmediatePropagation(){}});
+  assertions.push(['Escape cannot claim an in-flight publication was kept private',overlays.has('v205-publication-overlay')&&windowObj.IntervalCosmosV205.getLastSubmitResult().publication_required]);
+  completePublish({});await new Promise(setImmediate);
+  assertions.push(['pending publication closes only after completion',!overlays.has('v205-publication-overlay')]);
+  submitResult={session_id:'s5',publication_required:true,monthly_rank:51,monthly_best_improved:true};
+  await cloud.submitScore({});timers[timers.length-1].fn();
   let retries=0,consumed=false;
   resultPanel.querySelector=sel=>sel==='[data-action="retry"]'?{click(){retries++}}:null;
   const retryKey=()=>({key:'r',target:{closest(){return null}},preventDefault(){},stopImmediatePropagation(){consumed=true}});
