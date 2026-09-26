@@ -901,7 +901,7 @@ function renderPracticeSelect() {
     <button class="learning-guide-card" data-action="guide"><span class="guide-icon">🔰</span><span class="guide-copy"><strong>はじめての音程ガイド</strong><small>音程の数え方・長短／完全の見分け方を確認する</small></span><span class="guide-cta">まずはここから →</span></button>
 
     <div class="training-divider"><span>GAME TRAINING</span></div>
-    <div class="segmented"><button class="tab-btn ${state.practiceView === 'text' ? 'active' : ''}" data-view="text">文字</button><button class="tab-btn ${state.practiceView === 'keys' ? 'active' : ''}" data-view="keys">鍵盤</button><button class="tab-btn ${state.practiceView === 'ear' ? 'active' : ''}" data-view="ear">EAR</button></div>
+    <div class="segmented"><button class="tab-btn ${state.practiceView === 'text' ? 'active' : ''}" data-view="text" aria-pressed="${state.practiceView === 'text'}">文字</button><button class="tab-btn ${state.practiceView === 'keys' ? 'active' : ''}" data-view="keys" aria-pressed="${state.practiceView === 'keys'}">鍵盤</button><button class="tab-btn ${state.practiceView === 'ear' ? 'active' : ''}" data-view="ear" aria-pressed="${state.practiceView === 'ear'}">EAR</button></div>
     <div class="practice-list">
       <button class="practice-option" data-practice="manual"><span class="practice-icon">🎯</span><span class="practice-copy"><strong>FOCUS SELECT</strong><span>選んだ音程だけを反復して練習します。</span></span></button>
       <button class="practice-option" data-practice="adaptive"><span class="practice-icon">🤖</span><span class="practice-copy"><strong>ADAPTIVE TRAINING</strong><span>苦手な音程を自動判定し、重点的に反復します。</span></span></button>
@@ -933,7 +933,7 @@ function renderIntervalSelect() {
   app.innerHTML = `<main class="screen"><section class="shell narrow glass select-panel">
     <div class="topbar"><button class="secondary-btn" data-action="practice">← BACK</button><div class="topbar-title" style="text-align:center"><p class="eyebrow">FOCUS SELECT</p><h1>SELECT INTERVALS</h1><p>1つ以上選択してください。</p></div><span style="width:72px"></span></div>
     <div class="interval-tools"><button class="secondary-btn" data-action="select-all">ALL</button><button class="secondary-btn" data-action="select-core">CORE 7</button><button class="secondary-btn danger" data-action="clear-all">RESET</button></div>
-    <div class="interval-grid">${INTERVALS.map(iv => `<button class="chip ${selected.has(iv.key) ? 'selected' : ''}" data-interval="${iv.key}"><span class="iv-key">${iv.key}</span><span class="iv-name">${iv.jp}</span></button>`).join('')}</div>
+    <div class="interval-grid">${INTERVALS.map(iv => `<button class="chip ${selected.has(iv.key) ? 'selected' : ''}" data-interval="${iv.key}" aria-pressed="${selected.has(iv.key)}"><span class="iv-key">${iv.key}</span><span class="iv-name">${iv.jp}</span></button>`).join('')}</div>
     <div class="start-row"><button class="primary-btn" data-action="start-manual" ${selected.size ? '' : 'disabled'}>START FOCUS</button><span class="selected-count">${selected.size} / 13</span></div>
   </section>${modalHTML()}</main>`;
 }
@@ -1256,10 +1256,17 @@ app.addEventListener('click', event => {
   if (interval) {
     const key = interval.dataset.interval;
     state.selectedIntervals.has(key) ? state.selectedIntervals.delete(key) : state.selectedIntervals.add(key);
-    render(); return;
+    render();
+    app.querySelector(`[data-interval="${key}"]`)?.focus({ preventScroll: true });
+    return;
   }
   const view = event.target.closest('[data-view]');
-  if (view) { state.practiceView = view.dataset.view; render(); return; }
+  if (view) {
+    state.practiceView = view.dataset.view;
+    render();
+    app.querySelector(`[data-view="${state.practiceView}"]`)?.focus({ preventScroll: true });
+    return;
+  }
   const practice = event.target.closest('[data-practice]');
   if (practice) {
     const type = practice.dataset.practice;
@@ -1324,9 +1331,9 @@ app.addEventListener('click', event => {
     state.settings.audioStyle = state.settings.audioStyle === 'melodic' ? 'harmonic' : state.settings.audioStyle === 'harmonic' ? 'both' : 'melodic';
     saveSettings(); render(); audio.playInterval(state.question).catch(()=>{});
   }
-  else if (action === 'select-all') { state.selectedIntervals = new Set(INTERVALS.map(i=>i.key)); render(); }
-  else if (action === 'select-core') { state.selectedIntervals = new Set(['m3','M3','P4','TT','P5','m6','M6']); render(); }
-  else if (action === 'clear-all') { state.selectedIntervals.clear(); render(); }
+  else if (action === 'select-all') { state.selectedIntervals = new Set(INTERVALS.map(i=>i.key)); render(); app.querySelector('[data-action="select-all"]')?.focus({ preventScroll: true }); }
+  else if (action === 'select-core') { state.selectedIntervals = new Set(['m3','M3','P4','TT','P5','m6','M6']); render(); app.querySelector('[data-action="select-core"]')?.focus({ preventScroll: true }); }
+  else if (action === 'clear-all') { state.selectedIntervals.clear(); render(); app.querySelector('[data-action="clear-all"]')?.focus({ preventScroll: true }); }
   else if (action === 'start-manual') {
     if (!state.selectedIntervals.size) return;
     const id = state.practiceView === 'keys' ? 'manualKeys' : state.practiceView === 'ear' ? 'manualEar' : 'manualText';
