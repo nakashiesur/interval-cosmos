@@ -268,13 +268,14 @@
       "displayName": "FIRST SIGNAL",
       "category": "basic",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/first_signal-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/first_signal-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/first_signal.svg"
     },
     {
       "family": "achievements",
@@ -282,13 +283,14 @@
       "displayName": "ORBIT STARTER",
       "category": "basic",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/sessions_5-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/sessions_5-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/sessions_5.svg"
     },
     {
       "family": "achievements",
@@ -296,13 +298,14 @@
       "displayName": "ORBIT REGULAR",
       "category": "basic",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/sessions_20-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/sessions_20-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/sessions_20.svg"
     },
     {
       "family": "achievements",
@@ -310,13 +313,14 @@
       "displayName": "STAR TRACKER",
       "category": "basic",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/sessions_50-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/sessions_50-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/sessions_50.svg"
     },
     {
       "family": "achievements",
@@ -324,13 +328,14 @@
       "displayName": "STELLAR VETERAN",
       "category": "basic",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/sessions_100-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/sessions_100-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/sessions_100.svg"
     },
     {
       "family": "achievements",
@@ -338,13 +343,14 @@
       "displayName": "CLEAN CONTACT",
       "category": "accuracy",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/perfect_5-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/perfect_5-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/perfect_5.svg"
     },
     {
       "family": "achievements",
@@ -352,13 +358,14 @@
       "displayName": "CLEAR ORBIT",
       "category": "accuracy",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/perfect_10-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/perfect_10-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/perfect_10.svg"
     },
     {
       "family": "achievements",
@@ -366,13 +373,14 @@
       "displayName": "PRECISION PILOT",
       "category": "accuracy",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/perfect_20-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/perfect_20-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/perfect_20.svg"
     },
     {
       "family": "achievements",
@@ -380,13 +388,14 @@
       "displayName": "COMBO 5",
       "category": "combo",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/combo_5-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/combo_5-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/combo_5.svg"
     },
     {
       "family": "achievements",
@@ -394,13 +403,14 @@
       "displayName": "COMBO DRIVER",
       "category": "combo",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/combo_10-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/combo_10-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/combo_10.svg"
     },
     {
       "family": "achievements",
@@ -408,13 +418,14 @@
       "displayName": "CHAIN 20",
       "category": "combo",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/combo_20-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/combo_20-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/combo_20.svg"
     },
     {
       "family": "achievements",
@@ -422,13 +433,14 @@
       "displayName": "CHAIN REACTOR",
       "category": "combo",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/combo_30-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/combo_30-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/combo_30.svg"
     },
     {
       "family": "achievements",
@@ -436,13 +448,14 @@
       "displayName": "TEXT SPECIALIST",
       "category": "mode",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/text_10-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/text_10-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/text_10.svg"
     },
     {
       "family": "achievements",
@@ -450,13 +463,14 @@
       "displayName": "KEYS SPECIALIST",
       "category": "mode",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/keys_10-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/keys_10-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/keys_10.svg"
     },
     {
       "family": "achievements",
@@ -464,13 +478,14 @@
       "displayName": "HYPER IGNITION",
       "category": "mode",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/hyper_first-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/hyper_first-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/hyper_first.svg"
     },
     {
       "family": "achievements",
@@ -478,13 +493,14 @@
       "displayName": "EAR CONTACT",
       "category": "mode",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/ear_first-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/ear_first-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/ear_first.svg"
     },
     {
       "family": "achievements",
@@ -492,13 +508,14 @@
       "displayName": "COSMOS EXPLORER",
       "category": "mode",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/all_modes-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/all_modes-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/all_modes.svg"
     },
     {
       "family": "achievements",
@@ -506,13 +523,14 @@
       "displayName": "13 SIGNALS",
       "category": "interval",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/interval_all_seen-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/interval_all_seen-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/interval_all_seen.svg"
     },
     {
       "family": "achievements",
@@ -520,13 +538,14 @@
       "displayName": "INTERVAL NAVIGATOR",
       "category": "interval",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/interval_80-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/interval_80-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/interval_80.svg"
     },
     {
       "family": "achievements",
@@ -534,13 +553,14 @@
       "displayName": "INTERVAL MASTER",
       "category": "interval",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/interval_90-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/interval_90-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/interval_90.svg"
     },
     {
       "family": "achievements",
@@ -548,13 +568,14 @@
       "displayName": "THREE DAY ORBIT",
       "category": "streak",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/streak_3-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/streak_3-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/streak_3.svg"
     },
     {
       "family": "achievements",
@@ -562,13 +583,14 @@
       "displayName": "SEVEN DAY ORBIT",
       "category": "streak",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/streak_7-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/streak_7-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/streak_7.svg"
     },
     {
       "family": "achievements",
@@ -576,13 +598,14 @@
       "displayName": "FOURTEEN DAY ORBIT",
       "category": "streak",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/streak_14-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/streak_14-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/streak_14.svg"
     },
     {
       "family": "achievements",
@@ -590,13 +613,14 @@
       "displayName": "OPEN CHANNEL",
       "category": "ranking",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/public_record-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/public_record-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/public_record.svg"
     },
     {
       "family": "achievements",
@@ -604,13 +628,14 @@
       "displayName": "TOP TEN",
       "category": "ranking",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/rank_top10-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/rank_top10-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/rank_top10.svg"
     },
     {
       "family": "achievements",
@@ -618,13 +643,14 @@
       "displayName": "PODIUM",
       "category": "ranking",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/rank_podium-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/rank_podium-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/rank_podium.svg"
     },
     {
       "family": "achievements",
@@ -632,13 +658,14 @@
       "displayName": "NUMBER ONE",
       "category": "ranking",
       "hidden": false,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/rank_first-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/rank_first-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/rank_first.svg"
     },
     {
       "family": "achievements",
@@ -646,13 +673,14 @@
       "displayName": "INNER EAR",
       "category": "hidden",
       "hidden": true,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/hidden_ear_perfect-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/hidden_ear_perfect-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/hidden_ear_perfect.svg"
     },
     {
       "family": "achievements",
@@ -660,13 +688,14 @@
       "displayName": "FIVE PERFECT ORBITS",
       "category": "hidden",
       "hidden": true,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/hidden_all_mode_perfect-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/hidden_all_mode_perfect-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/hidden_all_mode_perfect.svg"
     },
     {
       "family": "achievements",
@@ -674,13 +703,14 @@
       "displayName": "GRAVITY CHAIN",
       "category": "hidden",
       "hidden": true,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/hidden_combo_50-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/hidden_combo_50-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/hidden_combo_50.svg"
     },
     {
       "family": "achievements",
@@ -688,13 +718,14 @@
       "displayName": "SINGULARITY",
       "category": "hidden",
       "hidden": true,
-      "status": "not_generated",
+      "status": "implemented_vector",
       "exportSizes": [
         64,
         128,
         256
       ],
-      "proposedPath": "assets/art/v1/achievements/hidden_singularity-{size}.webp"
+      "proposedPath": "assets/art/v1/achievements/hidden_singularity-{size}.webp",
+      "assetPath": "assets/art/v1/achievements/hidden_singularity.svg"
     },
     {
       "family": "avatars",

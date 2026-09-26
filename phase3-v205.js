@@ -444,7 +444,7 @@
       </section>
       <section class="v205-profile-section">
         <div class="v205-section-head"><h3>FEATURED ACHIEVEMENTS</h3><span>代表実績</span></div>
-        ${achievements.length ? `<div class="v205-achievement-grid">${achievements.map(a => `<div class="v205-achievement"><strong>${esc(a.name || a.id || 'ACHIEVEMENT')}</strong><span>+${Number(a.points || 0)} pt</span><small>${esc(a.description || '')}</small></div>`).join('')}</div>` : '<div class="empty-state">代表実績はまだ設定されていません。</div>'}
+        ${achievements.length ? `<div class="v205-achievement-grid">${achievements.map(a => `<div class="v205-achievement">${window.IntervalCosmosArt?.achievementHTML(a.id,{unlocked:true})||''}<strong>${esc(a.name || a.id || 'ACHIEVEMENT')}</strong><span>+${Number(a.points || 0)} pt</span><small>${esc(a.description || '')}</small></div>`).join('')}</div>` : '<div class="empty-state">代表実績はまだ設定されていません。</div>'}
       </section>`;
     writeHTML(target, html, signature);
   }

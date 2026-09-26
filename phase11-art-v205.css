@@ -9,3 +9,9 @@
 
 .ic-avatar-choice .v205-avatar-caption{font-size:9px;letter-spacing:0;color:#b6c7da;line-height:1.3}
 .ic-account-layer.is-modal .ic-account-version{display:none}
+
+.v205-achievement-image{display:block;width:40px;height:40px;object-fit:contain;pointer-events:none}
+.v205-achievement-item .v205-achievement-mark:has(.v205-achievement-image){border:0;border-radius:0;width:100%;height:auto}
+.v205-achievement-mark .v205-achievement-image{width:100%;height:auto;aspect-ratio:1}
+.v205-achievement-item.locked .v205-achievement-image{filter:grayscale(1);opacity:.35}
+.v205-achievement>.v205-achievement-image{margin-bottom:6px}
