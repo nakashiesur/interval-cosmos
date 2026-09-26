@@ -60,6 +60,7 @@
       throw new Error('学籍番号または復旧コードを確認してください。');
     }
 
+    await cloud.ensureAccountAuth();
     const result = await rpc('recover_student_account', {
       p_student_number: normalizedStudent,
       p_recovery_code: code,
@@ -99,6 +100,7 @@
       if (code !== confirmation) throw new Error('復旧コードの確認入力が一致していません。');
       if (code === normalized.toUpperCase()) throw new Error('復旧コードに学籍番号そのものは使用できません。');
 
+      await cloud.ensureAccountAuth();
       const data = await rpc('create_player_account', {
         p_account_type:'student',
         p_student_number:normalized,

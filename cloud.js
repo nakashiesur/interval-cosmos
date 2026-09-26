@@ -157,6 +157,25 @@
     return authUser;
   }
 
+  // Registration/recovery are online operations. Cached JWTs can outlive a
+  // deleted Auth user, so validate with Auth before creating device links.
+  async function ensureAccountAuth() {
+    await ensureAuth();
+    const { data, error } = await client.auth.getUser();
+    if (error) {
+      if (!['user_not_found', 'session_not_found'].includes(error.code)) throw error;
+      const { error: signOutError } = await client.auth.signOut({ scope: 'local' });
+      if (signOutError) throw signOutError;
+      authUser = null;
+      player = null;
+      try { localStorage.removeItem(offlineProfileKey); } catch {}
+      return ensureAuth();
+    }
+    if (!data?.user) throw new Error('接続情報を確認できません。通信状態を確認して、もう一度お試しください。');
+    authUser = data.user;
+    return authUser;
+  }
+
   async function loadActualPlayer() {
     await ensureAuth();
     if (!client || !authUser) return null;
@@ -213,7 +232,7 @@
     courseCode,
     avatarId = 'nova',
   }) {
-    await ensureAuth();
+    await ensureAccountAuth();
 
     const normalized = normalizeStudentNumber(studentNumber);
     if (normalized.length < 3 || normalized.length > 20) {
@@ -606,6 +625,7 @@
     setGuestMode,
     getCachedPlayer,
     getAuthUser,
+    ensureAccountAuth,
   };
   window.addEventListener('online', () => syncSavedPlays());
   window.addEventListener('visibilitychange', () => { if (!document.hidden) syncSavedPlays(); });
