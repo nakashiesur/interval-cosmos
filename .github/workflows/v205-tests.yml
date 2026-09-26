@@ -58,7 +58,9 @@ jobs:
       - name: Wall-clock timer regression
         run: node tests/wallclock-v205-test.js
       - name: Fresh server isolation
-        run: python3 tests/fresh-server-test.py
+        run: |
+          python3 tests/fresh-server-test.py
+          python3 tests/device-server-test.py
       - name: Boot error regression
         run: |
           node tests/boot-error-v205-test.js
