@@ -37,3 +37,11 @@
   .answer-btn .answer-main{font-size:1.05rem}
   .hold-btn-wide{height:44px}
 }
+@media (orientation:landscape) and (max-height:540px){
+  .ear-prompt{gap:2px;margin-bottom:4px;font-size:1rem}
+  .ear-prompt strong{font-size:1.5rem;line-height:1.1}
+  .ear-prompt small{font-size:.5rem}
+  .ear-wave{height:22px}
+  .ear-wave i:nth-child(n){max-height:22px}
+  .ear-prompt+.note-question{font-size:1.4rem;line-height:1.2}
+}
