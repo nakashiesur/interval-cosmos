@@ -98,6 +98,8 @@ jobs:
           node tests/phase10-cosmos-polish-v205-test.js
           node tests/phase10-history-polish-v205-test.js
           node tests/phase10-history-folders-v205-test.js
+      - name: Guest local history regression
+        run: node tests/guest-history-v205-test.js
       - name: Deleted authentication regression
         run: node tests/deleted-auth-v205-test.js
       - name: Database build regression

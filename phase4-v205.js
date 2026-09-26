@@ -181,6 +181,7 @@
     const summary = summarize(sessions);
     const intervals = shared.guest ? intervalRows() : sharedRows(shared.rows);
     analysisRowsCache = intervals;
+    const deviceRows = intervalRows();
     const legacyRows = intervalRows(window.IntervalCosmosLearningSync?.legacy?.() || {});
     const weak = weakest([...intervals]);
     const strong = strongest([...intervals]);
@@ -258,6 +259,10 @@
           <article><span>CONFUSION</span><strong>${weak?.confusion ? `${weak.key} → ${weak.confusion[0]}` : '—'}</strong><small>${weak?.confusion ? `${weak.confusion[1]}回混同` : '明確な混同は未検出'}</small></article>
         </div>
         <div class="v205-history-intervals">${intervalCards}</div>
+        ${!shared.guest && deviceRows.some(r => r.seen) ? `<details class="v205-legacy-analysis v205-device-analysis"><summary>この端末の学習（ゲストの回答を含む）</summary>
+          <p class="v205-history-note">登録前のゲストプレイを含む、このブラウザの回答です。共通分析と重なる回答もあります。アカウント別の成績ではなく、共通集計には加算しません。</p>
+          <div class="v205-history-intervals">${deviceRows.map(r => `<button class="v205-history-interval" data-v205-practice-interval="${r.key}" title="${esc(INTERVAL_NAMES[r.key])}"><strong>${r.key}</strong><span>${r.seen ? `${r.accuracy}%` : '—'}</span><small>${r.seen} answers</small></button>`).join('')}</div>
+        </details>` : ''}
         <details class="v205-legacy-analysis"><summary>過去の端末内分析（共通集計には含めません）</summary>
           <p class="v205-history-note">この端末で同期機能を導入する前の記録です。他の端末とは合算しません。</p>
           <div class="v205-history-intervals">${legacyRows.map(r => `<button class="v205-history-interval" data-v205-practice-interval="${r.key}" title="${esc(INTERVAL_NAMES[r.key])}"><strong>${r.key}</strong><span>${r.seen ? `${r.accuracy}%` : '—'}</span><small>${r.seen} answers</small></button>`).join('')}</div>
