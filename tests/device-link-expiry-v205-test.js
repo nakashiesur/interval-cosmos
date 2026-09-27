@@ -12,7 +12,7 @@ const targetCode=source.slice(source.indexOf('function pollTargetLink('),source.
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b});return {promise,resolve,reject}};
 function targetContext(){
   const calls=[], button={disabled:false}; let poll;
-  const c={targetLink:{id:'request-a'},linkPollTimer:null,console,document:{querySelector:()=>button},
+  const c={appStarted:false,targetLink:{id:'request-a'},linkPollTimer:null,console,document:{querySelector:()=>button},
     cloud:{cancelDeviceLink:async id=>calls.push(id),getDeviceLinkTargetStatus:async()=>({status:'pending'}),setGuestMode(){},getMyPlayer:async()=>{}},
     setInterval:fn=>{poll=fn;return 1},clearInterval(){},setMessage(){},showLinkInput(){c.inputShown=true},startApp:async()=>{c.started=true}};
   vm.createContext(c);vm.runInContext(targetCode,c);return {c,calls,button,tick:()=>poll()};
