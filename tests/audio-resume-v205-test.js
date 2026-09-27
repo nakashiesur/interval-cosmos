@@ -12,8 +12,11 @@ async function testEngine(file, name, end) {
     constructor() { created++; this.state = 'suspended'; this.currentTime = 0; this.resumes = 0; this.destination = {}; }
     createGain() { return { gain: { value: 0, setTargetAtTime() {} }, connect() {} }; }
     async resume() { this.resumes++; this.state = 'running'; }
+    async close() { this.state = 'closed'; }
   }
-  const sandbox = {window: {AudioContext: Context}, state: {settings:{volume:.72}}, localStorage:{getItem:()=>null}};
+  const handlers = {};
+  const doc = {hidden:false,addEventListener:(name,fn)=>{handlers[name]=fn}};
+  const sandbox = {document:doc,window: {AudioContext: Context,addEventListener:(name,fn)=>{handlers[name]=fn}}, state: {settings:{volume:.72}}, localStorage:{getItem:()=>null}};
   vm.createContext(sandbox);
   const engine = vm.runInContext(`${code}; new ${name}()`, sandbox);
   await engine.unlock();
@@ -34,7 +37,22 @@ async function testEngine(file, name, end) {
   assert.notEqual(engine.ctx, original);
   assert.equal(created, 2);
   assert.equal(engine.ctx.state, 'running');
-  console.log(`PASS ${name}: interrupted/suspended/running/closed`);
+  const backgrounded = engine.ctx;
+  doc.hidden = true;
+  handlers.visibilitychange();
+  assert.equal(engine.ctx, null);
+  assert.equal(backgrounded.state, 'closed');
+  assert.equal(await engine.unlock(), false);
+  assert.equal(engine.ctx, null, 'Background timers cannot recreate audio');
+  doc.hidden = false;
+  handlers.visibilitychange();
+  assert.equal(engine.ctx, null, 'No automatic foreground playback');
+  await engine.unlock();
+  assert.equal(engine.ctx.state, 'running');
+  assert.notEqual(engine.ctx, backgrounded);
+  handlers.pagehide();
+  assert.equal(engine.ctx, null);
+  console.log(`PASS ${name}: interrupted/suspended/running/closed/background/pagehide`);
 }
 (async()=>{
   await testEngine('app.js','AudioEngine','const audio = new AudioEngine();');

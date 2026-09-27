@@ -47,7 +47,7 @@
       history.dataset.v205HistoryOpen = '1';
       history.title = '学習履歴';
       history.setAttribute('aria-label', '学習履歴');
-      history.innerHTML = '<span aria-hidden="true">◫</span><strong>学習履歴</strong><small>HISTORY</small>';
+      history.innerHTML = '<span aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M16 7C12 4 7 4 3 5v22c4-1 9-1 13 2 4-3 9-3 13-2V5c-4-1-9-1-13 2Z"/><path d="M16 7v22M7 10l5 1M7 15l5 1M20 11l5-1M20 16l5-1"/></svg></span><strong>学習履歴</strong><small>HISTORY</small>';
     }
 
     if (history && topActions) {
@@ -89,7 +89,7 @@
       cosmos.className = 'v205-home-cosmos-pill';
       cosmos.setAttribute('aria-label', 'MY COSMOS プロフィール');
       cosmos.dataset.v205CosmosOpen = '1';
-      cosmos.innerHTML = '<span aria-hidden="true">✦</span><strong>MY COSMOS</strong><small>PROFILE</small>';
+      cosmos.innerHTML = '<span aria-hidden="true"><svg viewBox="0 0 32 32" fill="currentColor"><path d="M16 1c2.4 9.8 5.2 12.6 15 15-9.8 2.4-12.6 5.2-15 15C13.6 21.2 10.8 18.4 1 16 10.8 13.6 13.6 10.8 16 1Z"/></svg></span><strong>MY COSMOS</strong><small>PROFILE</small>';
       const gear = topActions.querySelector('[data-action="settings"]');
       gear ? topActions.insertBefore(cosmos, gear) : topActions.appendChild(cosmos);
     }

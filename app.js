@@ -267,8 +267,20 @@ function buildQuestion() {
 }
 
 class AudioEngine {
-  constructor() { this.ctx = null; this.master = null; this.generation = 0; }
+  constructor() {
+    this.ctx = null; this.master = null; this.generation = 0;
+    const release = () => this.release();
+    window.addEventListener('pagehide', release);
+    document.addEventListener?.('visibilitychange', () => { if (document.hidden) release(); });
+  }
+  release() {
+    this.stopPending();
+    const old = this.ctx;
+    this.ctx = null; this.master = null;
+    if (old && old.state !== 'closed') old.close().catch(() => {});
+  }
   async unlock() {
+    if (document.hidden) return false;
     if (!this.ctx || this.ctx.state === 'closed') {
       this.ctx = new (window.AudioContext || window.webkitAudioContext)();
       this.master = this.ctx.createGain();
@@ -317,7 +329,7 @@ class AudioEngine {
   }
   async playInterval(question, style = state.settings.audioStyle) {
     if (!state.settings.sound || !question) return;
-    await this.unlock();
+    if (await this.unlock() === false) return;
     const token = ++this.generation;
     const now = this.ctx.currentTime + 0.035;
 
