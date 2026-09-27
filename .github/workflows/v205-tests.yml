@@ -63,6 +63,7 @@ jobs:
         run: |
           python3 tests/fresh-server-test.py
           python3 tests/device-server-test.py
+          python3 tests/device-test-build-test.py
       - name: Boot error regression
         run: |
           node tests/boot-error-v205-test.js
