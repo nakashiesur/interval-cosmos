@@ -42,3 +42,14 @@ function targetContext(){
  assert.equal(c.sourceLink,null);assert.equal(c.linkPollTimer,null);assert.equal(c.sourceCountdownTimer,null);assert(notices[0].includes('キャンセル'));
  console.log('PASS source keeps watching approval and dismisses target cancellation');
 })().catch(error=>{console.error(error);process.exitCode=1});
+
+const linkErrors={};vm.createContext(linkErrors);
+vm.runInContext(source.slice(source.indexOf('function deviceLinkError('),source.indexOf('async function submitLinkForm(')),linkErrors);
+assert(linkErrors.deviceLinkError({message:'This account is suspended'}).includes('一時停止'));
+assert(linkErrors.deviceLinkError({message:'This account is suspended or the source device is no longer linked'}).includes('接続が解除'));
+assert(linkErrors.deviceLinkError({message:'PIN is invalid or expired'}).includes('期限切れ'));
+assert.equal(linkErrors.deviceLinkError({},'再試行してください'),'再試行してください');
+const suspensionSQL=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20260927103943_suspended_account_actions.sql'),'utf8');
+assert.equal((suspensionSQL.match(/not p\.is_suspended/g)||[]).length,3);
+assert.equal((suspensionSQL.match(/d\.auth_user_id = v_request\.source_auth_user_id/g)||[]).length,2);
+console.log('PASS PIN errors are understandable and pending actions retain active-account guards');

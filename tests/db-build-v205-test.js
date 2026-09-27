@@ -23,6 +23,7 @@ const currentMigrations=[
   'supabase/migrations/20260924145138_shared_learning_answers.sql',
   'supabase/migrations/20260927094923_ranking_private_bests_rls.sql',
   'supabase/migrations/20260927095714_suspended_admin_guard.sql',
+  'supabase/migrations/20260927103943_suspended_account_actions.sql',
 ];
 
 function sha256(buffer){return crypto.createHash('sha256').update(buffer).digest('hex');}

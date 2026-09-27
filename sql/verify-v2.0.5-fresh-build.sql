@@ -140,6 +140,15 @@ begin
     raise exception 'Suspended administrator must lose authorization';
   end if;
 
+  if exists (
+    select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+    where n.nspname='public'
+      and p.proname in ('claim_device_link_request','confirm_device_link_request','publish_play_session')
+      and position('not p.is_suspended' in p.prosrc)=0
+  ) then
+    raise exception 'Pending linking and publication must recheck suspension';
+  end if;
+
   if has_function_privilege('authenticated', 'public.admin_delete_player_application_row(uuid)', 'EXECUTE') then
     raise exception 'authenticated must not execute admin_delete_player_application_row';
   end if;
