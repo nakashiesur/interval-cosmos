@@ -54,7 +54,42 @@ async function testEngine(file, name, end) {
   assert.equal(engine.ctx, null);
   console.log(`PASS ${name}: interrupted/suspended/running/closed/background/pagehide`);
 }
+async function testReplacement(file, name, end) {
+  const source = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+  const code = source.slice(source.indexOf(`class ${name}`), source.indexOf(end));
+  const timers = [], oscillators = [];
+  const parameter = () => ({setValueAtTime(){}, exponentialRampToValueAtTime(){}, setTargetAtTime(){}});
+  class Context {
+    constructor(){this.state='running';this.currentTime=0;this.destination={};}
+    createGain(){return {gain:parameter(),connect(){},disconnect(){}};}
+    createOscillator(){const o={frequency:parameter(),detune:parameter(),connect(g){return g},start(t){this.started=t},stop(t){if(t===undefined)this.cancelled=true},disconnect(){this.disconnected=true}};oscillators.push(o);return o;}
+  }
+  const sandbox={document:{hidden:false,addEventListener(){}},window:{AudioContext:Context,addEventListener(){},setTimeout:fn=>timers.push(fn)},setTimeout:fn=>timers.push(fn),state:{settings:{sound:true,volume:.7,audioStyle:'both'}},localStorage:{getItem:()=>JSON.stringify({sound:true,audioStyle:'both'})}};
+  vm.createContext(sandbox);
+  const e=vm.runInContext(`${code};new ${name}()`,sandbox);
+  const play=q=>name==='AudioEngine'?e.playInterval(q,'both'):e.play(q);
+  const stop=()=>name==='AudioEngine'?e.stopPending():e.stop();
+  const q={baseMidi:60,targetMidi:64};
+  await play(q);
+  const old=[...oscillators]; assert.equal(old.length,6);
+  await play(q);
+  assert(old.every(o=>o.cancelled&&o.disconnected),'Previous playing and scheduled voices are stopped');
+  const before=oscillators.length; timers.shift()();
+  assert.equal(oscillators.length,before,'Previous BOTH continuation cannot resume');
+  stop(); timers.splice(0).forEach(fn=>fn());
+  assert(oscillators.every(o=>o.cancelled),'End/next question cancels all voices');
+  assert.equal(e.voices.size,0);
+  let resume; e.unlock=()=>new Promise(resolve=>{resume=resolve});
+  const pending=play(q); stop(); resume(); await pending;
+  assert.equal(oscillators.length,before,'A pending unlock cannot resurrect stopped audio');
+  const callbacks=[];e.unlock=()=>new Promise(resolve=>callbacks.push(resolve));
+  const first=play(q),second=play(q); callbacks[1]();await second;const latest=oscillators.length;callbacks[0]();await first;
+  assert.equal(oscillators.length,latest,'Latest request wins even when resume resolves out of order');
+  console.log(`PASS ${name}: voice cancellation, BOTH timer, stop during resume, rapid replay`);
+}
 (async()=>{
+  await testReplacement('app.js','AudioEngine','const audio = new AudioEngine();');
+  await testReplacement('phase6-assignments-v205.js','AssignmentAudio','  function accidental');
   await testEngine('app.js','AudioEngine','const audio = new AudioEngine();');
   await testEngine('phase6-assignments-v205.js','AssignmentAudio','  function accidental');
 })().catch(e=>{console.error(e);process.exitCode=1;});

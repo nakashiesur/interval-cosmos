@@ -112,3 +112,9 @@
   .v205-pc-config-actions .primary-btn{min-width:0}
   .v205-pc-prefix-indicator{bottom:12px}
 }
+
+.v205-pc-start-hint{display:none}
+@media (hover:hover) and (pointer:fine){
+  .v205-pc-start-hint{display:block;font-size:.7rem;letter-spacing:.08em;margin-top:6px;opacity:.8}
+}
+button:focus-visible,a:focus-visible{outline:3px solid #55dcff!important;outline-offset:3px}

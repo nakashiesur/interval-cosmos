@@ -203,6 +203,28 @@
     return clickAndConsume(event, firstVisible(['.result-panel [data-action="retry"]']));
   }
 
+  function handleStart(event) {
+    if (document.querySelector('.settings-modal,.records-modal,.player-modal,.v205-pc-config-overlay')) return false;
+    return clickAndConsume(event, firstVisible(['.play-screen.is-ready [data-action="start-countdown"]']));
+  }
+
+  // Arrow navigation complements native Tab / Shift+Tab and Enter, without stealing
+  // arrow input from form fields, settings tabs, or custom gameplay answer bindings.
+  function handleMenuNavigation(event) {
+    if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return false;
+    if (answerButtonsVisible() || event.target.closest?.('[role="tablist"],[role="tab"]')) return false;
+    const overlays = [...document.querySelectorAll('[class*="overlay"],.modal-backdrop,.settings-modal,.records-modal,.player-modal')].filter(visible);
+    const root = overlays.at(-1) || document.querySelector('#app') || document;
+    const buttons = [...root.querySelectorAll('button, a[href], input, select')].filter(node => visible(node) && !node.disabled && node.tabIndex >= 0);
+    if (!buttons.length) return false;
+    const index = buttons.indexOf(document.activeElement);
+    const backwards = event.key === 'ArrowUp' || event.key === 'ArrowLeft';
+    buttons[(index < 0 ? (backwards ? buttons.length - 1 : 0) : (index + (backwards ? -1 : 1) + buttons.length) % buttons.length)].focus();
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    return true;
+  }
+
   function clearPrefix() {
     armedPrefix = null;
     armedUntil = 0;
@@ -305,6 +327,14 @@
     for (const button of document.querySelectorAll('[data-action="retry"], [data-a-retry]')) {
       if (button.title !== 'R：リトライ') button.title = 'R：リトライ';
     }
+    for (const button of document.querySelectorAll('[data-action="start-countdown"]')) {
+      button.title = 'S：ゲーム開始';
+      if (!button.querySelector('.v205-pc-start-hint')) {
+        const hint = document.createElement('span');
+        hint.className = 'v205-pc-start-hint'; hint.textContent = 'S キーで開始';
+        button.appendChild(hint);
+      }
+    }
     injectSettingsEntry();
   }
 
@@ -314,7 +344,7 @@
     const row = document.createElement('div');
     row.className = 'setting-row v205-pc-settings-entry';
     row.dataset.pcConfigEntry = '1';
-    row.innerHTML = `<div class="setting-label"><div><strong>PC KEY CONFIG</strong><span>回答キーと入力方式をカスタマイズ</span></div><button type="button" class="secondary-btn" data-pc-config-open>OPEN</button></div>`;
+    row.innerHTML = `<div class="setting-label"><div><strong>PC KEY CONFIG</strong><span>矢印 / Tabで選択、Enterで決定。Sで開始、Rで再挑戦、Escで戻る。回答キーも変更できます。</span></div><button type="button" class="secondary-btn" data-pc-config-open>OPEN</button></div>`;
     card.appendChild(row);
   }
 
@@ -496,6 +526,7 @@
     if (document.querySelector('.v205-pc-config-overlay')) {
       if (recordTarget) { captureConfigKey(event); return; }
       if (event.key === 'Escape') { handleEscape(event); return; }
+      return;
     }
     if (event.repeat || event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
     if (isEditable(event.target)) return;
@@ -506,7 +537,9 @@
       handleEscape(event);
       return;
     }
+    if (event.key.toLowerCase() === 's' && handleStart(event)) return;
     if (handleAnswerShortcut(event)) return;
+    if (handleMenuNavigation(event)) return;
     if (event.key.toLowerCase() === 'r') handleRetry(event);
     // Space is intentionally left to the existing normal / assignment audio engines.
   }, true);

@@ -960,3 +960,7 @@ button { touch-action: manipulation; user-select: none; }
   .both-order-tabs { flex-direction: column; }
   .both-order-tabs .tab-btn { min-height: 40px; }
 }
+
+.setting-description{display:grid;gap:5px;min-width:0}
+.setting-description span{line-height:1.6}
+.setting-description + .toggle{flex-shrink:0}

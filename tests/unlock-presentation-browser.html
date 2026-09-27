@@ -1,0 +1,12 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Unlock presentation regression</title>
+<link rel="stylesheet" href="../phase5-v205.css?v=beta.1.1"><link rel="stylesheet" href="../phase10-ui-foundation-v205.css">
+<body style="background:#070914;color:white"><h1>称号演出の確認</h1><button id="run">最初の獲得応答を2回返す</button><output id="result">未実行</output>
+<script>
+let calls=0,shown=[];
+const payload={new_achievements:[{id:'first_signal',name:'FIRST SIGNAL',points:10}],new_titles:[{id:'first_signal',name:'FIRST SIGNAL'}]};
+window.INTERVAL_COSMOS_CLOUD={supabaseUrl:'local-fixture',supabasePublishableKey:'fixture-only'};
+window.IntervalCosmosCloud={init:async()=>{},getMyPlayer:async()=>{},getCachedPlayer:()=>({player_id:'fixture'})};
+window.supabase={createClient:()=>({rpc:async()=>({data:payload})})};
+new MutationObserver(records=>{for(const r of records)for(const n of r.addedNodes)if(n.classList?.contains('v205-unlock-burst')){shown.push(n.textContent);document.querySelector('#result').textContent=`表示回数: ${shown.length} / ${shown.join(' → ')}`;}}).observe(document.body,{childList:true});
+document.querySelector('#run').onclick=async()=>{await Promise.all([window.IntervalCosmosProgressV205.evaluate(),window.IntervalCosmosProgressV205.evaluate()]);};
+</script><script src="../phase5-progression-v205.js?v=beta.1.1"></script><script src="../phase5-unlock-copy-hotfix-v205.js"></script></body></html>
