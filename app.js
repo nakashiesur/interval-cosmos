@@ -885,7 +885,7 @@ function renderSplash() {
 }
 
 function renderTitle() {
-  app.innerHTML = `<main class="screen"><section class="shell hero-wrap"><div class="logo-mark"></div><h1 class="title-display">INTERVAL</h1><h2 class="title-display secondary">COSMOS</h2><p class="title-sub">SEE IT. HEAR IT. KNOW IT.</p><button class="primary-btn" data-action="home">START</button></section></main>`;
+  app.innerHTML = `<main class="screen"><section class="shell hero-wrap"><div class="logo-mark"></div><h1 class="title-display">INTERVAL</h1><h2 class="title-display secondary">COSMOS</h2><p class="title-sub">SEE IT. HEAR IT. KNOW IT.</p><p class="eyebrow">v2.0.5 BETA 1</p><button class="primary-btn" data-action="home">START</button></section></main>`;
 }
 
 function renderHome() {
