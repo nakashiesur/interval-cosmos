@@ -1,0 +1,16 @@
+const fs = require('fs');
+const path = require('path');
+const cp = require('child_process');
+const assert = require('assert/strict');
+const root = path.resolve(__dirname, '..');
+cp.execFileSync(process.execPath, ['scripts/build-v2.0.5-incremental-bundle.js'], { cwd: root });
+const sql = fs.readFileSync(path.join(root, 'dist/interval-cosmos-v2.0.5-incremental.sql'), 'utf8');
+assert.equal((sql.match(/^begin;$/gm) || []).length, 1, 'one outer transaction');
+assert.equal((sql.match(/^commit;$/gm) || []).length, 1, 'no early commits from source files');
+assert(!/drop\s+(table|schema)|truncate\s/i.test(sql), 'no destructive rebuild');
+assert(!/insert into public\.(achievement_catalog|frame_catalog|daily_mission_catalog)/i.test(sql), 'do not reseed progression');
+assert(sql.includes('not(v_best_point_frame=any(v_before_frames))'), 'preserve selected owned frame');
+assert(sql.includes('Shared answers already installed; refusing to replay update'), 'reject replay before catalog mutations');
+assert(sql.indexOf('$preflight$;') < sql.indexOf('insert into public.avatar_catalog'), 'preflight precedes writes');
+assert(sql.includes('revoke all on public.learning_answers from public, anon, authenticated'), 'protect new answer table');
+console.log('PASS incremental update transaction, preservation, preflight and RLS guards');

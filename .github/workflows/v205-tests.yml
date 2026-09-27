@@ -114,6 +114,8 @@ jobs:
         run: node tests/deleted-auth-v205-test.js
       - name: Database build regression
         run: node tests/db-build-v205-test.js
+      - name: Incremental database build regression
+        run: node tests/incremental-build-v205-test.js
       - name: Release blocker gate
         if: github.event_name == 'pull_request'
         run: node tests/release-blockers-v205-test.js
