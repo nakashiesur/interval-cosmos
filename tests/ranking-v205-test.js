@@ -134,6 +134,9 @@ vm.runInContext(code,context,{filename:'phase3-v205.js'});
   assertions.push(['student number excluded from profile card copy',!code.includes('student_number')]);
   assertions.push(['result shortcuts implemented',code.includes("event.key.toLowerCase() === 'r'")&&code.includes("event.key === 'Escape'" )]);
 
+  const rlsPatch=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20260927094923_ranking_private_bests_rls.sql'),'utf8');
+  assertions.push(['mixed private/public rows are no longer public-readable',rlsPatch.includes('drop policy if exists "Public or own ranking bests readable"')&&rlsPatch.includes('player_id = (select public.current_player_id())')&&!rlsPatch.includes('public_score is not null')]);
+
   let fail=0;
   for(const [name,ok] of assertions){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
   process.exitCode=fail?1:0;

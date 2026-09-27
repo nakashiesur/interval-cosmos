@@ -16,11 +16,18 @@ begin
     format('select public.admin_set_player_suspended(%L,true)',target),
     format('select public.admin_unpublish_player_rankings(%L)',target),
     format('select public.admin_delete_player_rankings(%L)',target),
-    'select public.get_admin_dashboard_overview()'
+    'select public.get_admin_dashboard_overview()',
+    format('select public.get_admin_student_dashboard(%L)',target),
+    'select public.get_teacher_assignments()',
+    format('select public.get_assignment_results(%L)',gen_random_uuid()),
+    format('select public.set_assignment_published(%L,true)',gen_random_uuid()),
+    $q$select public.create_assignment('DENY','DENY','TEXT',array['P1'],now(),now()+interval '1 hour')$q$,
+    $q$select public.create_assignment_v2('DENY','DENY',array['TEXT','KEYS'],array['P1'],now(),now()+interval '1 hour')$q$,
+    format($q$select public.update_assignment(%L,'DENY','DENY','TEXT',array['P1'],now(),now()+interval '1 hour')$q$,gen_random_uuid())
   ] loop
     begin execute operation; raise exception 'Non-admin operation accepted';
     exception when raise_exception then
-      if sqlerrm not ilike '%admin%required%' then raise; end if;
+      if sqlerrm not ilike '%admin%required%' and sqlerrm <> 'Teacher account required' then raise; end if;
     end;
   end loop;
   if has_function_privilege('authenticated','public.admin_delete_player_application_row(uuid)','execute') then

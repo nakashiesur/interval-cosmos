@@ -131,6 +131,11 @@ begin
     raise exception 'Missing required current functions: %', v_missing;
   end if;
 
+  if exists (select 1 from pg_policies where schemaname='public' and tablename='ranking_bests' and policyname='Public or own ranking bests readable')
+     or not exists (select 1 from pg_policies where schemaname='public' and tablename='ranking_bests' and policyname='Own ranking bests readable') then
+    raise exception 'Mixed private/public ranking rows need owner-only direct access';
+  end if;
+
   if has_function_privilege('authenticated', 'public.admin_delete_player_application_row(uuid)', 'EXECUTE') then
     raise exception 'authenticated must not execute admin_delete_player_application_row';
   end if;
