@@ -44,7 +44,16 @@ const CANONICAL_PHASE1_SHA256='1949b4dc9aed25c72e93ebce746af363ef51fb771a64ae738
 
 const currentAvatars=['nova','orbit','pulse','prism','comet','nebula','vector','echo','quasar','lumen','wave','aster','teacher'];
 
+const projectRoot=path.join(__dirname,'..');
+const bundleBuilder=fs.readFileSync(path.join(projectRoot,'scripts/build-v2.0.5-supabase-bundle.js'),'utf8');
+const migrations=fs.readdirSync(path.join(projectRoot,'supabase/migrations')).filter(x=>x.endsWith('.sql')).map(x=>'supabase/migrations/'+x);
+const cacheAssets=new Set([...sw.slice(sw.indexOf('const ASSETS'),sw.indexOf('self.addEventListener')).matchAll(/['"]\.\/([^'"]*)['"]/g)].map(m=>m[1]));
+const localEntrypoints=[...index.matchAll(/(?:src|href)=["']([^"']+)["']/g)].map(m=>m[1].split('?')[0]).filter(x=>! /^(?:https?:|data:|#)/.test(x)&&/\.(?:js|css)$/.test(x));
 const tests=[
+  ['every incremental migration is documented, runnable and bundled',migrations.every(x=>migrationOrder.includes(x)&&migrationRunner.includes(x)&&bundleBuilder.includes(x))],
+  ['all local entry scripts and styles are precached',localEntrypoints.filter(x=>x!=='cloud-config.js').every(x=>cacheAssets.has(x.replace(/^\.\//,'')))],
+  ['connection config has explicit network-first offline fallback',sw.includes("url.pathname.endsWith('/cloud-config.js')")&&sw.includes("cache: 'no-store'")&&sw.includes('ignoreSearch: true')],
+  ['every precache asset exists', [...cacheAssets].every(x=>!x||fs.existsSync(path.join(projectRoot,x)))],
   ['root supabase_setup.sql is not placeholder',root.length>1000&&!root.includes('__TOO_LARGE_PLACEHOLDER__')],
   ['root setup includes every restored Phase 1 part',baseParts.every((_,i)=>root.includes(`part-${String(i+1).padStart(2,'0')}.sql`))],
   ['restored Phase 1 SQL matches canonical source hash',restoredBaseHash===CANONICAL_PHASE1_SHA256],
