@@ -14,7 +14,7 @@ fresh = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(fresh)
 asset_section = (ROOT / 'sw.js').read_text().split('const ASSETS = [', 1)[1].split('];', 1)[0]
 ALLOWED = {'/' + name.removeprefix('./') for name in re.findall(r"'([^']+)'", asset_section)}
-ALLOWED.update({'/', '/index.html', '/sw.js', '/cloud-config.js'})
+ALLOWED.update({'/', '/index.html', '/sw.js', '/cloud-config.js', '/device-visual-check.html'})
 
 class DeviceHandler(fresh.FreshHandler):
     def send_head(self):
