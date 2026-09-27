@@ -136,6 +136,10 @@ begin
     raise exception 'Mixed private/public ranking rows need owner-only direct access';
   end if;
 
+  if position('not p.is_suspended' in pg_get_functiondef('public.is_current_admin()'::regprocedure)) = 0 then
+    raise exception 'Suspended administrator must lose authorization';
+  end if;
+
   if has_function_privilege('authenticated', 'public.admin_delete_player_application_row(uuid)', 'EXECUTE') then
     raise exception 'authenticated must not execute admin_delete_player_application_row';
   end if;

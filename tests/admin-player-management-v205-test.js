@@ -31,6 +31,8 @@ const tests=[
   ['management UI injects only from student detail and never from non-admin state',js.includes('data-v205-admin-manage-open')&&js.includes('if (!isAdmin() || !currentPlayerId) return')],
 ];
 
+const adminGuard=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20260927095714_suspended_admin_guard.sql'),'utf8');
+tests.push(['suspended administrator loses live authorization',adminGuard.includes('p.is_admin and not p.is_suspended')&&adminGuard.includes('pd.auth_user_id = (select auth.uid())')]);
 let fail=0;
 for(const [name,ok] of tests){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
 process.exitCode=fail?1:0;
