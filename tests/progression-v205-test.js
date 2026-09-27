@@ -37,6 +37,33 @@ let fail=0;
 for(const [name,ok] of assertions){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
 process.exitCode=fail?1:0;
 
+{
+  const vm=require('vm'),assert=require('assert');
+  let owner='first',day='2026-09-27';
+  const context={cloud:{getCachedPlayer:()=>({player_id:owner})},unlockQueue:[],announcedUnlocks:new Set(),scheduleUnlock(){},Date:class {toLocaleDateString(){return day;}}};
+  vm.createContext(context);
+  vm.runInContext(js.slice(js.indexOf('  function queueUnlocks('),js.indexOf('  function showUnlock(')),context);
+  const first={new_achievements:[{id:'first_signal',name:'FIRST SIGNAL',points:10}],new_titles:[{id:'first_signal',name:'FIRST SIGNAL'}]};
+  context.queueUnlocks(first);context.queueUnlocks(first);
+  assert.equal(context.unlockQueue.length,1,'same-named achievement/title and repeated response produce one card');
+  assert.match(context.unlockQueue[0][0],/実績・称号/);
+  context.unlockQueue.length=0;context.queueUnlocks(first);
+  assert.equal(context.unlockQueue.length,0,'already displayed notification does not replay');
+  context.queueUnlocks({new_titles:first.new_titles});
+  assert.equal(context.unlockQueue.length,0,'split duplicate title response does not replay');
+  owner='second';context.queueUnlocks(first);
+  assert.equal(context.unlockQueue.length,1,'another account can unlock the same title');
+  context.queueUnlocks({new_titles:[{id:'other',name:'OTHER'}],new_frames:[{id:'bronze',name:'BRONZE'}]});
+  assert.equal(context.unlockQueue.length,3,'distinct rewards remain visible');
+  const daily={new_daily_completions:[{id:'daily_play_2',name:'WARM UP',reward_points:10}]};
+  context.queueUnlocks(daily);context.queueUnlocks(daily);
+  assert.equal(context.unlockQueue.length,4,'daily duplicate is suppressed');
+  day='2026-09-28';context.queueUnlocks(daily);
+  assert.equal(context.unlockQueue.length,5,'the next day can announce the same mission');
+  assert(!css.includes('v205UnlockRing 1.8s ease-out infinite'),'reward ring does not restart');
+  console.log('PASS unlock deduplication, combined title, account isolation and daily reset');
+}
+
 (async()=>{
   const vm=require('vm'),assert=require('assert');
   const requests=[],renders=[];let visible=false;

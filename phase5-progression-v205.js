@@ -5,6 +5,7 @@
   const LABELS = {basic:'BASIC',accuracy:'ACCURACY',combo:'COMBO',mode:'MODE',interval:'INTERVAL',streak:'STREAK',ranking:'RANKING',assignment:'ASSIGNMENT',hidden:'SECRET'};
   let client=null, cache=null, opening=false, queued=false, unlockQueue=[], showing=false, unlockTimer=null;
   let cosmosRequest=0;
+  const announcedUnlocks=new Set();
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const percent=(v,m)=>m>0?Math.max(0,Math.min(100,Math.round(v/m*100))):0;
 
@@ -31,10 +32,28 @@
   }
   function queueUnlocks(r){
     if(!r)return;
-    for(const a of r.new_achievements||[])unlockQueue.push(['ACHIEVEMENT',a.name,`+${a.points||0} PT`]);
-    for(const t of r.new_titles||[])unlockQueue.push(['TITLE UNLOCKED',t.name,'称号を獲得']);
-    for(const f of r.new_frames||[])unlockQueue.push(['FRAME UNLOCKED',f.name,f.animated?'DYNAMIC FRAME':'NEW FRAME']);
-    for(const m of r.new_daily_completions||[])unlockQueue.push(['DAILY COMPLETE',m.name,`+${m.reward_points||0} PT`]);
+    const player=cloud?.getCachedPlayer?.();
+    const owner=player?.player_id||player?.id||'current';
+    const day=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Tokyo'});
+    const key=(kind,item)=>JSON.stringify([owner,kind,item.id||item.name,kind==='daily'?day:'']);
+    const add=(keys,entry)=>{
+      if(keys.every(k=>announcedUnlocks.has(k)))return;
+      keys.forEach(k=>announcedUnlocks.add(k));
+      unlockQueue.push(entry);
+    };
+    const titles=r.new_titles||[],combinedTitles=new Set();
+    for(const a of r.new_achievements||[]){
+      // FIRST SIGNAL awards an achievement and a same-named title together.
+      // Announce both in one card rather than replaying the same heading.
+      const title=titles.find(t=>t.name===a.name);
+      if(title){
+        combinedTitles.add(title);
+        add([key('achievement',a),key('title',title)],['実績・称号を獲得しました',a.name,`+${a.points||0} PT · 称号を獲得`]);
+      }else add([key('achievement',a)],['ACHIEVEMENT',a.name,`+${a.points||0} PT`]);
+    }
+    for(const t of titles)if(!combinedTitles.has(t))add([key('title',t)],['TITLE UNLOCKED',t.name,'称号を獲得']);
+    for(const f of r.new_frames||[])add([key('frame',f)],['FRAME UNLOCKED',f.name,f.animated?'DYNAMIC FRAME':'NEW FRAME']);
+    for(const m of r.new_daily_completions||[])add([key('daily',m)],['DAILY COMPLETE',m.name,`+${m.reward_points||0} PT`]);
     // The base RESULT creates its rank cut-in only after submitScore resolves.
     // Give it a moment to mount, then wait until ranking/privacy presentation is fully finished.
     scheduleUnlock(420);
