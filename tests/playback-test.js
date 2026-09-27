@@ -14,9 +14,10 @@ const document = {
 };
 const storage = new Map();
 const localStorage = { getItem:k=>storage.get(k)||null, setItem:(k,v)=>storage.set(k,String(v)) };
+const events = {};
 const windowObj = {
   INTERVAL_COSMOS_CLOUD:{}, IntervalCosmosCloud:{configured:()=>false},
-  addEventListener(){}, setTimeout(fn){ fn(); return 1; }, clearTimeout(){},
+  addEventListener(name,fn){events[name]=fn;}, setTimeout(fn){ fn(); return 1; }, clearTimeout(){},
   requestAnimationFrame(){return 0;}, cancelAnimationFrame(){},
   innerWidth:430, innerHeight:932, devicePixelRatio:1, localStorage,
 };
@@ -48,7 +49,22 @@ async function runOrder(order, style='both') {
 }
 
 (async()=>{
+  val("state.profile = {is_guest:true}; state.cloudStatus='ready'; state.screen='play'");
+  events.offline();
+  const offlineGuest = val("state.cloudStatus==='offline' && cloudStatusLabel().startsWith('OFFLINE')");
+  windowObj.IntervalCosmosCloud.configured = ()=>true;
+  windowObj.IntervalCosmosCloud.init = async()=>({status:'guest',profile:{is_guest:true}});
+  val("state.screen='splash'");
+  context.navigator.onLine = false;
+  await val('initializeCloud()');
+  const offlineBoot = val("state.cloudStatus==='offline'");
+  context.navigator.onLine = true;
+  await events.online();
+  const restored = val("state.cloudStatus==='ready' && cloudStatusLabel()==='ONLINE'");
   const cases = [
+    ['guest offline event updates status',offlineGuest],
+    ['offline guest initialization stays offline',offlineBoot],
+    ['guest reconnect restores online status',restored],
     ['BOTH default H→M behavior', await runOrder('harmonicFirst') === 'HM'],
     ['BOTH selectable M→H behavior', await runOrder('melodicFirst') === 'MH'],
     ['MELODIC unchanged', await runOrder('harmonicFirst','melodic') === 'M'],

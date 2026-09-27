@@ -1,0 +1,14 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><title>Learning stalled transport regression</title>
+<body><h1>学習同期・応答停止テスト（ローカルのみ）</h1><button id="start">回答を保存して応答停止を再現</button><button id="retry">接続回復・再送</button><output id="result"></output>
+<script>
+let stalled=true;const received=new Set();
+window.INTERVAL_COSMOS_CLOUD={supabaseUrl:'local-stall-fixture'};
+window.IntervalCosmosCloud={getCachedPlayer:()=>({id:'fixture-player'}),getAuthUser:()=>({id:'fixture-auth'}),createClientEventId:()=>crypto.randomUUID(),
+ submitLearningAnswers:async(_,events)=>{if(stalled)return new Promise(()=>{});events.forEach(e=>received.add(e.event_id));},fetchLearningAnalysis:async()=>[]};
+</script><script src="../learning-sync-v205.js?v=alpha2"></script>
+<script>
+const api=window.IntervalCosmosLearningSync;
+const output=message=>document.querySelector('#result').textContent=message+' / 未同期 '+api.pending().length+' / 受信 '+received.size;
+document.querySelector('#start').onclick=async()=>{stalled=true;api.record('M3','M3',500);output('同期中');await api.flush();output('応答停止から復帰');};
+document.querySelector('#retry').onclick=async()=>{stalled=false;await api.flush();output(api.pending().length?'再送待ち（進行中の通信終了後に再試行）':'再送完了');};
+</script></body></html>

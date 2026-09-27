@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="ja"><head><base href="../"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Assignment return regression</title><link rel="stylesheet" href="phase6-assignments-v205.css"></head>
+<body style="background:#080d1d;color:white"><button data-a-open>課題を開く</button><output id="result"></output>
+<script>
+// Local mock only. The native confirmation is stubbed so the real click handler
+// and internal routing can be tested without browser-dialog automation support.
+window.confirm=()=>true;
+window.IntervalCosmosCloud={configured:()=>true,init:async()=>{},getCachedPlayer:()=>({id:'fixture',account_type:'staff',is_admin:false})};
+window.IntervalCosmosSupabaseSingleton={getClient:()=>({rpc:async name=>{
+ document.querySelector('#result').textContent='RPC: '+name;
+ if(name!=='get_my_assignments')return {error:new Error('Unexpected management route: '+name)};
+ return {data:[{id:'fixture',title:'LOCAL RETURN TEST',mode:'TEXT',interval_keys:['P1'],start_at:'2020-01-01',deadline_at:'2099-01-01',attempts:0}]};
+}})};
+</script><script src="phase6-assignments-v205.js?v=alpha5.10"></script></body></html>

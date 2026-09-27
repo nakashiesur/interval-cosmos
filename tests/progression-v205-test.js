@@ -1,0 +1,58 @@
+const fs = require('fs');
+const path = require('path');
+
+const sql = fs.readFileSync(path.join(__dirname,'..','sql','progression-v2.0.5.sql'),'utf8');
+const js = fs.readFileSync(path.join(__dirname,'..','phase5-progression-v205.js'),'utf8');
+const copy = fs.readFileSync(path.join(__dirname,'..','phase5-unlock-copy-hotfix-v205.js'),'utf8');
+const scroll = fs.readFileSync(path.join(__dirname,'..','phase5-scroll-retention-v205.js'),'utf8');
+const css = fs.readFileSync(path.join(__dirname,'..','phase5-v205.css'),'utf8');
+const index = fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
+const sw = fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8');
+
+const assertions = [
+  ['owned frame selection survives progress refresh',sql.includes('not(v_best_point_frame=any(v_before_frames))')],
+  ['visible achievement catalog', sql.includes("'first_signal'") && sql.includes("'interval_80'") && sql.includes("'streak_7'")],
+  ['hidden endgame achievements', sql.includes("'hidden_ear_perfect'") && sql.includes("'hidden_singularity'") && sql.includes("'???'")],
+  ['point frame progression', sql.includes("'bronze'") || sql.includes("unlock_rule->>'type'='points'")],
+  ['combination frames', sql.includes("'aurora'") && sql.includes("'supernova'") && sql.includes("'event_horizon'") && sql.includes('achievement_combo')],
+  ['three daily slots', sql.includes('slot') && sql.includes('limit 3') && sql.includes('ensure_my_daily_missions')],
+  ['daily has no score mutation', !sql.includes('update public.ranking_bests set public_score = public_score +')],
+  ['idempotent progression evaluation', sql.includes('on conflict do nothing') && sql.includes('evaluate_my_progress')],
+  ['featured achievement rpc', sql.includes('toggle_featured_achievement') && js.includes('data-v205-feature')],
+  ['my cosmos ui', js.includes('MY COSMOS') && js.includes('DAILY MISSIONS') && js.includes('FRAME EVOLUTION') && js.includes('ACHIEVEMENTS')],
+  ['hidden ui stays secret', js.includes("secret?'CONDITION ???'") || js.includes('CONDITION ???')],
+  ['title and frame equip', js.includes('mainTitleId') && js.includes('equippedFrameId')],
+  ['unlock presentation', js.includes('v205-unlock-burst') && css.includes('.v205-unlock-burst')],
+  ['unlock copy explicitly says achievement unlocked', copy.includes('実績を解除しました') && copy.includes('称号を獲得しました') && copy.includes('フレームを解放しました')],
+  ['unlock copy hotfix loaded after progression', index.indexOf('phase5-unlock-copy-hotfix-v205.js') > index.indexOf('phase5-progression-v205.js')],
+  ['unlock copy hotfix cached', sw.includes('phase5-unlock-copy-hotfix-v205.js')],
+  ['my cosmos scroll retention loaded after progression', index.indexOf('phase5-scroll-retention-v205.js') > index.indexOf('phase5-progression-v205.js')],
+  ['my cosmos scroll retention cached', sw.includes('phase5-scroll-retention-v205.js')],
+  ['selection rerenders preserve scroll', scroll.includes('card.scrollTop') && scroll.includes('MutationObserver') && scroll.includes('[data-v205-feature]') && scroll.includes('[data-v205-equip-title]') && scroll.includes('[data-v205-equip-frame]')],
+  ['cut-ins wait for ranking/privacy presentation', js.includes('rankingPresentationBusy') && js.includes('.rank-burst,.v205-publication-overlay') && js.includes('publication_required')],
+  ['mobile layout', css.includes('@media(max-width:780px)')],
+];
+
+let fail=0;
+for(const [name,ok] of assertions){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
+process.exitCode=fail?1:0;
+
+(async()=>{
+  const vm=require('vm'),assert=require('assert');
+  const requests=[],renders=[];let visible=false;
+  const ctx={cosmosRequest:0,opening:false,cache:null,console,
+    cloud:{getCachedPlayer:()=>({id:'fixture'})},rpc:()=>new Promise((resolve,reject)=>requests.push({resolve,reject})),
+    document:{querySelector:()=>visible?{remove(){visible=false}}:null},loading(){visible=true},
+    render:data=>renders.push(data),renderUnavailable(){throw Error('stale error rendered')}};
+  vm.createContext(ctx);
+  vm.runInContext(js.slice(js.indexOf('  async function fetchProgress()'),js.indexOf('  function rankingPresentationBusy()'))+
+    js.slice(js.indexOf('  function close()'),js.indexOf('  function loading()'))+
+    js.slice(js.indexOf('  async function open()'),js.indexOf('  function inject()')),ctx);
+  const old=ctx.open();ctx.close();const current=ctx.open();
+  requests[0].resolve({label:'old'});await old;assert.equal(ctx.opening,true);assert.equal(ctx.cache,null);
+  requests[1].resolve({label:'current'});await current;assert.equal(ctx.cache.label,'current');assert.equal(renders.length,1);
+  const refreshing=ctx.refresh();ctx.close();requests[2].resolve({label:'closed-refresh'});await refreshing;
+  assert.equal(renders.length,1);assert.equal(ctx.cache.label,'current');
+  const failing=ctx.open();ctx.close();requests[3].reject(Error('late error'));await failing;assert.equal(renders.length,1);
+  console.log('PASS closed/reopened MY COSMOS ignores stale loads, refreshes, errors and cache writes');
+})().catch(error=>{console.error(error);process.exitCode=1});

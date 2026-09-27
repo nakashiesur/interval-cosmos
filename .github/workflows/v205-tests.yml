@@ -1,0 +1,127 @@
+name: v2.0.5 regression tests
+
+on:
+  push:
+    branches: [v2.0.5-dev]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  node-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check extension scripts
+        run: |
+          node --check supabase-singleton-v205.js
+          node --check phase0-wallclock-v205.js
+          node --check phase9-staff-registration-v205.js
+          node --check phase2-recovery-v205-fixed.js
+          node --check runtime-v205.js
+          node --check phase3-ranking-hotfix-v205.js
+          node --check phase3-v205.js
+          node --check phase4-hotfix-v205.js
+          node --check phase4-v205.js
+          node --check phase4-analysis-hotfix-v205.js
+          node --check phase5-progression-v205.js
+          node --check phase5-unlock-copy-hotfix-v205.js
+          node --check phase5-scroll-retention-v205.js
+          node --check phase6-admin-policy-v205.js
+          node --check phase6-multimode-v205.js
+          node --check phase6-assignments-v205.js
+          node --check phase7-admin-dashboard-v205.js
+          node --check phase7-admin-home-dock-v205.js
+          node --check phase8-admin-player-management-v205.js
+          node --check phase8-pc-controls-v205.js
+          node --check phase10-ui-foundation-v205.js
+          node --check scripts/build-v2.0.5-supabase-bundle.js
+          node --check tests/admin-player-management-v205-test.js
+          node --check tests/phase10-ui-foundation-v205-test.js
+      - name: Existing smoke tests
+        run: node tests/smoke-test.js
+      - name: Service worker regression
+        run: node tests/service-worker-v205-test.js
+      - name: Offline submission regression
+        run: |
+          node tests/offline-outbox-v205-test.js
+          node tests/offline-result-v205-test.js
+          node tests/offline-dialog-v205-test.js
+      - name: Playback regression
+        run: |
+          node tests/playback-test.js
+          node tests/audio-resume-v205-test.js
+      - name: Wall-clock timer regression
+        run: node tests/wallclock-v205-test.js
+      - name: Fresh server isolation
+        run: |
+          python3 tests/fresh-server-test.py
+          python3 tests/device-server-test.py
+          python3 tests/device-test-build-test.py
+      - name: Boot error regression
+        run: |
+          node tests/boot-error-v205-test.js
+          node tests/guest-conversion-v205-test.js
+          node tests/device-link-expiry-v205-test.js
+      - name: Account regression
+        run: node tests/account-v205-test.js
+      - name: Staff registration regression
+        run: node tests/staff-registration-v205-test.js
+      - name: Recovery regression
+        run: node tests/recovery-v205-test.js
+      - name: Ranking regression
+        run: node tests/ranking-v205-test.js
+      - name: Learning history regression
+        run: |
+          node tests/history-v205-test.js
+          node tests/learning-sync-v205-test.js
+      - name: Progression regression
+        run: node tests/progression-v205-test.js
+      - name: Assignment regression
+        run: |
+          node tests/assignments-v205-test.js
+          node tests/assignment-folders-v205-test.js
+      - name: Assignment gameplay layout regression
+        run: node tests/assignment-layout-v205-test.js
+      - name: Admin dashboard regression
+        run: node tests/admin-dashboard-v205-test.js
+      - name: Admin player management regression
+        run: node tests/admin-player-management-v205-test.js
+      - name: PC controls regression
+        run: node tests/pc-controls-v205-test.js
+      - name: Phase 10 UI foundation regression
+        run: node tests/phase10-ui-foundation-v205-test.js
+      - name: Phase 10 responsive polish regression
+        run: |
+          node tests/phase10-result-polish-v205-test.js
+          node tests/phase10-cosmos-polish-v205-test.js
+          node tests/phase10-history-polish-v205-test.js
+          node tests/phase10-history-folders-v205-test.js
+      - name: Settings keyboard regression
+        run: node tests/settings-keyboard-v205-test.js
+      - name: Guest local history regression
+        run: |
+          node tests/guest-history-v205-test.js
+          node tests/guest-sessions-v205-test.js
+          node tests/guest-offline-init-v205-test.js
+      - name: Deleted authentication regression
+        run: node tests/deleted-auth-v205-test.js
+      - name: Database build regression
+        run: node tests/db-build-v205-test.js
+      - name: Incremental database build regression
+        run: node tests/incremental-build-v205-test.js
+      - name: Release blocker gate
+        if: github.event_name == 'pull_request'
+        run: node tests/release-blockers-v205-test.js
+
+      - name: Assignment deadline UI regression
+        run: node tests/assignment-deadline-ui-v205-test.js
+
+      - name: Approved artwork regression
+        run: node tests/art-v205-test.js

@@ -1,4 +1,4 @@
-const APP_VERSION = 'ver.2.0.4';
+const APP_VERSION = `ver.${window.IntervalCosmosVersion || '2.0.4'}`;
 const CLOUD_CONFIG = window.INTERVAL_COSMOS_CLOUD || {};
 const cloud = window.IntervalCosmosCloud || null;
 
@@ -164,6 +164,7 @@ function displayNote(note, midi, intervalKey) {
   return intervalKey === 'P8' ? `${note}${subscriptNumber(Math.floor(midi / 12) - 1)}` : note;
 }
 function cloudStatusLabel() {
+  if (state.cloudStatus === 'offline') return 'OFFLINE · 端末に保存';
   if (state.cloudStatus === 'ready') return 'ONLINE';
   if (state.cloudStatus === 'connecting') return 'CONNECTING';
   if (state.cloudStatus === 'error') return 'CONNECTION ERROR';
@@ -266,15 +267,28 @@ function buildQuestion() {
 }
 
 class AudioEngine {
-  constructor() { this.ctx = null; this.master = null; this.generation = 0; }
+  constructor() {
+    this.ctx = null; this.master = null; this.generation = 0;
+    const release = () => this.release();
+    window.addEventListener('pagehide', release);
+    document.addEventListener?.('visibilitychange', () => { if (document.hidden) release(); });
+  }
+  release() {
+    this.stopPending();
+    const old = this.ctx;
+    this.ctx = null; this.master = null;
+    if (old && old.state !== 'closed') old.close().catch(() => {});
+  }
   async unlock() {
-    if (!this.ctx) {
+    if (document.hidden) return false;
+    if (!this.ctx || this.ctx.state === 'closed') {
       this.ctx = new (window.AudioContext || window.webkitAudioContext)();
       this.master = this.ctx.createGain();
       this.master.gain.value = state.settings.volume;
       this.master.connect(this.ctx.destination);
     }
-    if (this.ctx.state === 'suspended') await this.ctx.resume();
+    // Safari uses interrupted after another app takes the audio session.
+    if (this.ctx.state !== 'running') await this.ctx.resume();
     this.master.gain.setTargetAtTime(state.settings.volume, this.ctx.currentTime, 0.02);
   }
   setVolume(value) {
@@ -315,7 +329,7 @@ class AudioEngine {
   }
   async playInterval(question, style = state.settings.audioStyle) {
     if (!state.settings.sound || !question) return;
-    await this.unlock();
+    if (await this.unlock() === false) return;
     const token = ++this.generation;
     const now = this.ctx.currentTime + 0.035;
 
@@ -469,6 +483,7 @@ function updateMastery(correctKey, chosenKey, ok, takenMs) {
     m.confusions[chosenKey] = (m.confusions[chosenKey] || 0) + 1;
   }
   saveMastery();
+  window.IntervalCosmosLearningSync?.record(correctKey, chosenKey, takenMs);
 }
 
 function masteryScore(key) {
@@ -661,6 +676,11 @@ function endGame() {
   state.phase = 'ending';
   audio.stopPending();
   const finalScore = currentFinalScore();
+  if (state.profile?.is_guest || (!state.profile && cloud?.isGuestMode?.())) window.IntervalCosmosGuestSessions?.save({
+    mode: rankingKeyForMode() || state.modeId, score: finalScore,
+    total_answers: state.game.total, correct_answers: state.game.correct,
+    max_combo: state.game.maxCombo, played_at: new Date().toISOString()
+  });
   state.rankingSubmit = mode()?.ranked ? { status: 'preparing' } : null;
   state.screen = 'result';
   starfield.set(finalScore, state.game.maxCombo, 'result');
@@ -672,7 +692,8 @@ function endGame() {
 async function submitOnlineScore(finalScore) {
   if (!state.game || state.game.onlineSubmitted) return;
   state.game.onlineSubmitted = true;
-  if (state.cloudStatus !== 'ready' || !cloud) {
+  const knownPlayer = state.profile && !state.profile.is_guest && (state.profile.id || state.profile.player_id);
+  if (!cloud || (!['ready','offline'].includes(state.cloudStatus) && !knownPlayer)) {
     state.rankingSubmit = { status: 'unavailable' };
     if (state.screen === 'result') render();
     return;
@@ -700,12 +721,12 @@ async function submitOnlineScore(finalScore) {
       maxCombo: state.game.maxCombo,
       avgResponse: avg,
     });
-    state.rankingSubmit = { status: 'done', ...(result || {}) };
+    state.rankingSubmit = { status: result?.queued ? 'queued' : 'done', ...(result || {}) };
     if (state.screen === 'result') {
       render();
       animateResultScore(finalScore);
       const bestRank = Math.min(Number(result?.monthly_rank || 9999), Number(result?.hall_rank || 9999));
-      if (bestRank <= 50) showRankBurst(bestRank, finalScore);
+      if (bestRank <= 50) showRankBurst(bestRank, finalScore, result);
     }
   } catch (error) {
     console.error(error);
@@ -714,12 +735,13 @@ async function submitOnlineScore(finalScore) {
   }
 }
 
-function showRankBurst(rank, score) {
+function showRankBurst(rank, score, result) {
   const node = document.createElement('div');
   node.className = 'rank-burst';
   node.innerHTML = `<div class="rank-burst-rings"></div><div class="rank-burst-copy"><div class="rank-burst-kicker">RANK IN</div><div class="rank-burst-rank">${rank}<span>${rank === 1 ? 'st' : rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th'}</span></div><div class="rank-burst-score">${formatNumber(score)} pts</div></div>`;
   overlayRoot.append(node);
-  window.setTimeout(() => node.remove(), 2300);
+  const awaitingChoice = window.IntervalCosmosRankingPrivacy?.mountBurst?.(node, result);
+  if (!awaitingChoice) window.setTimeout(() => node.remove(), 2300);
 }
 
 function showScoreFloater(delta) {
@@ -838,7 +860,7 @@ function questionHTML() {
   const def = mode();
   if (state.phase === 'idle') {
     const readyMode = def.hyper ? def.title : def.ear ? 'EAR LINK' : def.practice ? def.title : def.title.replace('STANDARD /', 'STANDARD /');
-    return `<div class="question-card glass ${def.hyper ? 'question-card-hyper' : ''}"><p class="question-label">READY</p><h2 class="ready-title">${readyMode}</h2><p class="ready-copy">問題を見た瞬間に、音程名と響きを結びつける。</p><button class="primary-btn ${def.hyper ? 'hyper hyper-launch' : ''}" data-action="start-countdown">GAME START</button></div>`;
+    return `<div class="question-card glass ${def.hyper ? 'question-card-hyper' : ''}"><p class="question-label">READY</p><h2 class="ready-title">${readyMode}</h2><p class="ready-copy">問題を見た瞬間に、音程名と響きを結びつける。</p><button class="primary-btn ${def.hyper ? 'hyper hyper-launch' : ''}" data-action="start-countdown">GAME START</button><button class="secondary-btn ready-cancel" data-action="home">キャンセル</button></div>`;
   }
   if (!q) return '';
   const baseDisplay = displayNote(q.base, q.baseMidi, q.intervalKey);
@@ -863,7 +885,7 @@ function renderSplash() {
 }
 
 function renderTitle() {
-  app.innerHTML = `<main class="screen"><section class="shell hero-wrap"><div class="logo-mark"></div><h1 class="title-display">INTERVAL</h1><h2 class="title-display secondary">COSMOS</h2><p class="title-sub">SEE IT. HEAR IT. KNOW IT.</p><button class="primary-btn" data-action="home">START</button></section></main>`;
+  app.innerHTML = `<main class="screen"><section class="shell hero-wrap"><div class="logo-mark"></div><h1 class="title-display">INTERVAL</h1><h2 class="title-display secondary">COSMOS</h2><p class="title-sub">SEE IT. HEAR IT. KNOW IT.</p><p class="eyebrow">v2.0.5 BETA 1</p><button class="primary-btn" data-action="home">START</button></section></main>`;
 }
 
 function renderHome() {
@@ -897,7 +919,7 @@ function renderPracticeSelect() {
     <button class="learning-guide-card" data-action="guide"><span class="guide-icon">🔰</span><span class="guide-copy"><strong>はじめての音程ガイド</strong><small>音程の数え方・長短／完全の見分け方を確認する</small></span><span class="guide-cta">まずはここから →</span></button>
 
     <div class="training-divider"><span>GAME TRAINING</span></div>
-    <div class="segmented"><button class="tab-btn ${state.practiceView === 'text' ? 'active' : ''}" data-view="text">文字</button><button class="tab-btn ${state.practiceView === 'keys' ? 'active' : ''}" data-view="keys">鍵盤</button><button class="tab-btn ${state.practiceView === 'ear' ? 'active' : ''}" data-view="ear">EAR</button></div>
+    <div class="segmented"><button class="tab-btn ${state.practiceView === 'text' ? 'active' : ''}" data-view="text" aria-pressed="${state.practiceView === 'text'}">文字</button><button class="tab-btn ${state.practiceView === 'keys' ? 'active' : ''}" data-view="keys" aria-pressed="${state.practiceView === 'keys'}">鍵盤</button><button class="tab-btn ${state.practiceView === 'ear' ? 'active' : ''}" data-view="ear" aria-pressed="${state.practiceView === 'ear'}">EAR</button></div>
     <div class="practice-list">
       <button class="practice-option" data-practice="manual"><span class="practice-icon">🎯</span><span class="practice-copy"><strong>FOCUS SELECT</strong><span>選んだ音程だけを反復して練習します。</span></span></button>
       <button class="practice-option" data-practice="adaptive"><span class="practice-icon">🤖</span><span class="practice-copy"><strong>ADAPTIVE TRAINING</strong><span>苦手な音程を自動判定し、重点的に反復します。</span></span></button>
@@ -929,7 +951,7 @@ function renderIntervalSelect() {
   app.innerHTML = `<main class="screen"><section class="shell narrow glass select-panel">
     <div class="topbar"><button class="secondary-btn" data-action="practice">← BACK</button><div class="topbar-title" style="text-align:center"><p class="eyebrow">FOCUS SELECT</p><h1>SELECT INTERVALS</h1><p>1つ以上選択してください。</p></div><span style="width:72px"></span></div>
     <div class="interval-tools"><button class="secondary-btn" data-action="select-all">ALL</button><button class="secondary-btn" data-action="select-core">CORE 7</button><button class="secondary-btn danger" data-action="clear-all">RESET</button></div>
-    <div class="interval-grid">${INTERVALS.map(iv => `<button class="chip ${selected.has(iv.key) ? 'selected' : ''}" data-interval="${iv.key}"><span class="iv-key">${iv.key}</span><span class="iv-name">${iv.jp}</span></button>`).join('')}</div>
+    <div class="interval-grid">${INTERVALS.map(iv => `<button class="chip ${selected.has(iv.key) ? 'selected' : ''}" data-interval="${iv.key}" aria-pressed="${selected.has(iv.key)}"><span class="iv-key">${iv.key}</span><span class="iv-name">${iv.jp}</span></button>`).join('')}</div>
     <div class="start-row"><button class="primary-btn" data-action="start-manual" ${selected.size ? '' : 'disabled'}>START FOCUS</button><span class="selected-count">${selected.size} / 13</span></div>
   </section>${modalHTML()}</main>`;
 }
@@ -946,7 +968,7 @@ function renderPlay() {
   const g = state.game;
   const danger = !def.unlimited && g.timeLeft <= 10;
   const hyperFx = def.hyper ? `<div class="hyper-fx" aria-hidden="true"><span class="warp-ring r1"></span><span class="warp-ring r2"></span><span class="warp-ring r3"></span><span class="hyper-scan"></span><span class="edge-fire left"></span><span class="edge-fire right"></span></div>` : '';
-  app.innerHTML = `<main class="screen play-screen ${danger ? 'danger-vignette' : ''} ${def.hyper ? 'hyper-play' : ''}">${hyperFx}<section class="play-shell">
+  app.innerHTML = `<main class="screen play-screen ${state.phase === 'idle' ? 'is-ready' : ''} ${danger ? 'danger-vignette' : ''} ${def.hyper ? 'hyper-play' : ''}">${hyperFx}<section class="play-shell">
     <header class="play-hud"><div class="hud-left"><span class="mode-mini">${def.ear ? 'ULTRA HARD' : def.hyper ? 'HYPER DRIVE' : def.practice ? 'PRACTICE' : 'STANDARD'}</span></div><div class="hud-center">${timerRingHTML()}</div><div class="hud-right">${def.hyper ? `<div class="metric combo ${g.combo >= 10 ? 'hot' : ''}"><span class="metric-label">COMBO</span><span class="metric-value">${g.combo}</span></div>` : ''}${def.scored ? `<div class="metric"><span class="metric-label">SCORE</span><span class="metric-value">${formatNumber(g.score)}</span></div>` : `<div class="metric"><span class="metric-label">ANSWERS</span><span class="metric-value">${g.total}</span></div>`}</div></header>
     <section class="question-zone">${questionHTML()}</section>
     <section class="answer-area">${state.phase === 'idle' ? '' : answerButtonsHTML()}</section>
@@ -980,6 +1002,8 @@ function recommendationText() {
 function rankingSubmitHTML() {
   if (!mode()?.ranked) return '';
   const r = state.rankingSubmit;
+  if (r?.status === 'queued') return `<div class="ranking-submit pending"><strong>端末に保存しました</strong><span>接続後に再送します。「保存・同期」で状況を確認できます。</span></div>`;
+  if (r?.status === 'synced-later') return `<div class="ranking-submit done"><strong>送信が完了しました</strong><span>「保存・同期」で公開状況を確認できます。</span></div>`;
   if (!r || r.status === 'preparing' || r.status === 'sending') return `<div class="ranking-submit pending"><span class="spinner"></span>オンラインランキングへ送信中</div>`;
   if (r.status === 'profile_required') return `<div class="ranking-submit warning">ランキング登録にはプレイヤー名が必要です。</div>`;
   if (r.status === 'unavailable') return `<div class="ranking-submit muted">オンラインランキングは未設定です。</div>`;
@@ -1021,7 +1045,7 @@ function renderResult() {
     ? `<div class="miss-grid">${misses.map(row => `<div class="miss-card ${missHeatClass(row.missRate)}"><span class="miss-key">${row.iv.key}</span><strong>${row.iv.jp}</strong><span class="miss-rate">誤答 ${Math.round(row.missRate * 100)}%</span><small>${row.wrong} miss / ${row.seen} answers</small></div>`).join('')}</div>`
     : `<div class="miss-perfect">✨ このセッションでは誤答がありませんでした。</div>`;
 
-  app.innerHTML = `<main class="screen"><section class="shell glass result-panel ${def.hyper ? 'result-hyper' : ''}">
+  app.innerHTML = `<main class="screen result-screen"><section class="shell glass result-panel ${def.hyper ? 'result-hyper' : ''}">
     <div class="result-head"><p class="eyebrow">MISSION COMPLETE</p><h1>${def.practice ? 'PRACTICE REPORT' : 'RESULT'}</h1><div class="result-mode">${def.title}</div>${def.scored ? `<div id="resultScore" class="score-big">${formatNumber(final)}</div><div class="score-caption">TOTAL SCORE</div>` : `<div class="score-big practice-total">${g.total}</div><div class="score-caption">QUESTIONS COMPLETED</div>`}${rankingSubmitHTML()}</div>
     <div class="stat-grid"><div class="stat-card glass-soft"><span class="label">正答 / 総問</span><span class="value">${g.correct} / ${g.total}</span></div><div class="stat-card glass-soft"><span class="label">正答率</span><span class="value">${acc}%</span></div><div class="stat-card glass-soft"><span class="label">最大コンボ</span><span class="value">${g.maxCombo}</span></div><div class="stat-card glass-soft"><span class="label">平均解答</span><span class="value">${avg.toFixed(2)}s</span></div><div class="stat-card glass-soft"><span class="label">最速解答</span><span class="value">${best.toFixed(2)}s</span></div></div>
 
@@ -1139,7 +1163,7 @@ async function initializeCloud() {
   state.cloudStatus = 'connecting';
   try {
     const data = await cloud.init();
-    state.cloudStatus = 'ready';
+    state.cloudStatus = navigator.onLine === false || data.status === 'offline' ? 'offline' : 'ready';
     state.cloudUserId = data.user?.id || null;
     state.profile = data.profile || null;
     state.playerDraft = state.profile?.player_name || '';
@@ -1250,10 +1274,17 @@ app.addEventListener('click', event => {
   if (interval) {
     const key = interval.dataset.interval;
     state.selectedIntervals.has(key) ? state.selectedIntervals.delete(key) : state.selectedIntervals.add(key);
-    render(); return;
+    render();
+    app.querySelector(`[data-interval="${key}"]`)?.focus({ preventScroll: true });
+    return;
   }
   const view = event.target.closest('[data-view]');
-  if (view) { state.practiceView = view.dataset.view; render(); return; }
+  if (view) {
+    state.practiceView = view.dataset.view;
+    render();
+    app.querySelector(`[data-view="${state.practiceView}"]`)?.focus({ preventScroll: true });
+    return;
+  }
   const practice = event.target.closest('[data-practice]');
   if (practice) {
     const type = practice.dataset.practice;
@@ -1318,9 +1349,9 @@ app.addEventListener('click', event => {
     state.settings.audioStyle = state.settings.audioStyle === 'melodic' ? 'harmonic' : state.settings.audioStyle === 'harmonic' ? 'both' : 'melodic';
     saveSettings(); render(); audio.playInterval(state.question).catch(()=>{});
   }
-  else if (action === 'select-all') { state.selectedIntervals = new Set(INTERVALS.map(i=>i.key)); render(); }
-  else if (action === 'select-core') { state.selectedIntervals = new Set(['m3','M3','P4','TT','P5','m6','M6']); render(); }
-  else if (action === 'clear-all') { state.selectedIntervals.clear(); render(); }
+  else if (action === 'select-all') { state.selectedIntervals = new Set(INTERVALS.map(i=>i.key)); render(); app.querySelector('[data-action="select-all"]')?.focus({ preventScroll: true }); }
+  else if (action === 'select-core') { state.selectedIntervals = new Set(['m3','M3','P4','TT','P5','m6','M6']); render(); app.querySelector('[data-action="select-core"]')?.focus({ preventScroll: true }); }
+  else if (action === 'clear-all') { state.selectedIntervals.clear(); render(); app.querySelector('[data-action="clear-all"]')?.focus({ preventScroll: true }); }
   else if (action === 'start-manual') {
     if (!state.selectedIntervals.size) return;
     const id = state.practiceView === 'keys' ? 'manualKeys' : state.practiceView === 'ear' ? 'manualEar' : 'manualText';
@@ -1359,7 +1390,7 @@ app.addEventListener('pointerleave', cancelHold);
 app.addEventListener('pointercancel', cancelHold);
 
 window.addEventListener('keydown', event => {
-  if (event.repeat) return;
+  if (event.repeat || event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
   if (event.key === 'Escape') {
     if (state.showSettings || state.showRecords || (state.showPlayerSetup && state.profile)) { state.showSettings=false; state.showRecords=false; if (state.profile) state.showPlayerSetup=false; render(); }
     return;
@@ -1374,9 +1405,25 @@ window.addEventListener('keydown', event => {
 });
 
 window.addEventListener('beforeunload', () => { saveSettings(); saveMastery(); });
+window.addEventListener('online', initializeCloud);
+window.addEventListener('offline', () => {
+  state.cloudStatus = 'offline';
+  if (state.screen !== 'play') render();
+});
+window.addEventListener('interval-cosmos-sync', () => {
+  const pending = state.rankingSubmit;
+  if (pending?.status !== 'queued') return;
+  const saved = cloud?.getSavedPlays?.().find(r => r.payload.clientEventId === pending.client_event_id);
+  if (saved?.status === 'synced') {
+    state.rankingSubmit = {...pending,status:'synced-later'};
+    if (state.screen === 'result') render();
+  }
+});
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  const registerWorker = () => navigator.serviceWorker.register('./sw.js').catch(() => {});
+  if (document.readyState === 'complete') registerWorker();
+  else window.addEventListener('load', registerWorker, {once:true});
 }
 
 saveSettings();

@@ -1,0 +1,9 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><title>Cosmos lifecycle regression</title><link rel="stylesheet" href="../phase5-v205.css">
+<body><button data-v205-cosmos-open>MY COSMOSを開く</button><button id="resolve">保留中の応答を返す</button><output id="state"></output>
+<script>
+const pending=[];
+window.INTERVAL_COSMOS_CLOUD={supabaseUrl:'local-fixture',supabasePublishableKey:'fixture-only'};
+window.IntervalCosmosCloud={getCachedPlayer:()=>({id:'fixture'}),init:async()=>{}};
+window.supabase={createClient:()=>({rpc:()=>new Promise(resolve=>pending.push(resolve))})};
+document.querySelector('#resolve').onclick=()=>{pending.shift()?.({data:{player:{player_name:'LOCAL FIXTURE'},frames:[],titles:[],achievements:[]}});document.querySelector('#state').textContent='応答を返しました';};
+</script><script src="../phase5-progression-v205.js?v=alpha4.4"></script></body></html>

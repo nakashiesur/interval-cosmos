@@ -1,0 +1,8 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><title>Saved sync lifecycle regression</title><link rel="stylesheet" href="../offline-sync-v205.css">
+<body><div class="home-footer"></div><button style="position:fixed;top:4px;right:4px;z-index:30000" id="release">保留中の応答を返す</button><output id="errors"></output>
+<script>
+const pending=[];
+window.IntervalCosmosCloud={getCachedPlayer:()=>({id:'fixture'}),getSavedPlays:()=>[{status:'blocked',errorCode:'IC001',visibility:'ask',payload:{mode:'TEXT',score:50,playedAt:'2026-09-26T00:00:00Z',clientEventId:'fixture-event'}}],getMyPlayer:()=>new Promise(resolve=>pending.push(resolve))};
+document.querySelector('#release').onclick=()=>pending.shift()?.({ranking_visibility:'ask'});
+window.addEventListener('unhandledrejection',e=>{document.querySelector('#errors').textContent=e.reason.message;});
+</script><script src="../offline-sync-ui-v205.js?v=alpha10.3"></script></body></html>
