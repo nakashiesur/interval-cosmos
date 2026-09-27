@@ -48,8 +48,8 @@ const tests=[
   ['key config preserves panel and overlay scroll across rerenders',polishJs.includes('bindAndRestoreScroll') && polishJs.includes('panelScrollTop') && polishJs.includes('overlayScrollTop') && polishJs.includes("target.classList.contains('v205-pc-config-panel')")],
   ['key config overlay fully masks underlying mode UI',polishCss.includes('linear-gradient(180deg,#050918 0%,#03060f 100%)') && polishCss.includes('isolation:isolate')],
   ['polish observer is child-list only',polishJs.includes('{ subtree: true, childList: true }') && !polishJs.includes('attributes: true')],
-  ['PC controls load before assignment engine',index.indexOf('phase8-pc-controls-v205.js?v=alpha8.8') < index.indexOf('phase6-assignments-v205.js?v=alpha5.13')],
-  ['PC input-mode assets are loaded',index.includes('phase8-pc-controls-v205.css?v=alpha8.8') && index.includes('phase8-pc-controls-v205.js?v=alpha8.8') && index.includes('phase8-config-polish-v205.css?v=alpha8.7') && index.includes('phase8-config-polish-v205.js?v=alpha8.7')],
+  ['PC controls load before assignment engine',index.indexOf('phase8-pc-controls-v205.js?v=beta.1.2') < index.indexOf('phase6-assignments-v205.js?v=beta.1.2')],
+  ['PC input-mode assets are loaded',index.includes('phase8-pc-controls-v205.css?v=beta.1.2') && index.includes('phase8-pc-controls-v205.js?v=beta.1.2') && index.includes('phase8-config-polish-v205.css?v=alpha8.7') && index.includes('phase8-config-polish-v205.js?v=alpha8.7')],
   ['pc assets use current cache generation',sw.includes('beta-1')],
   ['pc assets cached',sw.includes('phase8-pc-controls-v205.js') && sw.includes('phase8-pc-controls-v205.css') && sw.includes('phase8-config-polish-v205.js') && sw.includes('phase8-config-polish-v205.css')],
   ['observer only watches child list',js.includes("{ subtree: true, childList: true }") && !js.includes('attributes: true')],
@@ -57,3 +57,21 @@ const tests=[
 let fail=0;
 for(const [name,ok] of tests){console.log(ok?'PASS':'FAIL',name);if(!ok)fail++;}
 process.exitCode=fail?1:0;
+
+// Execute the real start/navigation helpers with focused and blocked controls.
+const vm=require('node:vm'),assert=require('node:assert/strict');
+let blocked=false,clicked=0,focus=null,playing=false;
+const controls=Array.from({length:3},(_,i)=>({disabled:i===1,tabIndex:0,focus(){focus=this;context.document.activeElement=this;}}));
+const context={document:{activeElement:null,querySelector:s=>s==='#app'?context.document:blocked,querySelectorAll:s=>s.startsWith('[class')?[]:controls},visible:()=>true,firstVisible:()=>({disabled:false,click(){clicked++}}),clickAndConsume:(e,n)=>{n.click();return true},answerButtonsVisible:()=>playing};
+vm.createContext(context);
+vm.runInContext(js.slice(js.indexOf('  function handleStart('),js.indexOf('  function clearPrefix(')),context);
+assert(context.handleStart({}));assert.equal(clicked,1);
+blocked=true;assert.equal(context.handleStart({}),false);assert.equal(clicked,1);blocked=false;
+const event={key:'ArrowDown',target:{closest:()=>false},preventDefault(){},stopImmediatePropagation(){}};
+context.handleMenuNavigation(event);assert.equal(focus,controls[0]);
+context.handleMenuNavigation(event);assert.equal(focus,controls[2]);
+context.handleMenuNavigation(event);assert.equal(focus,controls[0]);
+event.key='ArrowUp';context.handleMenuNavigation(event);assert.equal(focus,controls[2]);
+playing=true;assert.equal(context.handleMenuNavigation(event),false);playing=false;
+event.target.closest=()=>true;assert.equal(context.handleMenuNavigation(event),false);
+console.log('PASS S starts ready screen, modal blocks start, arrows wrap and skip disabled, gameplay and tabs retain keys');

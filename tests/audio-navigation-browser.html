@@ -1,0 +1,29 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><title>音の切替確認</title>
+<style>body{background:#091021;color:#def;font:18px system-ui;padding:30px}button{padding:16px}pre{white-space:pre-wrap}</style>
+<h1>音の切替確認（ローカル専用）</h1><p>通常・課題それぞれで、長い再生の途中に次の音へ切り替えます。</p><button id="run">音を鳴らして検証</button><pre id="out">未実行</pre>
+<script>
+const out=document.querySelector('#out');
+document.querySelector('#run').onclick=async()=>{
+ out.textContent='検証中';
+ try{
+ for(const [file,name,end] of [['app.js','AudioEngine','const audio = new AudioEngine();'],['phase6-assignments-v205.js','AssignmentAudio','  function accidental']]){
+ const source=await(await fetch('../'+file+'?v=beta.1.2')).text();
+ const code=source.slice(source.indexOf('class '+name),source.indexOf(end));
+ const Engine=new Function('state',code+';return '+name)({settings:{sound:true,volume:.4,audioStyle:'both'}});
+ const e=new Engine();if(name==='AssignmentAudio')e.settings=()=>({sound:true,volume:.4,audioStyle:'both'});
+ const play=q=>name==='AudioEngine'?e.playInterval(q,'both'):e.play(q);
+ const stop=()=>name==='AudioEngine'?e.stopPending():e.stop();
+ await play({baseMidi:60,targetMidi:64});const old=[...e.voices],ended=new Set();old.forEach(o=>o.addEventListener('ended',()=>ended.add(o)));
+ await new Promise(r=>setTimeout(r,100));
+ await play({baseMidi:67,targetMidi:74});
+ if(old.some(o=>e.voices.has(o)))throw Error(name+':前の音が残っています');
+ await new Promise(r=>setTimeout(r,100));
+ if(ended.size!==old.length)throw Error(name+':古い音源が終了していません');stop();
+ await new Promise(r=>setTimeout(r,1300));
+ if(e.voices.size)throw Error(name+':遅れて再生されています');
+ e.release();out.textContent+='\nPASS '+name+'：前の音を停止・遅延再生なし';
+ }
+ out.textContent+='\n完了';
+ }catch(e){out.textContent+='\nFAIL '+e.message;}
+};
+</script></html>

@@ -268,7 +268,7 @@ function buildQuestion() {
 
 class AudioEngine {
   constructor() {
-    this.ctx = null; this.master = null; this.generation = 0;
+    this.ctx = null; this.master = null; this.generation = 0; this.voices = new Set();
     const release = () => this.release();
     window.addEventListener('pagehide', release);
     document.addEventListener?.('visibilitychange', () => { if (document.hidden) release(); });
@@ -294,7 +294,13 @@ class AudioEngine {
   setVolume(value) {
     if (this.master && this.ctx) this.master.gain.setTargetAtTime(value, this.ctx.currentTime, 0.02);
   }
-  stopPending() { this.generation += 1; }
+  stopPending() {
+    this.generation += 1;
+    for (const osc of this.voices) {
+      try { osc.stop(); osc.disconnect(); } catch {}
+    }
+    this.voices.clear();
+  }
   tone(midi, when, duration = 0.62, strength = 1) {
     if (!this.ctx || !this.master) return;
     const freq = 440 * Math.pow(2, (midi - 69) / 12);
@@ -315,6 +321,8 @@ class AudioEngine {
       gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, peak * 0.32), when + 0.2);
       gain.gain.exponentialRampToValueAtTime(0.0001, when + duration);
       osc.connect(gain).connect(this.master);
+      this.voices.add(osc);
+      osc.onended = () => { this.voices.delete(osc); osc.disconnect(); gain.disconnect(); };
       osc.start(when);
       osc.stop(when + duration + 0.05);
     });
@@ -329,8 +337,9 @@ class AudioEngine {
   }
   async playInterval(question, style = state.settings.audioStyle) {
     if (!state.settings.sound || !question) return;
-    if (await this.unlock() === false) return;
-    const token = ++this.generation;
+    this.stopPending();
+    const token = this.generation;
+    if (await this.unlock() === false || token !== this.generation || !this.ctx) return;
     const now = this.ctx.currentTime + 0.035;
 
     if (style === 'harmonic') {
@@ -650,13 +659,16 @@ function answerQuestion(chosenKey) {
   render();
 
   if (!ok && state.settings.sound) {
-    window.setTimeout(() => audio.playInterval(q, 'both').catch(() => {}), 100);
+    window.setTimeout(() => {
+      if (state.question === q && state.phase === 'running') audio.playInterval(q, 'both').catch(() => {});
+    }, 100);
   }
 
   const session = state.sessionId;
   const delay = ok ? 360 : 780;
   window.setTimeout(() => {
     if (session !== state.sessionId || state.phase !== 'running') return;
+    audio.stopPending();
     state.previousKey = q.intervalKey;
     state.question = buildQuestion();
     state.answerLabelLang = Math.random() < 0.5 ? 'jp' : 'symbol';
@@ -1069,7 +1081,7 @@ function settingsModalHTML() {
       <div class="playback-help"><p><strong>MELODIC</strong>：基準音 → 到達音の順に、2音を続けて再生します。</p><p><strong>HARMONIC</strong>：基準音と到達音の2音を同時に鳴らします。</p><p><strong>BOTH</strong>：MELODICとHARMONICを続けて再生します。</p></div>
       ${s.audioStyle === 'both' ? `<div class="both-order"><div class="setting-label compact"><strong>BOTHの再生順</strong><span>最初に聴く形式を選択</span></div><div class="segmented both-order-tabs" style="margin:0"><button class="tab-btn ${s.bothOrder === 'harmonicFirst' ? 'active' : ''}" data-setting="bothOrder" data-value="harmonicFirst">HARMONIC → MELODIC</button><button class="tab-btn ${s.bothOrder === 'melodicFirst' ? 'active' : ''}" data-setting="bothOrder" data-value="melodicFirst">MELODIC → HARMONIC</button></div></div>` : ''}
     </div>
-    <div class="setting-row"><div class="setting-label"><strong>Auto play each question</strong><button class="toggle ${s.autoPlay ? 'on' : ''}" data-setting-toggle="autoPlay"></button></div></div>
+    <div class="setting-row"><div class="setting-label"><div class="setting-description"><strong>Auto play each question</strong><span>新しい問題が出るたびに音を自動再生します。OFFでもREPLAYで再生できます。</span></div><button class="toggle ${s.autoPlay ? 'on' : ''}" data-setting-toggle="autoPlay" aria-label="問題ごとの自動再生" aria-pressed="${s.autoPlay}"></button></div></div>
     <div class="setting-row cloud-setting"><div><strong>Online ranking</strong><span class="cloud-state ${state.cloudStatus}">${cloudStatusLabel()}</span></div><p>${state.cloudStatus === 'ready' ? `PLAYER：${escapeHTML(profileText)}` : state.cloudStatus === 'unconfigured' ? 'cloud-config.jsへSupabaseのURLとPublishable Keyを設定してください。' : escapeHTML(state.cloudError || '接続しています。')}</p><button class="secondary-btn" data-action="edit-profile" ${state.cloudStatus === 'ready' ? '' : 'disabled'}>PLAYER SETUP</button></div>
     <div class="settings-version">${APP_VERSION}</div>
   </section></div>`;
