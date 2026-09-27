@@ -15,7 +15,7 @@ class Handler(module.FreshHandler):
         if urlsplit(self.path).path == '/tests/offline-app/':
             html = (ROOT / 'index.html').read_text()
             html = html.replace('<head>', '<head><base href="/">')
-            html = html.replace('</body>', '<script src="/tests/offline-app/controls.js?v=2"></script></body>')
+            html = html.replace('</body>', '<script src="/tests/offline-app/controls.js?v=3"></script></body>')
             body = html.encode()
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')

@@ -8,7 +8,14 @@
   document.body.append(panel);
   const registration=await navigator.serviceWorker.register('/tests/offline-app/sw.js',{scope:'/tests/offline-app/'});
   const refresh=()=>navigator.serviceWorker.controller?.postMessage('status');
-  navigator.serviceWorker.addEventListener('message',e=>{if(e.data?.transport)panel.querySelector('span').textContent=e.data.transport;});
+  let simulatedOnline;
+  navigator.serviceWorker.addEventListener('message',e=>{
+    if(!e.data?.transport)return;
+    panel.querySelector('span').textContent=e.data.transport;
+    const online=e.data.transport==='接続';
+    Object.defineProperty(navigator,'onLine',{configurable:true,get:()=>online});
+    if(simulatedOnline!==online){simulatedOnline=online;window.dispatchEvent(new Event(online?'online':'offline'));}
+  });
   navigator.serviceWorker.addEventListener('controllerchange',refresh);
   panel.addEventListener('click',e=>{const action=e.target.dataset.transport;if(action)registration.active?.postMessage(action)});
   refresh();
