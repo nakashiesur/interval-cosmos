@@ -6,5 +6,5 @@ assert.equal(store.read().length,0);store.save({mode:'TEXT',score:123,total_answ
 const reloaded={window:{},localStorage:ctx.localStorage};vm.runInNewContext(code,reloaded);assert.equal(reloaded.window.IntervalCosmosGuestSessions.read()[0].score,123);
 for(let i=0;i<510;i++)store.save({mode:'KEYS',score:i});assert.equal(store.read().length,500);assert.equal(store.read()[0].score,509);
 ctx.localStorage.setItem=()=>{throw Error('quota')};assert.equal(store.save({mode:'TEXT',score:1}),false);
-const app=fs.readFileSync('app.js','utf8');assert(app.includes('if (state.profile?.is_guest) window.IntervalCosmosGuestSessions?.save'));
+const app=fs.readFileSync('app.js','utf8');assert(app.includes('if (state.profile?.is_guest || (!state.profile && cloud?.isGuestMode?.())) window.IntervalCosmosGuestSessions?.save'));
 console.log('PASS guest session persistence, newest-first bound, storage failure, guest-only save guard');
