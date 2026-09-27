@@ -10,6 +10,7 @@ const index = fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const sw = fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8');
 
 const assertions = [
+  ['owned frame selection survives progress refresh',sql.includes('not(v_best_point_frame=any(v_before_frames))')],
   ['visible achievement catalog', sql.includes("'first_signal'") && sql.includes("'interval_80'") && sql.includes("'streak_7'")],
   ['hidden endgame achievements', sql.includes("'hidden_ear_perfect'") && sql.includes("'hidden_singularity'") && sql.includes("'???'")],
   ['point frame progression', sql.includes("'bronze'") || sql.includes("unlock_rule->>'type'='points'")],
