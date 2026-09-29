@@ -1261,6 +1261,8 @@ async function savePlayerProfile() {
   }
 }
 
+window.addEventListener('interval-cosmos-ranking-changed',()=>{if(state.showRecords)loadRanking();});
+
 app.addEventListener('click', event => {
   const stop = event.target.closest('[data-stop]');
   if (stop && event.target === stop) return;

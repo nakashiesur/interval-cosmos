@@ -125,3 +125,6 @@ jobs:
 
       - name: Approved artwork regression
         run: node tests/art-v205-test.js
+
+      - name: Ranking moderation, update and install actions
+        run: node tests/app-actions-v205-test.js
