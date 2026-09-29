@@ -50,7 +50,7 @@ async function request(route, response, mode = 'navigate') {
   assert.equal(await (await request('cloud-config.js', new Error('offline'), 'cors')).text(), 'public configuration');
   let activated; handlers.activate({waitUntil: p => activated = p}); await activated;
   assert.deepEqual(deleted, ['interval-cosmos-old', 'interval-cosmos-v2-0-5-alpha10-25']);
-  assert.deepEqual(navigated, Array(2).fill('https://example.test/cosmos/update-required.html'));
+  assert.deepEqual(navigated, [], 'quiet releases do not notify or force reload');
   saved.set('./update-required.html', html('update notice'));
   assert.equal(await (await request('update-required.html', new Error('offline'))).text(),'update notice');
   context.caches.keys=async()=>[]; navigated.length=0;
