@@ -1,4 +1,4 @@
-const CACHE = 'interval-cosmos-v2-0-5-beta-1-9';
+const CACHE = 'interval-cosmos-v2-0-5-beta-1-10';
 const ASSETS = [
   './app-update-v205.js', './update-required.html', './update-required.js',
   './guest-sessions-v205.js', './phase10-device-fixes-v205.css',
@@ -77,17 +77,9 @@ self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
     const old = keys.filter(key => key.startsWith('interval-cosmos-') && key !== CACHE);
-    // Only already-controlled application windows are upgraded, never unrelated tabs.
-    const windows = old.length ? await self.clients.matchAll({type:'window'}) : [];
     await Promise.all(old.map(key => caches.delete(key)));
     await self.clients.claim();
-    const root = new URL('./', self.location.href);
-    // Do not await navigation inside activation: it waits for this worker to activate.
-    windows.forEach(client => {
-      const url = new URL(client.url);
-      if (url.origin !== root.origin || ![root.pathname, new URL('index.html', root).pathname].includes(url.pathname)) return;
-      client.navigate(new URL('update-required.html', root).href).catch(() => {});
-    });
+    // Quiet release: apply on the next ordinary navigation; no notice or forced reload.
   })());
 });
 

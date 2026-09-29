@@ -127,3 +127,25 @@ process.exitCode=fail?1:0;
  assert(!/(delete from|truncate)\s+public\.player_(achievements|frames|titles)/i.test(source));
  console.log('PASS predecessor frame ordering and attainable review catalog limits');
 }
+
+{
+ const vm=require('vm'),assert=require('assert');
+ const ctx={POINT_FRAMES:new Set(['normal','bronze','silver','gold','platinum','cosmic']),esc:x=>String(x??''),percent:(v,m)=>Math.max(0,Math.min(100,Math.round(v/m*100)))};
+ vm.createContext(ctx);
+ vm.runInContext(js.slice(js.indexOf('  function frameStatus('),js.indexOf('  function dailyHTML(')),ctx);
+ vm.runInContext(js.slice(js.indexOf('  function frameHTML('),js.indexOf('  function titleHTML(')),ctx);
+ const frames=[{id:'platinum',name:'PLATINUM',unlocked:true,tier:4,points_required:2200},{id:'cosmic',name:'COSMIC',tier:5,points_required:3500},{id:'aurora',name:'AURORA',tier:6,points_required:6500},{id:'supernova',name:'SUPERNOVA',points_required:10000,unlock_rule:{requires_frame:'aurora'}},{id:'pulsar',name:'PULSAR',points_required:17500,unlock_rule:{requires_frame:'event_horizon'}}];
+ assert.equal(ctx.frameStatus({player:{achievement_points:1775},frames}).p,51);
+ let html=ctx.frameHTML({frames});
+ assert(!html.includes('v205-frame-supernova'));
+ assert(!html.includes('v205-frame-pulsar'));
+ assert(!html.includes('10,000'));
+ assert(!html.includes('17,500'));
+ assert(html.includes('v205-frame-aurora'));
+ assert(html.includes('v205-frame-cosmic'));
+ frames[2].unlocked=true;
+ html=ctx.frameHTML({frames});assert(html.includes('10,000'));assert(!html.includes('v205-frame-supernova'));
+ frames[3].unlocked=true;
+ html=ctx.frameHTML({frames});assert(html.includes('v205-frame-supernova'));
+ console.log('PASS cumulative PT, hidden art, predecessor condition reveal, retained owned frames');
+}
