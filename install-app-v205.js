@@ -12,8 +12,8 @@
   async function install(){
     if(installed())return;
     if(deferred){const prompt=deferred;deferred=null;try{await prompt.prompt();const choice=await prompt.userChoice;if(choice.outcome==='accepted')return;}catch(_){} }
-    const dialog=document.createElement('dialog');dialog.className='ic-action-dialog';dialog.innerHTML='<h2>ホーム画面へ追加</h2><p></p><p>追加したアイコンから、アプリとして起動できます。</p><button>閉じる</button>';
-    dialog.querySelector('p').textContent=instructions();document.body.append(dialog);dialog.showModal();dialog.querySelector('button').onclick=()=>dialog.close();dialog.onclose=()=>dialog.remove();
+    const dialog=document.createElement('dialog');dialog.className='ic-action-dialog';dialog.innerHTML='<h2>ホーム画面へ追加</h2><p></p><p>追加したアイコンから、アプリとして起動できます。</p><p>登録済みの方：ホーム画面版でPLAYER ACCESSが表示されたら、新規登録は不要です。このSafariで引き継ぎPINを発行 → ホーム画面版の「すでにアカウントがある」で入力 → Safariに戻って接続を承認してください。同じアカウントの記録を引き継げます。</p><button data-link>引き継ぎPINを発行</button><button data-close>閉じる</button>';
+    dialog.querySelector('p').textContent=instructions();document.body.append(dialog);dialog.showModal();dialog.querySelector('[data-close]').onclick=()=>dialog.close();const link=dialog.querySelector('[data-link]');link.hidden=!window.IntervalCosmosCloud?.getCachedPlayer?.()||window.IntervalCosmosCloud.getCachedPlayer().is_guest;link.onclick=()=>{dialog.close();window.IntervalCosmosAccountUI?.openSourceLink();};dialog.onclose=()=>dialog.remove();
   }
   function render(){
     const card=document.querySelector('.settings-modal .modal-card');if(!card)return;
