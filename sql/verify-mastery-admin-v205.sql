@@ -71,6 +71,17 @@ do $test$ declare p uuid:=public.current_player_id(); n int; begin
  perform public.evaluate_my_progress();
  if (select count(*) from public.player_achievements where player_id=p)<>n then raise exception 'Repeated evaluation changed achievements'; end if;
 end; $test$;
+do $test$
+declare p uuid:=public.current_player_id(); result jsonb;
+begin
+ result:=public.submit_saved_play(p,'ask',jsonb_build_object('clientEventId',gen_random_uuid(),'source','ranked','mode','TEXT','score',200,'totalAnswers',2,'correctAnswers',1,'maxCombo',1,'avgResponse',500,'playedAt',now()));
+ perform public.publish_play_session((result->>'session_id')::uuid);
+ perform public.admin_unpublish_player_rankings(p);
+ if exists(select 1 from public.ranking_bests where player_id=p and public_score is not null) then raise exception 'Self ranking stayed public'; end if;
+ perform public.admin_delete_player_rankings(p);
+ if exists(select 1 from public.ranking_bests where player_id=p) then raise exception 'Self ranking deletion failed'; end if;
+ if not exists(select 1 from public.play_sessions where player_id=p) then raise exception 'Ranking deletion removed history'; end if;
+end; $test$;
 reset role;
 update public.players set is_admin=false where id=current_setting('ic.qa_player')::uuid;
 set local role authenticated;
@@ -82,5 +93,5 @@ do $test$ declare denied boolean:=false; begin
  if not denied then raise exception 'Nonadmin edit permitted'; end if;
 end; $test$;
 reset role;
-select 'PASS: eight thresholds; OMEGA 38/39 locked and 39/39 unlocked; repeated evaluation stable; staff null-course self-edit; nonadmin denied' as result;
+select 'PASS: eight thresholds; OMEGA 38/39 locked and 39/39 unlocked; repeated evaluation stable; staff null-course self-edit; self ranking unpublish/delete preserves history; nonadmin denied' as result;
 rollback;
