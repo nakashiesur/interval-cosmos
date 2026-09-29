@@ -39,6 +39,15 @@ do $test$ begin
 end; $test$;
 reset role;
 insert into public.player_frames(player_id,frame_id) values(current_setting('ic.qa_player')::uuid,'cosmic') on conflict do nothing;
+-- Predecessor alone is insufficient: the new PT requirement must also hold.
+set local role authenticated;
+do $test$ begin perform public.evaluate_my_progress();
+if exists(select 1 from public.player_frames where player_id=public.current_player_id() and frame_id='aurora') then raise exception 'AURORA bypassed PT floor'; end if;
+end; $test$;
+reset role;
+insert into public.player_mode_clear_rewards(player_id,reward_date,mode,reward_points)
+values(current_setting('ic.qa_player')::uuid,current_date-1000,'TEXT',5000);
+
 set local role authenticated;
 do $test$ begin
  perform public.evaluate_my_progress();
@@ -104,6 +113,7 @@ for r in select * from public.achievement_catalog where sort_order between 1100 
 end loop;
 delete from public.play_sessions where player_id=p;
 end; $test$;
+update public.player_mode_clear_rewards set reward_points=15000 where player_id=current_setting('ic.qa_player')::uuid and reward_date=current_date-1000;
 insert into public.player_achievements(player_id,achievement_id)
 select current_setting('ic.qa_player')::uuid,id from public.achievement_catalog where id<>'streak_60' and is_active on conflict do nothing;
 set local role authenticated;

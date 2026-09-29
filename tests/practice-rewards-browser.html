@@ -1,0 +1,11 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><base href="/"><meta name="viewport" content="width=device-width,initial-scale=1"><title>モードクリア報酬 表示確認</title>
+<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="phase5-v205.css"><link rel="stylesheet" href="phase10-cosmos-polish-v205.css"><link rel="stylesheet" href="phase10-cosmos-folders-v205.css"><link rel="stylesheet" href="phase11-frames-v205.css">
+<body><div class="home-footer"><button data-v205-cosmos-open>架空データのMY COSMOSを開く</button></div>
+<script>
+// Offline synthetic fixture. Never connects to a database or creates an account.
+const ready=Promise.all([fetch('docs/reward-review-catalog.json').then(r=>r.json()),fetch('docs/reward-review-progression.json').then(r=>r.json())]);
+const player={id:'qa-fixture',player_name:'表示確認用プレイヤー',avatar_id:'nova',achievement_points:5400,equipped_frame_id:'cosmic'};
+window.INTERVAL_COSMOS_CLOUD={supabaseUrl:'fixture',supabasePublishableKey:'fixture'};
+window.IntervalCosmosCloud={getCachedPlayer:()=>player,init:async()=>{}};
+window.supabase={createClient:()=>({rpc:async()=>{const [a,p]=await ready;return {error:null,data:{player,mission_date:'2026-09-29',achievements:a.map(x=>({...x,name:x.display_name,unlocked:false})),titles:[],frames:p.frames.map((f,i)=>({id:f.id,name:f.name,points_required:f.points,unlock_rule:f.rule,tier:i,unlocked:i<6,equipped:f.id==='cosmic'})),daily_missions:[{slot:1,name:'2回プレイ',description:'今日は2回プレイする',target:2,progress:2,completed:true,reward_points:30},{slot:2,name:'15回答',description:'15問に回答する',target:15,progress:10,completed:false,reward_points:30},{slot:3,name:'EAR LINK',description:'EAR LINKをプレイする',target:1,progress:0,completed:false,reward_points:40}],mode_clear_rewards:['TEXT','KEYS','HD_TEXT','HD_KEYS','EAR_LINK'].map((mode,i)=>({mode,reward_points:[20,20,25,25,30][i],min_answers:i===4?5:10,min_accuracy:50,completed:i<2})),point_breakdown:{achievements:1000,daily:3000,mode_clear:1400}}}}})};
+</script><script src="phase11-art-v205.js"></script><script src="phase5-progression-v205.js"></script><script src="phase10-cosmos-folders-v205.js"></script></body></html>

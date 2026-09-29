@@ -121,7 +121,7 @@ process.exitCode=fail?1:0;
  assert.equal(catalog.length,39);
  assert.equal(Math.max(...catalog.filter(a=>a.requirement.type==='combo').map(a=>a.requirement.value)),45);
  assert.equal(Math.max(...catalog.filter(a=>a.requirement.type==='streak_days').map(a=>a.requirement.days)),10);
- assert.deepEqual(catalog.filter(a=>a.requirement.type==='active_days').map(a=>a.requirement.days),[15,30]);
+ assert.deepEqual(catalog.filter(a=>a.requirement.type==='active_days').map(a=>a.requirement.days),[10,20]);
  assert(source.includes('requires_frame'));assert(source.includes('order by tier,sort_order,id'));
  assert(!/(delete from|truncate)\s+public\.player_(achievements|frames|titles)/i.test(source));
  console.log('PASS predecessor frame ordering and attainable review catalog limits');
