@@ -16,11 +16,10 @@
     "hidden": false,
     "points": 20,
     "category": "basic",
-    "description": "累計10回・2日以上プレイする。",
+    "description": "累計5回プレイする。",
     "requirement": {
       "type": "sessions",
-      "count": 10,
-      "min_active_days": 2
+      "count": 5
     },
     "display_name": "ORBIT STARTER"
   },
@@ -29,11 +28,10 @@
     "hidden": false,
     "points": 40,
     "category": "basic",
-    "description": "累計30回・3日以上プレイする。",
+    "description": "累計30回プレイする。",
     "requirement": {
       "type": "sessions",
-      "count": 30,
-      "min_active_days": 3
+      "count": 30
     },
     "display_name": "ORBIT REGULAR"
   },
@@ -42,11 +40,10 @@
     "hidden": false,
     "points": 80,
     "category": "basic",
-    "description": "累計75回・7日以上プレイする。",
+    "description": "累計75回プレイする。",
     "requirement": {
       "type": "sessions",
-      "count": 75,
-      "min_active_days": 7
+      "count": 75
     },
     "display_name": "STAR TRACKER"
   },
@@ -55,11 +52,10 @@
     "hidden": false,
     "points": 150,
     "category": "basic",
-    "description": "累計150回・14日以上プレイする。",
+    "description": "累計150回プレイする。",
     "requirement": {
       "type": "sessions",
-      "count": 150,
-      "min_active_days": 14
+      "count": 150
     },
     "display_name": "STELLAR VETERAN"
   },
@@ -68,13 +64,12 @@
     "hidden": false,
     "points": 20,
     "category": "accuracy",
-    "description": "1プレイで15問以上・全問正解を2回。累計10プレイ・通算2日以上。",
+    "description": "1プレイで15問以上・全問正解を2回。累計5プレイ。",
     "requirement": {
       "type": "perfect_session",
       "min_answers": 15,
-      "min_sessions": 10,
-      "repeat_count": 2,
-      "min_active_days": 2
+      "min_sessions": 5,
+      "repeat_count": 2
     },
     "display_name": "CLEAN CONTACT"
   },
@@ -83,13 +78,12 @@
     "hidden": false,
     "points": 40,
     "category": "accuracy",
-    "description": "1プレイで20問以上・全問正解を3回。累計25プレイ・通算5日以上。",
+    "description": "1プレイで20問以上・全問正解を3回。累計25プレイ。",
     "requirement": {
       "type": "perfect_session",
       "min_answers": 20,
       "min_sessions": 25,
-      "repeat_count": 3,
-      "min_active_days": 5
+      "repeat_count": 3
     },
     "display_name": "CLEAR ORBIT"
   },
@@ -98,13 +92,12 @@
     "hidden": false,
     "points": 80,
     "category": "accuracy",
-    "description": "1プレイで30問以上・全問正解を5回。累計50プレイ・通算7日以上。",
+    "description": "1プレイで30問以上・全問正解を5回。累計50プレイ。",
     "requirement": {
       "type": "perfect_session",
       "min_answers": 30,
       "min_sessions": 50,
-      "repeat_count": 5,
-      "min_active_days": 7
+      "repeat_count": 5
     },
     "display_name": "PRECISION PILOT"
   },
@@ -113,13 +106,12 @@
     "hidden": false,
     "points": 15,
     "category": "combo",
-    "description": "10コンボ以上を2回。累計10プレイ・通算2日以上。",
+    "description": "10コンボ以上を2回。累計5プレイ。",
     "requirement": {
       "type": "combo",
       "value": 10,
-      "min_sessions": 10,
-      "repeat_count": 2,
-      "min_active_days": 2
+      "min_sessions": 5,
+      "repeat_count": 2
     },
     "display_name": "COMBO 10"
   },
@@ -128,13 +120,12 @@
     "hidden": false,
     "points": 30,
     "category": "combo",
-    "description": "15コンボ以上を3回。累計25プレイ・通算5日以上。",
+    "description": "15コンボ以上を3回。累計25プレイ。",
     "requirement": {
       "type": "combo",
       "value": 15,
       "min_sessions": 25,
-      "repeat_count": 3,
-      "min_active_days": 5
+      "repeat_count": 3
     },
     "display_name": "COMBO DRIVER"
   },
@@ -143,13 +134,12 @@
     "hidden": false,
     "points": 60,
     "category": "combo",
-    "description": "25コンボ以上を3回。累計50プレイ・通算7日以上。",
+    "description": "25コンボ以上を3回。累計50プレイ。",
     "requirement": {
       "type": "combo",
       "value": 25,
       "min_sessions": 50,
-      "repeat_count": 3,
-      "min_active_days": 7
+      "repeat_count": 3
     },
     "display_name": "CHAIN 25"
   },
@@ -158,13 +148,12 @@
     "hidden": false,
     "points": 100,
     "category": "combo",
-    "description": "35コンボ以上を5回。累計75プレイ・通算10日以上。",
+    "description": "35コンボ以上を5回。累計75プレイ。",
     "requirement": {
       "type": "combo",
       "value": 35,
       "min_sessions": 75,
-      "repeat_count": 5,
-      "min_active_days": 10
+      "repeat_count": 5
     },
     "display_name": "CHAIN REACTOR"
   },
@@ -173,12 +162,11 @@
     "hidden": false,
     "points": 30,
     "category": "mode",
-    "description": "TEXTを25回プレイする。2日以上プレイ。",
+    "description": "TEXTを10回プレイする。",
     "requirement": {
       "mode": "TEXT",
       "type": "mode_sessions",
-      "count": 25,
-      "min_active_days": 2
+      "count": 10
     },
     "display_name": "TEXT SPECIALIST"
   },
@@ -187,12 +175,11 @@
     "hidden": false,
     "points": 30,
     "category": "mode",
-    "description": "KEYSを25回プレイする。2日以上プレイ。",
+    "description": "KEYSを10回プレイする。",
     "requirement": {
       "mode": "KEYS",
       "type": "mode_sessions",
-      "count": 25,
-      "min_active_days": 2
+      "count": 10
     },
     "display_name": "KEYS SPECIALIST"
   },
@@ -201,15 +188,14 @@
     "hidden": false,
     "points": 25,
     "category": "mode",
-    "description": "HD TEXT / HD KEYSを合計10回プレイする。2日以上プレイ。",
+    "description": "HD TEXT / HD KEYSを合計5回プレイする。",
     "requirement": {
       "type": "any_mode",
-      "count": 10,
+      "count": 5,
       "modes": [
         "HD_TEXT",
         "HD_KEYS"
-      ],
-      "min_active_days": 2
+      ]
     },
     "display_name": "HYPER IGNITION"
   },
@@ -218,12 +204,11 @@
     "hidden": false,
     "points": 35,
     "category": "mode",
-    "description": "EAR_LINKを10回プレイする。2日以上プレイ。",
+    "description": "EAR LINKを5回プレイする。",
     "requirement": {
       "mode": "EAR_LINK",
       "type": "mode_sessions",
-      "count": 10,
-      "min_active_days": 2
+      "count": 5
     },
     "display_name": "EAR CONTACT"
   },
@@ -232,7 +217,7 @@
     "hidden": false,
     "points": 100,
     "category": "mode",
-    "description": "主要5モードをすべてプレイする。累計50回・5日以上プレイ。",
+    "description": "主要5モードをすべてプレイする。累計15回プレイ。",
     "requirement": {
       "type": "all_modes",
       "modes": [
@@ -242,8 +227,7 @@
         "HD_KEYS",
         "EAR_LINK"
       ],
-      "min_sessions": 50,
-      "min_active_days": 5
+      "min_sessions": 15
     },
     "display_name": "COSMOS EXPLORER"
   },
@@ -252,12 +236,11 @@
     "hidden": false,
     "points": 50,
     "category": "interval",
-    "description": "13音程すべてに15回答以上、正答率0%以上。2日以上プレイ。",
+    "description": "13音程すべてに15回答以上。",
     "requirement": {
       "type": "interval_mastery",
       "min_seen": 15,
-      "min_accuracy": 0,
-      "min_active_days": 2
+      "min_accuracy": 0
     },
     "display_name": "13 SIGNALS"
   },
@@ -266,12 +249,11 @@
     "hidden": false,
     "points": 120,
     "category": "interval",
-    "description": "13音程すべてに30回答以上、正答率80%以上。5日以上プレイ。",
+    "description": "13音程すべてに30回答以上、正答率80%以上。",
     "requirement": {
       "type": "interval_mastery",
       "min_seen": 30,
-      "min_accuracy": 80,
-      "min_active_days": 5
+      "min_accuracy": 80
     },
     "display_name": "INTERVAL NAVIGATOR"
   },
@@ -280,12 +262,11 @@
     "hidden": false,
     "points": 200,
     "category": "interval",
-    "description": "13音程すべてに50回答以上、正答率90%以上。10日以上プレイ。",
+    "description": "13音程すべてに50回答以上、正答率90%以上。",
     "requirement": {
       "type": "interval_mastery",
       "min_seen": 50,
-      "min_accuracy": 90,
-      "min_active_days": 10
+      "min_accuracy": 90
     },
     "display_name": "INTERVAL MASTER"
   },
@@ -330,12 +311,11 @@
     "hidden": false,
     "points": 20,
     "category": "ranking",
-    "description": "ランキングへ記録を公開する。累計10回・2日以上プレイ。",
+    "description": "ランキングへ記録を公開する。累計10回プレイ。",
     "requirement": {
       "rank": 999999,
       "type": "public_rank",
-      "min_sessions": 10,
-      "min_active_days": 2
+      "min_sessions": 10
     },
     "display_name": "OPEN CHANNEL"
   },
@@ -344,12 +324,11 @@
     "hidden": false,
     "points": 80,
     "category": "ranking",
-    "description": "殿堂ランキング10位以内に入る。累計50回・5日以上プレイ。",
+    "description": "殿堂ランキング10位以内に入る。累計50回プレイ。",
     "requirement": {
       "rank": 10,
       "type": "public_rank",
-      "min_sessions": 50,
-      "min_active_days": 5
+      "min_sessions": 50
     },
     "display_name": "TOP TEN"
   },
@@ -358,12 +337,11 @@
     "hidden": false,
     "points": 120,
     "category": "ranking",
-    "description": "殿堂ランキング3位以内に入る。累計100回・10日以上プレイ。",
+    "description": "殿堂ランキング3位以内に入る。累計100回プレイ。",
     "requirement": {
       "rank": 3,
       "type": "public_rank",
-      "min_sessions": 100,
-      "min_active_days": 10
+      "min_sessions": 100
     },
     "display_name": "PODIUM"
   },
@@ -372,12 +350,11 @@
     "hidden": false,
     "points": 200,
     "category": "ranking",
-    "description": "殿堂ランキング1位以内に入る。累計150回・20日以上プレイ。",
+    "description": "殿堂ランキング1位以内に入る。累計150回プレイ。",
     "requirement": {
       "rank": 1,
       "type": "public_rank",
-      "min_sessions": 150,
-      "min_active_days": 20
+      "min_sessions": 150
     },
     "display_name": "NUMBER ONE"
   },
@@ -392,8 +369,7 @@
       "type": "perfect_session",
       "min_answers": 15,
       "min_sessions": 50,
-      "repeat_count": 3,
-      "min_active_days": 7
+      "repeat_count": 3
     },
     "display_name": "INNER EAR"
   },
@@ -414,7 +390,6 @@
       ],
       "min_answers": 20,
       "min_sessions": 75,
-      "min_active_days": 10,
       "mode_min_answers": {
         "EAR_LINK": 10
       }
@@ -431,8 +406,7 @@
       "type": "combo",
       "value": 40,
       "min_sessions": 100,
-      "repeat_count": 3,
-      "min_active_days": 14
+      "repeat_count": 3
     },
     "display_name": "GRAVITY CHAIN"
   },
@@ -482,13 +456,12 @@
     "hidden": false,
     "points": 180,
     "category": "accuracy",
-    "description": "1プレイで40問以上・全問正解を3回。累計100プレイ・通算10日以上。",
+    "description": "1プレイで40問以上・全問正解を3回。累計100プレイ。",
     "requirement": {
       "type": "perfect_session",
       "min_answers": 40,
       "min_sessions": 100,
-      "repeat_count": 3,
-      "min_active_days": 10
+      "repeat_count": 3
     },
     "display_name": "PRECISION ACE"
   },
@@ -497,13 +470,12 @@
     "hidden": false,
     "points": 200,
     "category": "combo",
-    "description": "45コンボ以上を3回。累計150プレイ・通算18日以上。",
+    "description": "45コンボ以上を3回。累計150プレイ。",
     "requirement": {
       "type": "combo",
       "value": 45,
       "min_sessions": 150,
-      "repeat_count": 3,
-      "min_active_days": 18
+      "repeat_count": 3
     },
     "display_name": "APEX CHAIN"
   },
@@ -512,31 +484,31 @@
     "hidden": false,
     "points": 200,
     "category": "streak",
-    "description": "通算10日プレイする。連続でなくてもよい。",
+    "description": "通算7日プレイする。連続でなくてもよい。",
     "requirement": {
-      "days": 10,
+      "days": 7,
       "type": "active_days"
     },
-    "display_name": "TEN DAY JOURNEY"
+    "display_name": "SEVEN DAY JOURNEY"
   },
   {
     "id": "streak_60",
     "hidden": false,
     "points": 300,
     "category": "streak",
-    "description": "通算20日プレイする。連続でなくてもよい。",
+    "description": "通算15日プレイする。連続でなくてもよい。",
     "requirement": {
-      "days": 20,
+      "days": 15,
       "type": "active_days"
     },
-    "display_name": "TWENTY DAY CONSTELLATION"
+    "display_name": "FIFTEEN DAY CONSTELLATION"
   },
   {
     "id": "all_modes_perfect_30",
     "hidden": false,
     "points": 300,
     "category": "mode",
-    "description": "主要5モードそれぞれで30問以上・全問正解（EAR LINKは15問以上）。累計100プレイ・通算14日以上。",
+    "description": "主要5モードそれぞれで30問以上・全問正解（EAR LINKは15問以上）。累計100プレイ。",
     "requirement": {
       "type": "all_modes_perfect",
       "modes": [
@@ -548,7 +520,6 @@
       ],
       "min_answers": 30,
       "min_sessions": 100,
-      "min_active_days": 14,
       "mode_min_answers": {
         "EAR_LINK": 15
       }
@@ -560,14 +531,13 @@
     "hidden": false,
     "points": 250,
     "category": "accuracy",
-    "description": "EAR LINKで20問以上・全問正解を3回。累計75プレイ・通算10日以上。",
+    "description": "EAR LINKで20問以上・全問正解を3回。累計75プレイ。",
     "requirement": {
       "mode": "EAR_LINK",
       "type": "perfect_session",
       "min_answers": 20,
       "min_sessions": 75,
-      "repeat_count": 3,
-      "min_active_days": 10
+      "repeat_count": 3
     },
     "display_name": "DEEP LISTENER"
   }

@@ -159,57 +159,57 @@
   "daily": [
     {
       "name": "PRECISION CHECK",
-      "points": 40,
+      "points": 80,
       "description": "5問以上・正答率90%以上のセッションを1回完了する。"
     },
     {
       "name": "15 CONTACTS",
-      "points": 30,
+      "points": 60,
       "description": "今日15問回答する。"
     },
     {
       "name": "COMBO 5",
-      "points": 30,
+      "points": 60,
       "description": "今日の最大コンボ5に到達する。"
     },
     {
       "name": "10 CLEAR SIGNALS",
-      "points": 30,
+      "points": 60,
       "description": "今日10問正解する。"
     },
     {
       "name": "EAR SIGNAL",
-      "points": 40,
+      "points": 80,
       "description": "今日EAR LINKを1回プレイする。"
     },
     {
       "name": "HYPER SPARK",
-      "points": 40,
+      "points": 80,
       "description": "今日HYPER DRIVEを1回プレイする。"
     },
     {
       "name": "KEYS ORBIT",
-      "points": 30,
+      "points": 60,
       "description": "今日KEYSを1セッションプレイする。"
     },
     {
       "name": "CLEAN RUN",
-      "points": 40,
+      "points": 80,
       "description": "5問以上のセッションを正答率100%で1回完了する。"
     },
     {
       "name": "WARM UP ORBIT",
-      "points": 30,
+      "points": 60,
       "description": "今日2セッションプレイする。"
     },
     {
       "name": "TEXT ORBIT",
-      "points": 30,
+      "points": 60,
       "description": "今日TEXTを1セッションプレイする。"
     },
     {
       "name": "DUAL ROUTE",
-      "points": 40,
+      "points": 80,
       "description": "今日2種類のモードをプレイする。"
     }
   ]
