@@ -55,3 +55,5 @@ assert.equal((upgrade.match(/if not public\.is_current_admin\(\) then/g)||[]).le
 assert(upgrade.includes("p.account_type = 'student' or p.id = public.current_player_id()"));
 assert(upgrade.includes("v_target.account_type <> 'student' and v_target.id <> public.current_player_id()"));
 console.log('PASS admin-only student view, account switch reset, retained authorization and restricted self-management SQL');
+
+assert(upgrade.includes("p_course_code is null and v_target.account_type <> 'staff'"), 'Staff may retain an unset course; students still require one');

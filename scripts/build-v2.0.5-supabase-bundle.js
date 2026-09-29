@@ -23,8 +23,7 @@ const files = [
   'supabase/migrations/20260927094923_ranking_private_bests_rls.sql',
   'supabase/migrations/20260927095714_suspended_admin_guard.sql',
   'supabase/migrations/20260927103943_suspended_account_actions.sql',
-  'sql/progression-mastery-v2.0.5.sql',
-  'sql/admin-self-management-v2.0.5.sql',
+  'supabase/migrations/20260929105007_additive_mastery_and_admin_self_management.sql',
 ];
 
 for (const relative of files) {

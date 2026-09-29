@@ -10,7 +10,7 @@ assert(read('phase3-v205.js').includes("avatar.dataset.artAvatar !== (row.avatar
 assert(read('phase11-frames-v205.css').includes('prefers-reduced-motion:reduce'));
 console.log('PASS 25 safe avatar identities, 11 course assets, catalog coverage, offline cache, repeated ranking render guard, reduced motion');
 
-assert.equal(art.achievements.length,31);
+assert.equal(art.achievements.length,39);
 for(const id of art.achievements){
  const svg=read(`assets/art/v1/achievements/${id}.svg`);
  assert(!/<script|<image|https?:\/\/(?!www.w3.org)/.test(svg));
@@ -25,4 +25,4 @@ const renderContext={window:ctx.window,LABELS:{},esc:s=>s};vm.createContext(rend
 const secret=renderContext.achievementHTML({achievements:[{id:'hidden_singularity',hidden:true,unlocked:false,name:'SECRET NAME',description:'SECRET CONDITION'}]});
 assert(!secret.includes('SECRET NAME'));assert(!secret.includes('SECRET CONDITION'));assert(!secret.includes('.svg'));assert(secret.includes('CONDITION ???'));
 const visible=renderContext.achievementHTML({achievements:[{id:'first_signal',unlocked:true,name:'FIRST SIGNAL'}]});assert(visible.includes('first_signal.svg'));assert(visible.includes('data-v205-feature'));
-console.log('PASS 31 achievement badges, concealed secret artwork and text, unlocked feature control');
+console.log('PASS 39 achievement badges, concealed secret artwork and text, unlocked feature control');

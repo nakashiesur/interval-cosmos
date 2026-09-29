@@ -92,7 +92,7 @@
           <div class="v205-admin-manage-title"><div><h3>PROFILE</h3><span>プレイヤープロフィール</span></div></div>
           <div class="v205-admin-manage-fields">
             <label><span>プレイヤー名</span><input id="v205AdminManageName" maxlength="16" value="${esc(player.player_name || '')}"></label>
-            <label><span>所属コース</span><select id="v205AdminManageCourse">${courses.map(row=>`<option value="${esc(row.code)}" ${row.code===player.course_code?'selected':''}>${esc(row.display_name)}</option>`).join('')}</select></label>
+            <label><span>所属コース</span><select id="v205AdminManageCourse">${player.account_type==='staff'?`<option value="" ${!player.course_code?'selected':''}>未設定</option>`:''}${courses.map(row=>`<option value="${esc(row.code)}" ${row.code===player.course_code?'selected':''}>${esc(row.display_name)}</option>`).join('')}</select></label>
             <label><span>アバター</span><select id="v205AdminManageAvatar">${avatars.map(row=>`<option value="${esc(row.id)}" ${row.id===player.avatar_id?'selected':''}>${esc(row.display_name || row.id)}</option>`).join('')}</select></label>
           </div>
           <button type="button" class="primary-btn" data-v205-admin-save-profile>変更を保存</button>
@@ -176,7 +176,7 @@
 
   async function saveProfile(){
     const name=document.getElementById('v205AdminManageName')?.value?.trim() || '';
-    const course=document.getElementById('v205AdminManageCourse')?.value || '';
+    const course=document.getElementById('v205AdminManageCourse')?.value || null;
     const avatar=document.getElementById('v205AdminManageAvatar')?.value || '';
     await rpc('admin_update_player_profile',{p_player_id:currentPlayerId,p_player_name:name,p_course_code:course,p_avatar_id:avatar});
     setMessage('プロフィールを更新しました。');
@@ -225,7 +225,7 @@
     button.type='button';
     button.className='secondary-btn v205-admin-manage-open';
     button.dataset.v205AdminManageOpen='1';
-    button.textContent='⚙ MANAGE STUDENT';
+    button.textContent='⚙ データを管理';
     detail.appendChild(button);
   }
 
