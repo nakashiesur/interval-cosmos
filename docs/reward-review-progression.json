@@ -62,7 +62,7 @@
         "type": "achievement_combo",
         "requires_frame": "cosmic"
       },
-      "points": 5000
+      "points": 6500
     },
     {
       "id": "supernova",
@@ -76,7 +76,7 @@
         "type": "achievement_combo",
         "requires_frame": "aurora"
       },
-      "points": 7000
+      "points": 10000
     },
     {
       "id": "event_horizon",
@@ -89,7 +89,7 @@
         "type": "achievement_combo",
         "requires_frame": "supernova"
       },
-      "points": 9000
+      "points": 13500
     },
     {
       "id": "pulsar",
@@ -103,7 +103,7 @@
         "type": "achievement_combo",
         "requires_frame": "event_horizon"
       },
-      "points": 11500
+      "points": 17500
     },
     {
       "id": "omega",
@@ -153,7 +153,7 @@
         "type": "achievement_combo",
         "requires_frame": "pulsar"
       },
-      "points": 14500
+      "points": 23500
     }
   ],
   "daily": [

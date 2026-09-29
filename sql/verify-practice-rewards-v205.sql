@@ -5,9 +5,9 @@ insert into public.players(id,account_type,player_name,avatar_id) values(gen_ran
 insert into public.player_devices(auth_user_id,player_id) values(current_setting('ic.qa_auth')::uuid,current_setting('ic.qa_player')::uuid);
 select set_config('request.jwt.claim.sub',current_setting('ic.qa_auth'),true);
 update public.mode_clear_reward_catalog set enabled_from=now()-interval '2 days';
--- Same-day duplicate plays; EAR uses its lower answer threshold. All five total 240 PT.
+-- Same-day duplicate plays; EAR uses its lower answer threshold. Six attempts in each mode still earn only five awards, totaling 600 PT.
 insert into public.play_sessions(client_event_id,player_id,mode,score,total_answers,correct_answers,played_at)
-select gen_random_uuid(),current_setting('ic.qa_player')::uuid,mode,0,min_answers,ceil(min_answers*.5)::integer,now() from public.mode_clear_reward_catalog cross join generate_series(1,2);
+select gen_random_uuid(),current_setting('ic.qa_player')::uuid,mode,0,min_answers,ceil(min_answers*.5)::integer,now() from public.mode_clear_reward_catalog cross join generate_series(1,6);
 -- A delayed offline record qualifies on its played date, not its upload date.
 insert into public.play_sessions(client_event_id,player_id,mode,score,total_answers,correct_answers,played_at)
 values(gen_random_uuid(),current_setting('ic.qa_player')::uuid,'TEXT',0,10,5,now()-interval '1 day');
@@ -21,17 +21,19 @@ insert into public.play_sessions(client_event_id,player_id,mode,source,score,tot
 -- Simulate a daily award already earned at the old rate.
 insert into public.player_daily_mission_progress(player_id,mission_date,slot,mission_id,progress,completed,completed_at,reward_points_awarded)
 values(current_setting('ic.qa_player')::uuid,current_date-100,1,'daily_text',1,true,now(),10);
+insert into public.player_achievements(player_id,achievement_id,points_awarded) values(current_setting('ic.qa_player')::uuid,'streak_30',200);
 set local role authenticated;
 do $test$ declare n integer; total integer; result jsonb; begin
  result:=public.get_my_cosmos_progress();
+ if (select points_awarded from public.player_achievements where player_id=public.current_player_id() and achievement_id='streak_30')<>200 then raise exception 'Old achievement reward decreased'; end if;
  select count(*),sum(reward_points) into n,total from public.player_mode_clear_rewards where player_id=public.current_player_id();
- if n<>6 or total<>280 then raise exception 'Daily mode cap/offline/boundary failure: %, %',n,total; end if;
- if (result->'point_breakdown'->>'mode_clear')::integer<>280 then raise exception 'Mode points missing in UI'; end if;
+ if n<>26 or total<>620 then raise exception 'Daily mode cap/offline/boundary failure: %, %',n,total; end if;
+ if (result->'point_breakdown'->>'mode_clear')::integer<>620 then raise exception 'Mode points missing in UI'; end if;
  if jsonb_array_length(result->'mode_clear_rewards')<>5 then raise exception 'Missing mode cards'; end if;
  perform public.get_my_cosmos_progress();
- if (select sum(reward_points) from public.player_mode_clear_rewards where player_id=public.current_player_id())<>280 then raise exception 'Repeated evaluation double-awarded'; end if;
+ if (select sum(reward_points) from public.player_mode_clear_rewards where player_id=public.current_player_id())<>620 then raise exception 'Repeated evaluation double-awarded'; end if;
  if (select reward_points_awarded from public.player_daily_mission_progress where player_id=public.current_player_id() and mission_date=current_date-100)<>10 then raise exception 'Old daily award changed'; end if;
- if (select achievement_points from public.players where id=public.current_player_id())<>(result->'point_breakdown'->>'achievements')::integer+(result->'point_breakdown'->>'daily')::integer+280 then raise exception 'Total PT mismatch'; end if;
+ if (select achievement_points from public.players where id=public.current_player_id())<>(result->'point_breakdown'->>'achievements')::integer+(result->'point_breakdown'->>'daily')::integer+620 then raise exception 'Total PT mismatch'; end if;
  begin
  insert into public.player_mode_clear_rewards(player_id,reward_date,mode,reward_points) values(public.current_player_id(),current_date+10,'TEXT',1000);
  raise exception 'Client could forge PT';

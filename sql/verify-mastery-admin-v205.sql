@@ -46,7 +46,7 @@ if exists(select 1 from public.player_frames where player_id=public.current_play
 end; $test$;
 reset role;
 insert into public.player_mode_clear_rewards(player_id,reward_date,mode,reward_points)
-values(current_setting('ic.qa_player')::uuid,current_date-1000,'TEXT',5000);
+values(current_setting('ic.qa_player')::uuid,current_date-1000,'TEXT',6500);
 
 set local role authenticated;
 do $test$ begin
@@ -113,7 +113,7 @@ for r in select * from public.achievement_catalog where sort_order between 1100 
 end loop;
 delete from public.play_sessions where player_id=p;
 end; $test$;
-update public.player_mode_clear_rewards set reward_points=15000 where player_id=current_setting('ic.qa_player')::uuid and reward_date=current_date-1000;
+update public.player_mode_clear_rewards set reward_points=25000 where player_id=current_setting('ic.qa_player')::uuid and reward_date=current_date-1000;
 insert into public.player_achievements(player_id,achievement_id)
 select current_setting('ic.qa_player')::uuid,id from public.achievement_catalog where id<>'streak_60' and is_active on conflict do nothing;
 set local role authenticated;

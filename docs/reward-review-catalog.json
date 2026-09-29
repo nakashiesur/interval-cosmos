@@ -285,7 +285,7 @@
   {
     "id": "streak_7",
     "hidden": false,
-    "points": 80,
+    "points": 150,
     "category": "streak",
     "description": "7日連続でプレイする。",
     "requirement": {
@@ -297,7 +297,7 @@
   {
     "id": "streak_14",
     "hidden": false,
-    "points": 160,
+    "points": 300,
     "category": "streak",
     "description": "10日連続でプレイする。",
     "requirement": {
@@ -311,11 +311,15 @@
     "hidden": false,
     "points": 20,
     "category": "ranking",
-    "description": "ランキングへ記録を公開する。累計10回プレイ。",
+    "description": "ランキングへ記録を公開する、または20問以上・正答率90%以上を5回（EAR LINKは10問以上）。累計10回プレイ。",
     "requirement": {
       "rank": 999999,
       "type": "public_rank",
-      "min_sessions": 10
+      "min_sessions": 10,
+      "precision_runs": 5,
+      "precision_min_answers": 20,
+      "precision_min_accuracy": 90,
+      "precision_ear_min_answers": 10
     },
     "display_name": "OPEN CHANNEL"
   },
@@ -324,11 +328,15 @@
     "hidden": false,
     "points": 80,
     "category": "ranking",
-    "description": "殿堂ランキング10位以内に入る。累計50回プレイ。",
+    "description": "殿堂ランキング10位以内に入る、または20問以上・正答率90%以上を15回（EAR LINKは10問以上）。累計50回プレイ。",
     "requirement": {
       "rank": 10,
       "type": "public_rank",
-      "min_sessions": 50
+      "min_sessions": 50,
+      "precision_runs": 15,
+      "precision_min_answers": 20,
+      "precision_min_accuracy": 90,
+      "precision_ear_min_answers": 10
     },
     "display_name": "TOP TEN"
   },
@@ -337,11 +345,15 @@
     "hidden": false,
     "points": 120,
     "category": "ranking",
-    "description": "殿堂ランキング3位以内に入る。累計100回プレイ。",
+    "description": "殿堂ランキング3位以内に入る、または20問以上・正答率90%以上を30回（EAR LINKは10問以上）。累計100回プレイ。",
     "requirement": {
       "rank": 3,
       "type": "public_rank",
-      "min_sessions": 100
+      "min_sessions": 100,
+      "precision_runs": 30,
+      "precision_min_answers": 20,
+      "precision_min_accuracy": 90,
+      "precision_ear_min_answers": 10
     },
     "display_name": "PODIUM"
   },
@@ -350,11 +362,15 @@
     "hidden": false,
     "points": 200,
     "category": "ranking",
-    "description": "殿堂ランキング1位以内に入る。累計150回プレイ。",
+    "description": "殿堂ランキング1位以内に入る、または20問以上・正答率90%以上を50回（EAR LINKは10問以上）。累計150回プレイ。",
     "requirement": {
       "rank": 1,
       "type": "public_rank",
-      "min_sessions": 150
+      "min_sessions": 150,
+      "precision_runs": 50,
+      "precision_min_answers": 20,
+      "precision_min_accuracy": 90,
+      "precision_ear_min_answers": 10
     },
     "display_name": "NUMBER ONE"
   },
@@ -444,10 +460,10 @@
     "hidden": false,
     "points": 300,
     "category": "basic",
-    "description": "累計500回プレイする。",
+    "description": "累計450回プレイする。",
     "requirement": {
       "type": "sessions",
-      "count": 500
+      "count": 450
     },
     "display_name": "DEEP SPACE LEGEND"
   },
@@ -482,7 +498,7 @@
   {
     "id": "streak_30",
     "hidden": false,
-    "points": 200,
+    "points": 80,
     "category": "streak",
     "description": "通算7日プレイする。連続でなくてもよい。",
     "requirement": {
@@ -494,7 +510,7 @@
   {
     "id": "streak_60",
     "hidden": false,
-    "points": 300,
+    "points": 150,
     "category": "streak",
     "description": "通算15日プレイする。連続でなくてもよい。",
     "requirement": {
