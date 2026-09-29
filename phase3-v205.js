@@ -27,6 +27,7 @@
   let lastSubmitResult = null;
   let rankingCache = [];
   let rankingCacheScope = null;
+  let rankingCachePeriod = null;
   let promptScheduledFor = null;
   let enhanceQueued = false;
   let publicationPending = false;
@@ -114,6 +115,7 @@
     cloud.fetchRankings = async args => {
       const result = await originalFetch(args);
       rankingCache = Array.isArray(result?.rows) ? result.rows : [];
+      rankingCachePeriod = result?.period;
       rankingCacheScope = `${args?.mode || ''}:${args?.scope || ''}`;
       queueEnhance();
       return result;
@@ -368,6 +370,15 @@
       if (rankNode && rankNode.textContent !== rankLabel) rankNode.textContent = rankLabel;
 
       node.dataset.v205PlayerId = row.player_id || row.user_id || '';
+      const canDelete=currentProfile()?.is_admin&&!window.IntervalCosmosAssignmentAdminPolicyV205?.isStudentView();
+      let trash=node.querySelector('[data-rank-delete]');
+      if(!canDelete) trash?.remove();
+      else if(rankingCachePeriod&&row.updated_at){
+        if(!trash){trash=document.createElement('button');trash.type='button';trash.className='ic-rank-trash';trash.setAttribute('aria-label','長押しでランキングから削除');trash.title='長押しで削除';trash.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 10v8M14 10v8"/></svg>';node.append(trash);}
+        const value=JSON.stringify({id:row.player_id,mode:rankingCacheScope.split(':')[0],period:rankingCachePeriod,score:Number(row.score),updated:row.updated_at,name:row.player_name});
+        if(trash.dataset.rankDelete!==value)trash.dataset.rankDelete=value;
+      }
+
       node.classList.add(`v205-frame-${row.equipped_frame_id || 'normal'}`);
 
       const avatar = node.querySelector('.rank-avatar');
@@ -492,6 +503,7 @@
       return;
     }
 
+    if(event.target.closest?.('[data-rank-delete]'))return;
     const row = event.target.closest?.('.ranking-row[data-v205-player-id]');
     if (row?.dataset.v205PlayerId) {
       openProfileCard(row.dataset.v205PlayerId);
@@ -504,6 +516,7 @@
   window.addEventListener('keydown', event => {
     if (event.repeat || event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
 
+    if(event.target.closest?.('[data-rank-delete]'))return;
     const focusedRow = event.target?.closest?.('.ranking-row[data-v205-player-id]');
     if (focusedRow && (event.key === 'Enter' || event.key === ' ')) {
       event.preventDefault();

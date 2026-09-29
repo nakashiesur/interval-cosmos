@@ -1,5 +1,7 @@
-const CACHE = 'interval-cosmos-v2-0-5-beta-1-10';
+const CACHE = 'interval-cosmos-v2-0-5-beta-1-11';
 const ASSETS = [
+  './icon-180.png','./icon-192.png','./icon-512.png',
+  './ranking-admin-v205.js','./install-app-v205.js','./app-actions-v205.css',
   './app-update-v205.js', './update-required.html', './update-required.js',
   './guest-sessions-v205.js', './phase10-device-fixes-v205.css',
   './assets/art/v1/frames/normal.svg',
@@ -86,6 +88,10 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
+
+  if (url.origin === self.location.origin && url.pathname.endsWith('/release.json')) {
+    event.respondWith(fetch(event.request,{cache:'no-store'}));return;
+  }
 
   if (url.pathname.endsWith('/cloud-config.js')) {
     event.respondWith(fetch(event.request, { cache: 'no-store' }).then(response => {
