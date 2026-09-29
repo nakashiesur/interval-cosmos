@@ -1,7 +1,7 @@
 const cloud = window.IntervalCosmosCloud || null;
 const appRoot = document.querySelector('#app');
 
-const VERSION = '2.0.5-beta.1.11';
+const VERSION = '2.0.5-beta.1.12';
 window.IntervalCosmosVersion = VERSION;
 const COURSES = [
   { code: 'piano', department: '音楽学科', name: 'ピアノコース' },
@@ -79,7 +79,7 @@ function loadingScreen(message = 'ONLINE SYSTEM INITIALIZING') {
 }
 
 function showChooser() {
-  panel(`${header('FIRST CONTACT', 'PLAYER ACCESS', 'あなたのプレイ方法を選択してください。')}
+  panel(`${header('FIRST CONTACT', 'PLAYER ACCESS', '登録済みの方は「すでにアカウントがある」を選択。ホーム画面版でも同じ記録を引き継げます。')}
     <div class="ic-account-choice-grid">
       <button class="ic-account-choice primary" data-v205-action="student">
         <span class="ic-choice-mark">01</span><strong>学生として登録</strong><small>学籍番号・所属コースを登録して、記録をオンライン同期</small>

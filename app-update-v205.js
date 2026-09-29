@@ -1,5 +1,5 @@
 (() => {
-  const VERSION='beta.1.11';
+  const VERSION='beta.1.12';
   const root=new URL('./',document.currentScript.src);
   let checking=false, updateDialog=null;
   function showUpdate(){

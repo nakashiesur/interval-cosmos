@@ -1,5 +1,6 @@
-const CACHE = 'interval-cosmos-v2-0-5-beta-1-11';
+const CACHE = 'interval-cosmos-v2-0-5-beta-1-12';
 const ASSETS = [
+  './mode-rewards-ui-v205.js',
   './icon-180.png','./icon-192.png','./icon-512.png',
   './ranking-admin-v205.js','./install-app-v205.js','./app-actions-v205.css',
   './app-update-v205.js', './update-required.html', './update-required.js',

@@ -32,6 +32,7 @@ const files = [
   'supabase/migrations/20260929131914_admin_private_identity.sql',
   'supabase/migrations/20260929140541_progressive_frame_reveal.sql',
   'supabase/migrations/20260929142912_admin_ranking_entry_delete.sql',
+  'supabase/migrations/20260929150241_mode_reward_receipts.sql',
 ];
 
 for (const relative of files) {
