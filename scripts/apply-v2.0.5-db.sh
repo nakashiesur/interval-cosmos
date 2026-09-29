@@ -33,6 +33,13 @@ FILES=(
   "supabase/migrations/20260927094923_ranking_private_bests_rls.sql"
   "supabase/migrations/20260927095714_suspended_admin_guard.sql"
   "supabase/migrations/20260927103943_suspended_account_actions.sql"
+  "supabase/migrations/20260929105007_additive_mastery_and_admin_self_management.sql"
+  "supabase/migrations/20260929111219_prospective_reward_balance.sql"
+  "supabase/migrations/20260929113538_attainable_progression_and_frame_order.sql"
+  "supabase/migrations/20260929115249_balanced_practice_rewards.sql"
+  "supabase/migrations/20260929125320_first_day_progression.sql"
+  "supabase/migrations/20260929130548_repeated_mode_rewards.sql"
+  "supabase/migrations/20260929131914_admin_private_identity.sql"
 )
 
 if grep -q '__TOO_LARGE_PLACEHOLDER__' "$ROOT_DIR/supabase_setup.sql"; then

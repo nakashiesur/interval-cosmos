@@ -14,7 +14,7 @@ const sw=fs.readFileSync(path.join(__dirname,'..','sw.js'),'utf8');
 const tests=[
   ['assignment management corrected to admin-only', adminSql.includes('select p.is_admin and not p.is_suspended') && !adminSql.includes("p.account_type = 'staff' or p.is_admin")],
   ['ordinary staff routed as normal player', adminPolicy.includes("player.account_type === 'staff'") && adminPolicy.includes("account_type: 'student'")],
-  ['admin routed to management view', adminPolicy.includes('player.is_admin') && adminPolicy.includes("account_type: 'staff'")],
+  ['admin routed to management view', adminPolicy.includes('player.is_admin') && adminPolicy.includes("is_admin: !isStudentView()")],
   ['teacher helper direct browser access revoked', adminSql.includes('from public, anon, authenticated')],
   ['assignment create rpc', sql.includes('create or replace function public.create_assignment(')],
   ['published toggle rpc', sql.includes('set_assignment_published')],
@@ -56,14 +56,14 @@ process.exitCode=fail?1:0;
   const vm=require('vm'),assert=require('assert');
   const source=fs.readFileSync(path.join(__dirname,'..','phase6-assignments-v205.js'),'utf8');
   const route=source.slice(source.indexOf('  async function openAssignments(){'),source.indexOf('  async function renderStudent(){'));
-  for(const cached of [true,false]){
+  for(const studentView of [false,true]) for(const cached of [true,false]){
     for(const profile of [{account_type:'staff',is_admin:false},{account_type:'student',is_admin:false},{account_type:'staff',is_admin:true},{account_type:'student',is_admin:true}]){
       let destination='';
-      const ctx={raf:1,audio:null,game:{},currentAssignment:{},cancelAnimationFrame(){},loading(){},console,
+      const ctx={window:{IntervalCosmosAssignmentAdminPolicyV205:{isStudentView:()=>profile.is_admin&&studentView}},raf:1,audio:null,game:{},currentAssignment:{},cancelAnimationFrame(){},loading(){},console,
         cloud:{getCachedPlayer:()=>cached?profile:null,getMyPlayer:async()=>profile},
         renderTeacher:async()=>{destination='admin'},renderStudent:async()=>{destination='player'},errorView:e=>{throw e}};
       vm.createContext(ctx);vm.runInContext(route,ctx);await ctx.openAssignments();
-      assert.equal(destination,profile.is_admin?'admin':'player');assert.equal(ctx.game,null);
+      assert.equal(destination,profile.is_admin&&!studentView?'admin':'player');assert.equal(ctx.game,null);
     }
   }
   console.log('PASS internal assignment return routes use admin permission for cached and refreshed profiles');

@@ -83,3 +83,47 @@ process.exitCode=fail?1:0;
   const failing=ctx.open();ctx.close();requests[3].reject(Error('late error'));await failing;assert.equal(renders.length,1);
   console.log('PASS closed/reopened MY COSMOS ignores stale loads, refreshes, errors and cache writes');
 })().catch(error=>{console.error(error);process.exitCode=1});
+
+// The expansion must not rewrite earned rewards, and the pinnacle must include
+// every achievement from the original catalog and this expansion exactly once.
+{
+ const assert=require('node:assert/strict');
+ const expansion=fs.readFileSync(path.join(__dirname,'../sql/progression-mastery-v2.0.5.sql'),'utf8');
+ const original=fs.readFileSync(path.join(__dirname,'../sql/progression-v2.0.5.sql'),'utf8').split('insert into public.achievement_catalog')[1].split('on conflict')[0];
+ const originalIds=[...original.matchAll(/^  \('([^']+)'/gm)].map(m=>m[1]);
+ const additions=expansion.split('insert into public.achievement_catalog')[1].split('on conflict')[0];
+ const newIds=[...additions.matchAll(/^\('([^']+)'/gm)].map(m=>m[1]);
+ const omega=expansion.split("('omega','OMEGA'")[1];
+ const ids=JSON.parse(omega.match(/'(\{"type".*?\})'::jsonb/)[1]).ids;
+ assert.equal(newIds.length,8);assert.equal(ids.length,39);assert.equal(new Set(ids).size,39);
+ for(const id of [...originalIds,...newIds])assert(ids.includes(id));
+ assert(!/\b(delete|update|truncate)\b/i.test(expansion));
+ assert(!/player_achievements|player_frames|player_titles/.test(expansion));
+ console.log('PASS additive mastery catalog preserves earned rewards; OMEGA requires all 39 achievements');
+}
+
+{
+ const assert=require('node:assert/strict');
+ const balance=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20260929111219_prospective_reward_balance.sql'),'utf8');
+ assert(balance.includes("min_active_days"));assert(balance.includes("repeat_count"));
+ assert(balance.includes("COSMO SOVEREIGN"));
+ assert(!/(?:update|delete from|insert into|truncate)\s+public\.player_(?:achievements|frames|titles)/i.test(balance));
+ assert(!/set\s+points\s*=/.test(balance));
+ const firstUpdate=balance.match(/update public.achievement_catalog[^;]*where id='first_signal'/);
+ assert.equal(firstUpdate,null,'The first-session welcome reward is retained');
+ console.log('PASS prospective balance preserves earned rows, points and first-session reward');
+}
+
+{
+ const assert=require('node:assert/strict');
+ const source=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20260929113538_attainable_progression_and_frame_order.sql'),'utf8');
+ const catalog=JSON.parse(fs.readFileSync(path.join(__dirname,'../docs/reward-review-catalog.json'),'utf8'));
+ assert.equal(catalog.length,39);
+ assert(catalog.every(a=>!a.requirement.min_active_days),'Only dedicated day achievements require dates');
+ assert.equal(Math.max(...catalog.filter(a=>a.requirement.type==='combo').map(a=>a.requirement.value)),45);
+ assert.equal(Math.max(...catalog.filter(a=>a.requirement.type==='streak_days').map(a=>a.requirement.days)),10);
+ assert.deepEqual(catalog.filter(a=>a.requirement.type==='active_days').map(a=>a.requirement.days),[7,15]);
+ assert(source.includes('requires_frame'));assert(source.includes('order by tier,sort_order,id'));
+ assert(!/(delete from|truncate)\s+public\.player_(achievements|frames|titles)/i.test(source));
+ console.log('PASS predecessor frame ordering and attainable review catalog limits');
+}

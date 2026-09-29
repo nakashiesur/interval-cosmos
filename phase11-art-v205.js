@@ -2,7 +2,7 @@
   'use strict';
   const avatars = 'nova orbit pulse prism comet nebula vector echo quasar lumen wave aster luna flora lyra ribbon aria gem charm bloom sonata parfait letter auris teacher'.split(' ');
   const courses = 'piano orchestral vocal_musical composition rock_pops electronic_organ sound_design music_education music_therapy child_culture voice_actor'.split(' ');
-  const achievements = 'first_signal sessions_5 sessions_20 sessions_50 sessions_100 perfect_5 perfect_10 perfect_20 combo_5 combo_10 combo_20 combo_30 text_10 keys_10 hyper_first ear_first all_modes interval_all_seen interval_80 interval_90 streak_3 streak_7 streak_14 public_record rank_top10 rank_podium rank_first hidden_ear_perfect hidden_all_mode_perfect hidden_combo_50 hidden_singularity'.split(' ');
+  const achievements = 'first_signal sessions_5 sessions_20 sessions_50 sessions_100 perfect_5 perfect_10 perfect_20 combo_5 combo_10 combo_20 combo_30 text_10 keys_10 hyper_first ear_first all_modes interval_all_seen interval_80 interval_90 streak_3 streak_7 streak_14 public_record rank_top10 rank_podium rank_first hidden_ear_perfect hidden_all_mode_perfect hidden_combo_50 hidden_singularity sessions_250 sessions_1000 perfect_40 combo_100 streak_30 streak_60 all_modes_perfect_30 ear_perfect_40'.split(' ');
   const achievementHTML = (id, {hidden = false, unlocked = false} = {}) => {
     if ((hidden || String(id).startsWith('hidden_')) && !unlocked) return '?';
     return achievements.includes(id) ? `<img class="v205-achievement-image" src="assets/art/v1/achievements/${id}.svg" width="40" height="40" alt="" draggable="false">` : (unlocked ? '✓' : '·');

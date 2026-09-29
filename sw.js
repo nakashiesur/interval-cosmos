@@ -1,5 +1,6 @@
-const CACHE = 'interval-cosmos-v2-0-5-beta-1-2';
+const CACHE = 'interval-cosmos-v2-0-5-beta-1-9';
 const ASSETS = [
+  './app-update-v205.js', './update-required.html', './update-required.js',
   './guest-sessions-v205.js', './phase10-device-fixes-v205.css',
   './assets/art/v1/frames/normal.svg',
   './assets/art/v1/frames/normal-still.svg',
@@ -47,12 +48,22 @@ const ASSETS = [
   './assets/art/v1/achievements/hidden_all_mode_perfect.svg',
   './assets/art/v1/achievements/hidden_combo_50.svg',
   './assets/art/v1/achievements/hidden_singularity.svg',
+  './assets/art/v1/achievements/sessions_250.svg',
+  './assets/art/v1/achievements/sessions_1000.svg',
+  './assets/art/v1/achievements/perfect_40.svg',
+  './assets/art/v1/achievements/combo_100.svg',
+  './assets/art/v1/achievements/streak_30.svg',
+  './assets/art/v1/achievements/streak_60.svg',
+  './assets/art/v1/achievements/all_modes_perfect_30.svg',
+  './assets/art/v1/achievements/ear_perfect_40.svg',
+
 
   './phase11-art-v205.js', './phase11-art-v205.css',
   './assets/art/v1/avatars/aria.svg', './assets/art/v1/avatars/aster.svg', './assets/art/v1/avatars/auris.svg', './assets/art/v1/avatars/bloom.svg', './assets/art/v1/avatars/charm.svg', './assets/art/v1/avatars/comet.svg', './assets/art/v1/avatars/echo.svg', './assets/art/v1/avatars/flora.svg', './assets/art/v1/avatars/gem.svg', './assets/art/v1/avatars/letter.svg', './assets/art/v1/avatars/lumen.svg', './assets/art/v1/avatars/luna.svg', './assets/art/v1/avatars/lyra.svg', './assets/art/v1/avatars/nebula.svg', './assets/art/v1/avatars/nova.svg', './assets/art/v1/avatars/orbit.svg', './assets/art/v1/avatars/parfait.svg', './assets/art/v1/avatars/prism.svg', './assets/art/v1/avatars/pulse.svg', './assets/art/v1/avatars/quasar.svg', './assets/art/v1/avatars/ribbon.svg', './assets/art/v1/avatars/sonata.svg', './assets/art/v1/avatars/teacher.svg', './assets/art/v1/avatars/vector.svg', './assets/art/v1/avatars/wave.svg', './assets/art/v1/courses/child_culture.svg', './assets/art/v1/courses/composition.svg', './assets/art/v1/courses/electronic_organ.svg', './assets/art/v1/courses/music_education.svg', './assets/art/v1/courses/music_therapy.svg', './assets/art/v1/courses/orchestral.svg', './assets/art/v1/courses/piano.svg', './assets/art/v1/courses/rock_pops.svg', './assets/art/v1/courses/sound_design.svg', './assets/art/v1/courses/vocal_musical.svg', './assets/art/v1/courses/voice_actor.svg',
   './phase11-frames-v205.css', './assets/art/v1/frames/supernova.svg', './assets/art/v1/frames/supernova-still.svg', './assets/art/v1/frames/event_horizon.svg', './assets/art/v1/frames/event_horizon-still.svg',
   './offline-outbox-v205.js', './offline-sync-ui-v205.js', './offline-sync-v205.css',
   './phase10-cosmos-folders-v205.js', './phase10-cosmos-folders-v205.css',
+  './assets/art/v1/frames/pulsar.svg', './assets/art/v1/frames/pulsar-still.svg', './assets/art/v1/frames/omega.svg', './assets/art/v1/frames/omega-still.svg',
   './', './index.html', './styles.css', './account-v205.css', './phase2-recovery-v205.css', './phase3-v205.css', './phase4-v205.css', './phase4-hotfix-v205.css', './phase5-v205.css', './phase6-assignments-v205.css', './phase6-multimode-v205.css', './phase6-game-layout-v205.css', './phase7-admin-dashboard-v205.css', './phase8-admin-player-management-v205.css', './phase8-pc-controls-v205.css', './phase8-config-polish-v205.css', './phase10-ui-foundation-v205.css', './phase10-header-polish-v205.css', './phase10-practice-polish-v205.css', './phase10-result-polish-v205.css', './phase10-cosmos-polish-v205.css', './phase10-history-polish-v205.css', './phase10-history-folders-v205.css', './phase10-assignment-polish-v205.css',
   './learning-sync-v205.js', './account-gate.js', './supabase-singleton-v205.js', './phase9-staff-registration-v205.js', './phase2-recovery-v205-fixed.js', './runtime-v205.js', './phase3-ranking-hotfix-v205.js', './phase3-v205.js', './phase4-hotfix-v205.js', './phase4-v205.js', './phase4-analysis-hotfix-v205.js', './phase5-progression-v205.js', './phase5-unlock-copy-hotfix-v205.js', './phase5-scroll-retention-v205.js', './phase6-admin-policy-v205.js', './phase6-multimode-v205.js', './phase6-assignments-v205.js', './phase7-admin-dashboard-v205.js', './phase7-admin-home-dock-v205.js', './phase8-admin-player-management-v205.js', './phase8-pc-controls-v205.js', './phase8-config-polish-v205.js', './phase0-wallclock-v205.js', './phase10-ui-foundation-v205.js', './phase10-history-folders-v205.js', './app.js', './cloud.js',
   './nakashima-logo.png', './icon.svg', './manifest.webmanifest'
@@ -63,11 +74,21 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key.startsWith('interval-cosmos-') && key !== CACHE).map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    const old = keys.filter(key => key.startsWith('interval-cosmos-') && key !== CACHE);
+    // Only already-controlled application windows are upgraded, never unrelated tabs.
+    const windows = old.length ? await self.clients.matchAll({type:'window'}) : [];
+    await Promise.all(old.map(key => caches.delete(key)));
+    await self.clients.claim();
+    const root = new URL('./', self.location.href);
+    // Do not await navigation inside activation: it waits for this worker to activate.
+    windows.forEach(client => {
+      const url = new URL(client.url);
+      if (url.origin !== root.origin || ![root.pathname, new URL('index.html', root).pathname].includes(url.pathname)) return;
+      client.navigate(new URL('update-required.html', root).href).catch(() => {});
+    });
+  })());
 });
 
 self.addEventListener('fetch', event => {
@@ -98,7 +119,9 @@ self.addEventListener('fetch', event => {
           }
           return response;
         })
-        .catch(() => appNavigation ? caches.match('./index.html') : Response.error())
+        .catch(() => appNavigation ? caches.match('./index.html') :
+          url.origin === appRoot.origin && url.pathname === new URL('update-required.html', appRoot).pathname
+            ? caches.match('./update-required.html') : Response.error())
     );
     return;
   }

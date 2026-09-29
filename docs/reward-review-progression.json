@@ -1,0 +1,216 @@
+{
+  "frames": [
+    {
+      "id": "normal",
+      "name": "NORMAL",
+      "rule": {},
+      "points": 0
+    },
+    {
+      "id": "bronze",
+      "name": "BRONZE",
+      "rule": {
+        "type": "points",
+        "requires_frame": "normal"
+      },
+      "points": 150
+    },
+    {
+      "id": "silver",
+      "name": "SILVER",
+      "rule": {
+        "type": "points",
+        "requires_frame": "bronze"
+      },
+      "points": 500
+    },
+    {
+      "id": "gold",
+      "name": "GOLD",
+      "rule": {
+        "type": "points",
+        "requires_frame": "silver"
+      },
+      "points": 1200
+    },
+    {
+      "id": "platinum",
+      "name": "PLATINUM",
+      "rule": {
+        "type": "points",
+        "requires_frame": "gold"
+      },
+      "points": 2200
+    },
+    {
+      "id": "cosmic",
+      "name": "COSMIC",
+      "rule": {
+        "type": "points",
+        "requires_frame": "platinum"
+      },
+      "points": 3500
+    },
+    {
+      "id": "aurora",
+      "name": "AURORA",
+      "rule": {
+        "ids": [
+          "perfect_20",
+          "all_modes"
+        ],
+        "type": "achievement_combo",
+        "requires_frame": "cosmic"
+      },
+      "points": 6500
+    },
+    {
+      "id": "supernova",
+      "name": "SUPERNOVA",
+      "rule": {
+        "ids": [
+          "interval_90",
+          "combo_30",
+          "streak_14"
+        ],
+        "type": "achievement_combo",
+        "requires_frame": "aurora"
+      },
+      "points": 10000
+    },
+    {
+      "id": "event_horizon",
+      "name": "EVENT HORIZON",
+      "rule": {
+        "ids": [
+          "rank_first",
+          "hidden_ear_perfect"
+        ],
+        "type": "achievement_combo",
+        "requires_frame": "supernova"
+      },
+      "points": 13500
+    },
+    {
+      "id": "pulsar",
+      "name": "PULSAR",
+      "rule": {
+        "ids": [
+          "sessions_250",
+          "perfect_40",
+          "streak_14"
+        ],
+        "type": "achievement_combo",
+        "requires_frame": "event_horizon"
+      },
+      "points": 17500
+    },
+    {
+      "id": "omega",
+      "name": "COSMO SOVEREIGN",
+      "rule": {
+        "ids": [
+          "first_signal",
+          "sessions_5",
+          "sessions_20",
+          "sessions_50",
+          "sessions_100",
+          "perfect_5",
+          "perfect_10",
+          "perfect_20",
+          "combo_5",
+          "combo_10",
+          "combo_20",
+          "combo_30",
+          "text_10",
+          "keys_10",
+          "hyper_first",
+          "ear_first",
+          "all_modes",
+          "interval_all_seen",
+          "interval_80",
+          "interval_90",
+          "streak_3",
+          "streak_7",
+          "streak_14",
+          "public_record",
+          "rank_top10",
+          "rank_podium",
+          "rank_first",
+          "hidden_ear_perfect",
+          "hidden_all_mode_perfect",
+          "hidden_combo_50",
+          "hidden_singularity",
+          "sessions_250",
+          "sessions_1000",
+          "perfect_40",
+          "combo_100",
+          "streak_30",
+          "streak_60",
+          "all_modes_perfect_30",
+          "ear_perfect_40"
+        ],
+        "type": "achievement_combo",
+        "requires_frame": "pulsar"
+      },
+      "points": 23500
+    }
+  ],
+  "daily": [
+    {
+      "name": "PRECISION CHECK",
+      "points": 80,
+      "description": "5問以上・正答率90%以上のセッションを1回完了する。"
+    },
+    {
+      "name": "15 CONTACTS",
+      "points": 60,
+      "description": "今日15問回答する。"
+    },
+    {
+      "name": "COMBO 5",
+      "points": 60,
+      "description": "今日の最大コンボ5に到達する。"
+    },
+    {
+      "name": "10 CLEAR SIGNALS",
+      "points": 60,
+      "description": "今日10問正解する。"
+    },
+    {
+      "name": "EAR SIGNAL",
+      "points": 80,
+      "description": "今日EAR LINKを1回プレイする。"
+    },
+    {
+      "name": "HYPER SPARK",
+      "points": 80,
+      "description": "今日HYPER DRIVEを1回プレイする。"
+    },
+    {
+      "name": "KEYS ORBIT",
+      "points": 60,
+      "description": "今日KEYSを1セッションプレイする。"
+    },
+    {
+      "name": "CLEAN RUN",
+      "points": 80,
+      "description": "5問以上のセッションを正答率100%で1回完了する。"
+    },
+    {
+      "name": "WARM UP ORBIT",
+      "points": 60,
+      "description": "今日2セッションプレイする。"
+    },
+    {
+      "name": "TEXT ORBIT",
+      "points": 60,
+      "description": "今日TEXTを1セッションプレイする。"
+    },
+    {
+      "name": "DUAL ROUTE",
+      "points": 80,
+      "description": "今日2種類のモードをプレイする。"
+    }
+  ]
+}

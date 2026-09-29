@@ -122,7 +122,7 @@
     try{
       const p=cloud?.getCachedPlayer?.()||await cloud?.getMyPlayer?.();
       if(!p||p.is_guest)throw new Error('正式アカウントが必要です。');
-      if(p.is_admin)await renderTeacher();
+      if(p.is_admin && !window.IntervalCosmosAssignmentAdminPolicyV205?.isStudentView?.())await renderTeacher();
       else await renderStudent();
     }catch(e){console.error('[assignments]',e);errorView(e)}
   }

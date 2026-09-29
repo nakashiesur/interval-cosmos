@@ -12,6 +12,7 @@
     const style = document.createElement('style');
     style.id = 'v205AdminHomeDockStyle';
     style.textContent = `
+      .v205-admin-home-actions[hidden]{display:none!important}
       .v205-admin-dock-source{display:none!important}
       .v205-admin-home-row{margin-top:12px;padding-top:12px;border-top:1px solid rgba(116,145,201,.18);display:flex;align-items:center;gap:12px}
       .v205-admin-home-label{flex:0 0 auto;color:#5ee2ff;font-size:10px;font-weight:800;letter-spacing:.16em;white-space:nowrap}
@@ -60,14 +61,25 @@
       }
 
       ensureStyle();
-      ensureDock(footer);
+      const row = ensureDock(footer);
+      let toggle = row.querySelector('[data-v205-admin-view-toggle]');
+      if (!toggle) {
+        toggle = document.createElement('button'); toggle.type = 'button';
+        toggle.className = 'secondary-btn'; toggle.dataset.v205AdminViewToggle = '1';
+        row.prepend(toggle);
+      }
+      const studentView = Boolean(window.IntervalCosmosAssignmentAdminPolicyV205?.isStudentView?.());
+      const label = studentView ? '管理者モード OFF（学生表示）' : '管理者モード ON';
+      if (toggle.textContent !== label) toggle.textContent = label;
+      toggle.setAttribute('aria-pressed', String(!studentView));
+      row.querySelector('.v205-admin-home-actions').hidden = studentView;
 
       // Keep the real controls in their original footer so their own injectors remain satisfied.
       // Only hide them visually for the admin and use stable dock entry buttons above.
       const dashboardSource = footer.querySelector('[data-v205-admin-dashboard-open]');
       const assignmentSource = footer.querySelector('[data-a-open]');
       if (dashboardSource && !dashboardSource.classList.contains('v205-admin-dock-source')) dashboardSource.classList.add('v205-admin-dock-source');
-      if (assignmentSource && !assignmentSource.classList.contains('v205-admin-dock-source')) assignmentSource.classList.add('v205-admin-dock-source');
+      if (assignmentSource) assignmentSource.classList.toggle('v205-admin-dock-source', !studentView);
     } finally {
       arranging = false;
     }
@@ -83,6 +95,11 @@
   }
 
   window.addEventListener('click', event => {
+    if (event.target.closest?.('[data-v205-admin-view-toggle]')) {
+      event.preventDefault();
+      window.IntervalCosmosAssignmentAdminPolicyV205?.toggleView?.();
+      return;
+    }
     if (event.target.closest?.('[data-v205-admin-dock-dashboard]')) {
       event.preventDefault();
       window.IntervalCosmosAdminDashboardV205?.open?.();

@@ -2,7 +2,7 @@ const assert = require('assert');
 const fs = require('fs');
 const vm = require('vm');
 const path = require('path');
-const handlers = {}, saved = new Map(), deleted = [];
+const handlers = {}, saved = new Map(), deleted = [], navigated = [];
 let network;
 const cache = {put: async (key, value) => saved.set(typeof key === 'string' ? key : key.url, value)};
 const context = {
@@ -16,7 +16,7 @@ const context = {
   },
   self: {location: {origin: 'https://example.test', href: 'https://example.test/cosmos/sw.js'},
     addEventListener: (name, handler) => handlers[name] = handler,
-    clients: {claim: async () => {}}, skipWaiting: async () => {}},
+    clients: {claim: async () => {}, matchAll: async () => ['', 'index.html?old=1', 'tests/demo.html', 'https://other.test/'].map(route=>({url:route.startsWith('https:')?route:'https://example.test/cosmos/'+route,navigate:url=>{navigated.push(url);return new Promise(()=>{});}}))}, skipWaiting: async () => {}},
 };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8'), context);
 async function request(route, response, mode = 'navigate') {
@@ -50,5 +50,11 @@ async function request(route, response, mode = 'navigate') {
   assert.equal(await (await request('cloud-config.js', new Error('offline'), 'cors')).text(), 'public configuration');
   let activated; handlers.activate({waitUntil: p => activated = p}); await activated;
   assert.deepEqual(deleted, ['interval-cosmos-old', 'interval-cosmos-v2-0-5-alpha10-25']);
+  assert.deepEqual(navigated, Array(2).fill('https://example.test/cosmos/update-required.html'));
+  saved.set('./update-required.html', html('update notice'));
+  assert.equal(await (await request('update-required.html', new Error('offline'))).text(),'update notice');
+  context.caches.keys=async()=>[]; navigated.length=0;
+  handlers.activate({waitUntil:p=>activated=p}); await activated;
+  assert.equal(navigated.length,0,'first install must not redirect');
   console.log('PASS app-only navigation cache, offline fallback, HTTP errors, and scoped cleanup');
 })().catch(error => {console.error(error); process.exitCode = 1;});

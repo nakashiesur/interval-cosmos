@@ -68,7 +68,7 @@
     const c = await ensureClient();
     const [courseResult,avatarResult] = await Promise.all([
       c.from('courses').select('code,display_name,sort_order').order('sort_order'),
-      c.from('avatar_catalog').select('id,display_name,sort_order').eq('is_active',true).eq('staff_only',false).order('sort_order'),
+      c.from('avatar_catalog').select('id,display_name,sort_order,staff_only').eq('is_active',true).order('sort_order'),
     ]);
     if (courseResult.error) throw courseResult.error;
     if (avatarResult.error) throw avatarResult.error;
@@ -77,7 +77,8 @@
 
   function renderManager(player,catalogs){
     const courses = catalogs.courses || [];
-    const avatars = catalogs.avatars || [];
+    const avatars = (catalogs.avatars || []).filter(row => player.account_type === 'staff' || !row.staff_only);
+    const self = player.player_id === (cloud?.getCachedPlayer?.()?.player_id || cloud?.getCachedPlayer?.()?.id);
     const suspended = Boolean(player.is_suspended);
     const rankingRows = Number(player.published_ranking_rows || 0);
     managerOverlay().innerHTML = `
@@ -88,10 +89,20 @@
         </header>
 
         <section class="v205-admin-manage-block">
-          <div class="v205-admin-manage-title"><div><h3>PROFILE</h3><span>学生プロフィール</span></div></div>
+          <div class="v205-admin-manage-title"><div><h3>本人確認情報</h3><span>管理者専用</span></div></div>
+          <div class="v205-admin-manage-fields">
+            <label><span>学籍番号</span><input readonly value="${esc(player.student_number || '未設定（教職員など）')}"></label>
+            <label><span>本名（管理者用）</span><input id="v205AdminRealName" maxlength="100" autocomplete="off" value="${esc(player.admin_real_name || '')}"></label>
+          </div>
+          <p class="v205-admin-manage-note">管理者のみ閲覧・編集できます。プレイヤーへの通知や、ランキング・プロフィールへの表示はありません。空欄で保存すると削除できます。</p>
+          <button type="button" class="primary-btn" data-v205-admin-save-real-name>本名を保存</button>
+        </section>
+
+        <section class="v205-admin-manage-block">
+          <div class="v205-admin-manage-title"><div><h3>PROFILE</h3><span>プレイヤープロフィール</span></div></div>
           <div class="v205-admin-manage-fields">
             <label><span>プレイヤー名</span><input id="v205AdminManageName" maxlength="16" value="${esc(player.player_name || '')}"></label>
-            <label><span>所属コース</span><select id="v205AdminManageCourse">${courses.map(row=>`<option value="${esc(row.code)}" ${row.code===player.course_code?'selected':''}>${esc(row.display_name)}</option>`).join('')}</select></label>
+            <label><span>所属コース</span><select id="v205AdminManageCourse">${player.account_type==='staff'?`<option value="" ${!player.course_code?'selected':''}>未設定</option>`:''}${courses.map(row=>`<option value="${esc(row.code)}" ${row.code===player.course_code?'selected':''}>${esc(row.display_name)}</option>`).join('')}</select></label>
             <label><span>アバター</span><select id="v205AdminManageAvatar">${avatars.map(row=>`<option value="${esc(row.id)}" ${row.id===player.avatar_id?'selected':''}>${esc(row.display_name || row.id)}</option>`).join('')}</select></label>
           </div>
           <button type="button" class="primary-btn" data-v205-admin-save-profile>変更を保存</button>
@@ -99,7 +110,7 @@
 
         <section class="v205-admin-manage-block">
           <div class="v205-admin-manage-title"><div><h3>ACCOUNT STATE</h3><span>${suspended?'現在：一時停止中':'現在：利用可能'} / 連携端末 ${Number(player.linked_devices||0)}</span></div></div>
-          <button type="button" class="secondary-btn ${suspended?'restore':''}" data-v205-admin-toggle-suspend data-next="${suspended?'false':'true'}">${suspended?'アカウント停止を解除':'アカウントを一時停止'}</button>
+          <button type="button" class="secondary-btn ${suspended?'restore':''}" data-v205-admin-toggle-suspend ${self?'disabled title="自分のアカウントは停止できません"':''} data-next="${suspended?'false':'true'}">${suspended?'アカウント停止を解除':'アカウントを一時停止'}</button>
         </section>
 
         <section class="v205-admin-manage-block">
@@ -113,7 +124,7 @@
 
         <section class="v205-admin-manage-block danger-zone">
           <div class="v205-admin-manage-title"><div><h3>DANGER ZONE</h3><span>完全削除は取り消せません</span></div></div>
-          <button type="button" class="secondary-btn danger" data-v205-admin-delete-account>アカウントを完全削除</button>
+          <button type="button" class="secondary-btn danger" data-v205-admin-delete-account ${self?'disabled title="自分の管理者アカウントは削除できません"':''}>アカウントを完全削除</button>
         </section>
 
         <div class="v205-admin-manage-message" role="status"></div>
@@ -173,9 +184,15 @@
     window.IntervalCosmosAdminDashboardV205?.openStudent?.(id);
   }
 
+  async function saveRealName(){
+    const name=document.getElementById('v205AdminRealName')?.value?.trim() || '';
+    await rpc('admin_set_player_real_name',{p_player_id:currentPlayerId,p_real_name:name});
+    setMessage('管理者用の本名を保存しました。');
+  }
+
   async function saveProfile(){
     const name=document.getElementById('v205AdminManageName')?.value?.trim() || '';
-    const course=document.getElementById('v205AdminManageCourse')?.value || '';
+    const course=document.getElementById('v205AdminManageCourse')?.value || null;
     const avatar=document.getElementById('v205AdminManageAvatar')?.value || '';
     await rpc('admin_update_player_profile',{p_player_id:currentPlayerId,p_player_name:name,p_course_code:course,p_avatar_id:avatar});
     setMessage('プロフィールを更新しました。');
@@ -224,7 +241,7 @@
     button.type='button';
     button.className='secondary-btn v205-admin-manage-open';
     button.dataset.v205AdminManageOpen='1';
-    button.textContent='⚙ MANAGE STUDENT';
+    button.textContent='⚙ データを管理';
     detail.appendChild(button);
   }
 
@@ -240,6 +257,7 @@
     if(event.target.closest?.('[data-v205-admin-back]')){currentPlayerId=null;return}
     if(event.target.closest?.('[data-v205-admin-manage-open]')){openManager();return}
     if(event.target.closest?.('[data-v205-admin-manage-close]')){closeManager();return}
+    if(event.target.closest?.('[data-v205-admin-save-real-name]')){withBusy(saveRealName);return}
     if(event.target.closest?.('[data-v205-admin-save-profile]')){withBusy(saveProfile);return}
     const suspend=event.target.closest?.('[data-v205-admin-toggle-suspend]');
     if(suspend){withBusy(()=>toggleSuspend(suspend));return}
