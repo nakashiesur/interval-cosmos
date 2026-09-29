@@ -1,6 +1,21 @@
 (() => {
   const cloud = window.IntervalCosmosCloud;
   let relabelQueued = false;
+  let studentView = false;
+  let viewOwner = null;
+  function isStudentView() {
+    const player = realPlayer();
+    const id = player?.player_id || player?.id;
+    if (id !== viewOwner) { studentView = false; viewOwner = id; }
+    return Boolean(player?.is_admin && studentView);
+  }
+  function toggleView() {
+    if (!realPlayer()?.is_admin) return;
+    isStudentView(); studentView = !studentView;
+    applyAdminVisualState();
+    window.IntervalCosmosAdminHomeDockV205?.arrange?.();
+    relabelAssignmentButton();
+  }
 
   function realPlayer() {
     return cloud?.getCachedPlayer?.() || null;
@@ -8,13 +23,13 @@
 
   function assignmentRoleView(player) {
     if (!player) return player;
-    if (player.is_admin) return { ...player, account_type: 'staff' };
+    if (player.is_admin) return { ...player, account_type: isStudentView() ? 'student' : 'staff', is_admin: !isStudentView() };
     if (player.account_type === 'staff') return { ...player, account_type: 'student' };
     return player;
   }
 
   function applyAdminVisualState() {
-    const isAdmin = Boolean(realPlayer()?.is_admin);
+    const isAdmin = Boolean(realPlayer()?.is_admin && !isStudentView());
     document.documentElement.classList.toggle('v205-is-admin', isAdmin);
   }
 
@@ -22,16 +37,7 @@
     const api = window.IntervalCosmosAssignmentsV205;
     if (!api?.open || !cloud?.getCachedPlayer) return false;
 
-    const original = cloud.getCachedPlayer;
-    cloud.getCachedPlayer = function (...args) {
-      return assignmentRoleView(original.apply(this, args));
-    };
-
-    try {
-      api.open();
-    } finally {
-      cloud.getCachedPlayer = original;
-    }
+    api.open();
     return true;
   }
 
@@ -40,7 +46,7 @@
     const button = document.querySelector('[data-a-open]');
     if (!button) return;
     const player = realPlayer();
-    const desired = player?.is_admin ? '▣ ADMIN ASSIGNMENTS' : '▣ ASSIGNMENTS';
+    const desired = player?.is_admin && !isStudentView() ? '▣ ADMIN ASSIGNMENTS' : '▣ ASSIGNMENTS';
     if (button.textContent !== desired) button.textContent = desired;
   }
 
@@ -69,6 +75,8 @@
   window.addEventListener('DOMContentLoaded', queueRelabel, { once: true });
 
   window.IntervalCosmosAssignmentAdminPolicyV205 = {
+    isStudentView,
+    toggleView,
     assignmentRoleView,
     openWithAdminPolicy,
     applyAdminVisualState,

@@ -1,4 +1,4 @@
-const CACHE = 'interval-cosmos-v2-0-5-beta-1-2';
+const CACHE = 'interval-cosmos-v2-0-5-beta-1-3';
 const ASSETS = [
   './guest-sessions-v205.js', './phase10-device-fixes-v205.css',
   './assets/art/v1/frames/normal.svg',
@@ -53,6 +53,7 @@ const ASSETS = [
   './phase11-frames-v205.css', './assets/art/v1/frames/supernova.svg', './assets/art/v1/frames/supernova-still.svg', './assets/art/v1/frames/event_horizon.svg', './assets/art/v1/frames/event_horizon-still.svg',
   './offline-outbox-v205.js', './offline-sync-ui-v205.js', './offline-sync-v205.css',
   './phase10-cosmos-folders-v205.js', './phase10-cosmos-folders-v205.css',
+  './assets/art/v1/frames/pulsar.svg', './assets/art/v1/frames/pulsar-still.svg', './assets/art/v1/frames/omega.svg', './assets/art/v1/frames/omega-still.svg',
   './', './index.html', './styles.css', './account-v205.css', './phase2-recovery-v205.css', './phase3-v205.css', './phase4-v205.css', './phase4-hotfix-v205.css', './phase5-v205.css', './phase6-assignments-v205.css', './phase6-multimode-v205.css', './phase6-game-layout-v205.css', './phase7-admin-dashboard-v205.css', './phase8-admin-player-management-v205.css', './phase8-pc-controls-v205.css', './phase8-config-polish-v205.css', './phase10-ui-foundation-v205.css', './phase10-header-polish-v205.css', './phase10-practice-polish-v205.css', './phase10-result-polish-v205.css', './phase10-cosmos-polish-v205.css', './phase10-history-polish-v205.css', './phase10-history-folders-v205.css', './phase10-assignment-polish-v205.css',
   './learning-sync-v205.js', './account-gate.js', './supabase-singleton-v205.js', './phase9-staff-registration-v205.js', './phase2-recovery-v205-fixed.js', './runtime-v205.js', './phase3-ranking-hotfix-v205.js', './phase3-v205.js', './phase4-hotfix-v205.js', './phase4-v205.js', './phase4-analysis-hotfix-v205.js', './phase5-progression-v205.js', './phase5-unlock-copy-hotfix-v205.js', './phase5-scroll-retention-v205.js', './phase6-admin-policy-v205.js', './phase6-multimode-v205.js', './phase6-assignments-v205.js', './phase7-admin-dashboard-v205.js', './phase7-admin-home-dock-v205.js', './phase8-admin-player-management-v205.js', './phase8-pc-controls-v205.js', './phase8-config-polish-v205.js', './phase0-wallclock-v205.js', './phase10-ui-foundation-v205.js', './phase10-history-folders-v205.js', './app.js', './cloud.js',
   './nakashima-logo.png', './icon.svg', './manifest.webmanifest'

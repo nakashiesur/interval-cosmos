@@ -68,7 +68,7 @@
     const c = await ensureClient();
     const [courseResult,avatarResult] = await Promise.all([
       c.from('courses').select('code,display_name,sort_order').order('sort_order'),
-      c.from('avatar_catalog').select('id,display_name,sort_order').eq('is_active',true).eq('staff_only',false).order('sort_order'),
+      c.from('avatar_catalog').select('id,display_name,sort_order,staff_only').eq('is_active',true).order('sort_order'),
     ]);
     if (courseResult.error) throw courseResult.error;
     if (avatarResult.error) throw avatarResult.error;
@@ -77,7 +77,8 @@
 
   function renderManager(player,catalogs){
     const courses = catalogs.courses || [];
-    const avatars = catalogs.avatars || [];
+    const avatars = (catalogs.avatars || []).filter(row => player.account_type === 'staff' || !row.staff_only);
+    const self = player.player_id === (cloud?.getCachedPlayer?.()?.player_id || cloud?.getCachedPlayer?.()?.id);
     const suspended = Boolean(player.is_suspended);
     const rankingRows = Number(player.published_ranking_rows || 0);
     managerOverlay().innerHTML = `
@@ -88,7 +89,7 @@
         </header>
 
         <section class="v205-admin-manage-block">
-          <div class="v205-admin-manage-title"><div><h3>PROFILE</h3><span>学生プロフィール</span></div></div>
+          <div class="v205-admin-manage-title"><div><h3>PROFILE</h3><span>プレイヤープロフィール</span></div></div>
           <div class="v205-admin-manage-fields">
             <label><span>プレイヤー名</span><input id="v205AdminManageName" maxlength="16" value="${esc(player.player_name || '')}"></label>
             <label><span>所属コース</span><select id="v205AdminManageCourse">${courses.map(row=>`<option value="${esc(row.code)}" ${row.code===player.course_code?'selected':''}>${esc(row.display_name)}</option>`).join('')}</select></label>
@@ -99,7 +100,7 @@
 
         <section class="v205-admin-manage-block">
           <div class="v205-admin-manage-title"><div><h3>ACCOUNT STATE</h3><span>${suspended?'現在：一時停止中':'現在：利用可能'} / 連携端末 ${Number(player.linked_devices||0)}</span></div></div>
-          <button type="button" class="secondary-btn ${suspended?'restore':''}" data-v205-admin-toggle-suspend data-next="${suspended?'false':'true'}">${suspended?'アカウント停止を解除':'アカウントを一時停止'}</button>
+          <button type="button" class="secondary-btn ${suspended?'restore':''}" data-v205-admin-toggle-suspend ${self?'disabled title="自分のアカウントは停止できません"':''} data-next="${suspended?'false':'true'}">${suspended?'アカウント停止を解除':'アカウントを一時停止'}</button>
         </section>
 
         <section class="v205-admin-manage-block">
@@ -113,7 +114,7 @@
 
         <section class="v205-admin-manage-block danger-zone">
           <div class="v205-admin-manage-title"><div><h3>DANGER ZONE</h3><span>完全削除は取り消せません</span></div></div>
-          <button type="button" class="secondary-btn danger" data-v205-admin-delete-account>アカウントを完全削除</button>
+          <button type="button" class="secondary-btn danger" data-v205-admin-delete-account ${self?'disabled title="自分の管理者アカウントは削除できません"':''}>アカウントを完全削除</button>
         </section>
 
         <div class="v205-admin-manage-message" role="status"></div>

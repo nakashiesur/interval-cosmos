@@ -70,9 +70,12 @@
     const ratio = total ? Math.min(100,Math.round(done/total*100)) : 0;
     return `<div class="metric"><small>ACTIVE TASKS</small><b>${done}/${total}</b><div class="v205-admin-progress"><i style="width:${ratio}%"></i></div></div>`;
   }
+  function avatar(player){
+    return `<span class="v205-admin-avatar">${window.IntervalCosmosArt?.avatarHTML?.(player.avatar_id)||''}</span>`;
+  }
   function studentRow(row){
     return `<button type="button" class="v205-admin-student" data-v205-admin-student="${esc(row.player_id)}" data-course="${esc(row.course_code||'')}">
-      <div class="identity"><strong>${esc(row.student_number||'—')}　${esc(row.player_name||'PLAYER')}</strong><small>${esc(row.course_name||row.course_code||'所属未設定')}</small></div>
+      <div class="identity v205-admin-identity">${avatar(row)}<div><strong>${esc(row.student_number||'—')}　${esc(row.player_name||'PLAYER')}</strong><small>${esc(row.course_name||row.course_code||'所属未設定')}</small></div></div>
       <div class="metric"><small>30D PLAY</small><b>${Number(row.sessions_30d||0)}</b></div>
       <div class="metric"><small>30D ACC.</small><b>${pct(row.correct_30d,row.answers_30d)}%</b></div>
       <div class="metric"><small>ALL PLAY</small><b>${Number(row.sessions_all||0)}</b></div>
@@ -112,6 +115,7 @@
         ${summaryCard('ACCURACY',`${acc30}% / ${allAcc}%`,'30日 / 全期間')}
         ${summaryCard('ACTIVE ASSIGNMENTS',nfmt(s.active_assignments),'現在受付中')}
       </div>
+      <button type="button" class="secondary-btn" data-v205-admin-student="${esc(cloud?.getCachedPlayer?.()?.player_id||cloud?.getCachedPlayer?.()?.id)}">自分のデータを管理</button>
       <div class="v205-admin-toolbar">
         <input type="search" id="v205AdminSearch" value="${esc(filter.search)}" placeholder="学籍番号・名前・コースで検索">
         <select id="v205AdminCourse"><option value="all">全コース</option>${courses.map(([code,name])=>`<option value="${esc(code)}" ${filter.course===code?'selected':''}>${esc(name)}</option>`).join('')}</select>
@@ -128,6 +132,7 @@
   }
   function activityChart(rows){
     const data = Array.isArray(rows)?rows:[];
+    if (!data.some(r=>Number(r.sessions)>0)) return '<p class="v205-admin-note">直近30日のプレイ履歴はありません。</p>';
     const max = Math.max(1,...data.map(r=>Number(r.sessions||0)));
     return `<div class="v205-admin-activity">${data.map((r,i)=>{
       const h = Number(r.sessions||0) ? Math.max(8,Math.round(Number(r.sessions||0)/max*100)) : 2;
@@ -166,7 +171,7 @@
     const assignments=Array.isArray(data?.assignments)?data.assignments:[],recent=Array.isArray(data?.recent_sessions)?data.recent_sessions:[];
     overlay().innerHTML=`<section class="v205-admin-dashboard">
       <button type="button" class="secondary-btn v205-admin-back" data-v205-admin-back>← STUDENTS</button>
-      <header class="v205-admin-head"><div class="idbox"><p>STUDENT DETAIL</p><h2>${esc(st.student_number||'—')}　${esc(st.player_name||'PLAYER')}</h2><span class="meta">${esc(st.course_name||st.course_code||'所属未設定')}　/　登録 ${esc(dayText(st.created_at))}</span></div>${closeButton()}</header>
+      <header class="v205-admin-head"><div class="idbox">${avatar(st)}<p>PLAYER DETAIL</p><h2>${esc(st.student_number||'—')}　${esc(st.player_name||'PLAYER')}</h2><span class="meta">${esc(st.course_name||st.course_code||'所属未設定')}　/　登録 ${esc(dayText(st.created_at))}</span></div>${closeButton()}</header>
       <div class="v205-admin-summary">
         ${summaryCard('PLAY SESSIONS',`${nfmt(s.sessions_30d)} / ${nfmt(s.sessions_all)}`,'30日 / 全期間')}
         ${summaryCard('ACCURACY',`${pct(s.correct_30d,s.answers_30d)}% / ${pct(s.correct_all,s.answers_all)}%`,'30日 / 全期間')}
