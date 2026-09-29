@@ -1,4 +1,4 @@
-const CACHE = 'interval-cosmos-v2-0-5-beta-1-3';
+const CACHE = 'interval-cosmos-v2-0-5-beta-1-4';
 const ASSETS = [
   './guest-sessions-v205.js', './phase10-device-fixes-v205.css',
   './assets/art/v1/frames/normal.svg',

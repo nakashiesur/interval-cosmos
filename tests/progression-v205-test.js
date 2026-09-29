@@ -101,3 +101,15 @@ process.exitCode=fail?1:0;
  assert(!/player_achievements|player_frames|player_titles/.test(expansion));
  console.log('PASS additive mastery catalog preserves earned rewards; OMEGA requires all 39 achievements');
 }
+
+{
+ const assert=require('node:assert/strict');
+ const balance=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20260929111219_prospective_reward_balance.sql'),'utf8');
+ assert(balance.includes("min_active_days"));assert(balance.includes("repeat_count"));
+ assert(balance.includes("COSMO SOVEREIGN"));
+ assert(!/(?:update|delete from|insert into|truncate)\s+public\.player_(?:achievements|frames|titles)/i.test(balance));
+ assert(!/set\s+points\s*=/.test(balance));
+ const firstUpdate=balance.match(/update public.achievement_catalog[^;]*where id='first_signal'/);
+ assert.equal(firstUpdate,null,'The first-session welcome reward is retained');
+ console.log('PASS prospective balance preserves earned rows, points and first-session reward');
+}
