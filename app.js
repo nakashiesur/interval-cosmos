@@ -917,7 +917,7 @@ function renderHome() {
     </div>
 
     <div class="expert-divider"><span>EXPERT ZONE</span></div>
-    <button class="mode-card earlink wide earlink-elite" data-mode="earLink"><span class="ear-danger-orbit"></span><span class="mode-kicker danger-text">ULTRA HARD / AUDIO ONLY</span><span class="mode-title">EAR LINK</span><span class="mode-desc">視覚情報を封印し、実音だけで13音程を判定する超高難度モード。</span><span class="mode-badge">EXPERT</span></button>
+    <button class="mode-card earlink wide earlink-elite" data-mode="earLink"><span class="ear-danger-orbit"></span><span class="mode-kicker danger-text">ULTRA HARD / AUDIO ONLY</span><span class="mode-title">EAR LINK</span><span class="mode-desc">視覚情報を封印し、実音だけで13音程を判定する超高難度モード。</span><span class="mode-badge">60 SEC</span></button>
 
     <div class="home-footer home-footer-rich"><button class="secondary-btn" data-action="records">🏆 ONLINE RANKING</button><button class="secondary-btn practice-shortcut" data-action="quick-adaptive">🔰 苦手を重点練習</button></div>
     <div class="cloud-note ${state.cloudStatus}"><span class="cloud-dot"></span>${cloudStatusLabel()}${state.cloudStatus === 'error' ? `：${escapeHTML(state.cloudError)}` : ''}</div>

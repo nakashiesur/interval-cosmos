@@ -4,7 +4,7 @@
   const receipts=new Map();
   const guest=()=>!window.IntervalCosmosCloud?.getCachedPlayer?.()||window.IntervalCosmosCloud.getCachedPlayer().is_guest;
   const today=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Tokyo'});
-  function label(row){const left=Math.max(0,Number(row.daily_limit||5)-Number(row.earned_count||0));return {left,text:`PT獲得 残り ${left}/5${left===0?' · 本日のPT獲得終了':''}`};}
+  function label(row){const left=Math.max(0,Number(row.daily_limit||5)-Number(row.earned_count||0));return {left,text:`PT 残り ${left}/5${left===0?' · 本日終了':''}`};}
   async function refresh(force=false){
     if(guest()||fetching||(!force&&Date.now()-lastFetch<30000&&day===today()))return;
     fetching=true;
@@ -15,7 +15,7 @@
       const row=day===today()&&!guest()?rows.find(r=>r.mode===modes[card.dataset.mode]):null;
       let badge=card.querySelector('.ic-mode-remaining');
       if(!row){badge?.remove();continue;}
-      if(!badge){badge=document.createElement('small');badge.className='ic-mode-remaining';const seconds=card.querySelector('.mode-badge');seconds?seconds.before(badge):card.append(badge);}
+      if(!badge){badge=document.createElement('small');badge.className='ic-mode-remaining';let seconds=card.querySelector('.mode-badge');if(!seconds){seconds=document.createElement('span');seconds.className='mode-badge';seconds.textContent='75 SEC + BONUS';card.append(seconds);}seconds.append(badge);}
       const l=label(row);if(badge.textContent!==l.text)badge.textContent=l.text;badge.classList.toggle('exhausted',l.left===0);
     }
     const hyper=document.querySelector('.mode-card[data-action="hyper"]');
@@ -23,8 +23,8 @@
       const values=day===today()&&!guest()?['HD_TEXT','HD_KEYS'].map(m=>rows.find(r=>r.mode===m)):[];
       let summary=hyper.querySelector('.ic-mode-remaining');
       if(values.length===2&&values.every(Boolean)){
-        if(!summary){summary=document.createElement('small');summary.className='ic-mode-remaining';hyper.querySelector('.mode-badge')?.before(summary);}
-        const text=values.map((r,i)=>`${i?'KEYS':'TEXT'} ${label(r).text}`).join(' ／ ');
+        if(!summary){summary=document.createElement('small');summary.className='ic-mode-remaining';hyper.querySelector('.mode-badge')?.append(summary);}
+        const text='PT '+values.map((r,i)=>`${i?'KEYS':'TEXT'} ${label(r).left}/5`).join(' · ');
         if(summary.textContent!==text)summary.textContent=text;
         summary.classList.toggle('exhausted',values.every(r=>label(r).left===0));
       }else summary?.remove();
