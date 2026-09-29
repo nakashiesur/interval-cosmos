@@ -113,3 +113,16 @@ process.exitCode=fail?1:0;
  assert.equal(firstUpdate,null,'The first-session welcome reward is retained');
  console.log('PASS prospective balance preserves earned rows, points and first-session reward');
 }
+
+{
+ const assert=require('node:assert/strict');
+ const source=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20260929113538_attainable_progression_and_frame_order.sql'),'utf8');
+ const catalog=JSON.parse(fs.readFileSync(path.join(__dirname,'../docs/reward-review-catalog.json'),'utf8'));
+ assert.equal(catalog.length,39);
+ assert.equal(Math.max(...catalog.filter(a=>a.requirement.type==='combo').map(a=>a.requirement.value)),45);
+ assert.equal(Math.max(...catalog.filter(a=>a.requirement.type==='streak_days').map(a=>a.requirement.days)),10);
+ assert.deepEqual(catalog.filter(a=>a.requirement.type==='active_days').map(a=>a.requirement.days),[15,30]);
+ assert(source.includes('requires_frame'));assert(source.includes('order by tier,sort_order,id'));
+ assert(!/(delete from|truncate)\s+public\.player_(achievements|frames|titles)/i.test(source));
+ console.log('PASS predecessor frame ordering and attainable review catalog limits');
+}

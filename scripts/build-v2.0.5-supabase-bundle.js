@@ -25,6 +25,7 @@ const files = [
   'supabase/migrations/20260927103943_suspended_account_actions.sql',
   'supabase/migrations/20260929105007_additive_mastery_and_admin_self_management.sql',
   'supabase/migrations/20260929111219_prospective_reward_balance.sql',
+  'supabase/migrations/20260929113538_attainable_progression_and_frame_order.sql',
 ];
 
 for (const relative of files) {

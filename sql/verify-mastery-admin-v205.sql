@@ -29,6 +29,22 @@ do $test$ begin
  if not exists(select 1 from public.player_achievements where player_id=public.current_player_id() and achievement_id='perfect_5') then raise exception 'Legacy reward revoked'; end if;
 end; $test$;
 reset role;
+-- AURORA cannot bypass COSMIC even when its own achievements are present.
+insert into public.player_achievements(player_id,achievement_id) values
+(current_setting('ic.qa_player')::uuid,'perfect_20'),(current_setting('ic.qa_player')::uuid,'all_modes') on conflict do nothing;
+set local role authenticated;
+do $test$ begin
+ perform public.evaluate_my_progress();
+ if exists(select 1 from public.player_frames where player_id=public.current_player_id() and frame_id='aurora') then raise exception 'AURORA bypassed COSMIC'; end if;
+end; $test$;
+reset role;
+insert into public.player_frames(player_id,frame_id) values(current_setting('ic.qa_player')::uuid,'cosmic') on conflict do nothing;
+set local role authenticated;
+do $test$ begin
+ perform public.evaluate_my_progress();
+ if not exists(select 1 from public.player_frames where player_id=public.current_player_id() and frame_id='aurora') then raise exception 'AURORA failed after predecessor unlocked'; end if;
+end; $test$;
+reset role;
 -- Check each new threshold below and at the exact boundary.
 do $test$
 declare p uuid:=current_setting('ic.qa_player')::uuid; r record; n int; target int; modes text[]; baseline int;
@@ -45,6 +61,14 @@ for r in select * from public.achievement_catalog where sort_order between 1100 
    insert into public.play_sessions(client_event_id,player_id,mode,score,played_at) values(gen_random_uuid(),p,'TEXT',0,now());
    if n=target-1 and public.achievement_requirement_met(p,r.requirement) then raise exception '% unlocked early',r.id; end if;
   end loop;
+ when 'active_days' then
+  target:=(r.requirement->>'days')::int;
+  for n in 1..target loop
+   insert into public.play_sessions(client_event_id,player_id,mode,score,played_at) values(gen_random_uuid(),p,'TEXT',0,now()-n*interval '2 days');
+   insert into public.play_sessions(client_event_id,player_id,mode,score,played_at) values(gen_random_uuid(),p,'TEXT',0,now()-n*interval '2 days');
+   if n=target-1 and public.achievement_requirement_met(p,r.requirement) then raise exception '% counted repeated same-day sessions as days',r.id; end if;
+  end loop;
+  if public.longest_play_streak(p)>1 then raise exception 'Nonconsecutive test fixture invalid'; end if;
  when 'streak_days' then
   target:=(r.requirement->>'days')::int;
   for n in 1..target loop
@@ -71,7 +95,7 @@ for r in select * from public.achievement_catalog where sort_order between 1100 
   target:=(r.requirement->>'min_answers')::int;
   select array_agg(value) into modes from jsonb_array_elements_text(r.requirement->'modes');
   for n in 1..cardinality(modes) loop
-   insert into public.play_sessions(client_event_id,player_id,mode,score,total_answers,correct_answers,played_at) values(gen_random_uuid(),p,modes[n],0,target,target,now());
+   insert into public.play_sessions(client_event_id,player_id,mode,score,total_answers,correct_answers,played_at) values(gen_random_uuid(),p,modes[n],0,coalesce((r.requirement->'mode_min_answers'->>modes[n])::int,target),coalesce((r.requirement->'mode_min_answers'->>modes[n])::int,target),now());
    if n=cardinality(modes)-1 and public.achievement_requirement_met(p,r.requirement) then raise exception '% unlocked missing a mode',r.id; end if;
   end loop;
  else raise exception 'Unexpected requirement %',r.id;
@@ -121,5 +145,5 @@ do $test$ declare denied boolean:=false; begin
  if not denied then raise exception 'Nonadmin edit permitted'; end if;
 end; $test$;
 reset role;
-select 'PASS: first-session flood prevented and earned rewards retained; eight thresholds; OMEGA 38/39 locked and 39/39 unlocked; repeated evaluation stable; staff null-course self-edit; self ranking unpublish/delete preserves history; nonadmin denied' as result;
+select 'PASS: predecessor frame gating; cumulative days across breaks without duplicates; first-session flood prevented and earned rewards retained; eight thresholds; OMEGA 38/39 locked and 39/39 unlocked; repeated evaluation stable; staff null-course self-edit; self ranking unpublish/delete preserves history; nonadmin denied' as result;
 rollback;
