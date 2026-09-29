@@ -10,7 +10,7 @@ const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
 
 const tests=[
-  ['admin management UI is loaded',index.includes('phase8-admin-player-management-v205.js?v=beta.1.3')&&index.includes('phase8-admin-player-management-v205.css?v=alpha9.0')],
+  ['admin management UI is loaded',index.includes('phase8-admin-player-management-v205.js?v=beta.1.9')&&index.includes('phase8-admin-player-management-v205.css?v=alpha9.0')],
   ['service worker caches admin management UI',sw.includes('phase8-admin-player-management-v205.js')&&sw.includes('phase8-admin-player-management-v205.css')],
   ['UI requires cached admin role',js.includes('is_admin')&&js.includes('if (!isAdmin() || !playerId) return')],
   ['profile edit RPC is wired',js.includes("rpc('admin_update_player_profile'")&&sql.includes('admin_update_player_profile')],

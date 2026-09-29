@@ -89,6 +89,16 @@
         </header>
 
         <section class="v205-admin-manage-block">
+          <div class="v205-admin-manage-title"><div><h3>本人確認情報</h3><span>管理者専用</span></div></div>
+          <div class="v205-admin-manage-fields">
+            <label><span>学籍番号</span><input readonly value="${esc(player.student_number || '未設定（教職員など）')}"></label>
+            <label><span>本名（管理者用）</span><input id="v205AdminRealName" maxlength="100" autocomplete="off" value="${esc(player.admin_real_name || '')}"></label>
+          </div>
+          <p class="v205-admin-manage-note">管理者のみ閲覧・編集できます。プレイヤーへの通知や、ランキング・プロフィールへの表示はありません。空欄で保存すると削除できます。</p>
+          <button type="button" class="primary-btn" data-v205-admin-save-real-name>本名を保存</button>
+        </section>
+
+        <section class="v205-admin-manage-block">
           <div class="v205-admin-manage-title"><div><h3>PROFILE</h3><span>プレイヤープロフィール</span></div></div>
           <div class="v205-admin-manage-fields">
             <label><span>プレイヤー名</span><input id="v205AdminManageName" maxlength="16" value="${esc(player.player_name || '')}"></label>
@@ -174,6 +184,12 @@
     window.IntervalCosmosAdminDashboardV205?.openStudent?.(id);
   }
 
+  async function saveRealName(){
+    const name=document.getElementById('v205AdminRealName')?.value?.trim() || '';
+    await rpc('admin_set_player_real_name',{p_player_id:currentPlayerId,p_real_name:name});
+    setMessage('管理者用の本名を保存しました。');
+  }
+
   async function saveProfile(){
     const name=document.getElementById('v205AdminManageName')?.value?.trim() || '';
     const course=document.getElementById('v205AdminManageCourse')?.value || null;
@@ -241,6 +257,7 @@
     if(event.target.closest?.('[data-v205-admin-back]')){currentPlayerId=null;return}
     if(event.target.closest?.('[data-v205-admin-manage-open]')){openManager();return}
     if(event.target.closest?.('[data-v205-admin-manage-close]')){closeManager();return}
+    if(event.target.closest?.('[data-v205-admin-save-real-name]')){withBusy(saveRealName);return}
     if(event.target.closest?.('[data-v205-admin-save-profile]')){withBusy(saveProfile);return}
     const suspend=event.target.closest?.('[data-v205-admin-toggle-suspend]');
     if(suspend){withBusy(()=>toggleSuspend(suspend));return}

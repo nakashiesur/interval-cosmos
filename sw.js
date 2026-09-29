@@ -1,5 +1,6 @@
-const CACHE = 'interval-cosmos-v2-0-5-beta-1-8';
+const CACHE = 'interval-cosmos-v2-0-5-beta-1-9';
 const ASSETS = [
+  './app-update-v205.js', './update-required.html', './update-required.js',
   './guest-sessions-v205.js', './phase10-device-fixes-v205.css',
   './assets/art/v1/frames/normal.svg',
   './assets/art/v1/frames/normal-still.svg',
@@ -73,11 +74,21 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key.startsWith('interval-cosmos-') && key !== CACHE).map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    const old = keys.filter(key => key.startsWith('interval-cosmos-') && key !== CACHE);
+    // Only already-controlled application windows are upgraded, never unrelated tabs.
+    const windows = old.length ? await self.clients.matchAll({type:'window'}) : [];
+    await Promise.all(old.map(key => caches.delete(key)));
+    await self.clients.claim();
+    const root = new URL('./', self.location.href);
+    // Do not await navigation inside activation: it waits for this worker to activate.
+    windows.forEach(client => {
+      const url = new URL(client.url);
+      if (url.origin !== root.origin || ![root.pathname, new URL('index.html', root).pathname].includes(url.pathname)) return;
+      client.navigate(new URL('update-required.html', root).href).catch(() => {});
+    });
+  })());
 });
 
 self.addEventListener('fetch', event => {
@@ -108,7 +119,9 @@ self.addEventListener('fetch', event => {
           }
           return response;
         })
-        .catch(() => appNavigation ? caches.match('./index.html') : Response.error())
+        .catch(() => appNavigation ? caches.match('./index.html') :
+          url.origin === appRoot.origin && url.pathname === new URL('update-required.html', appRoot).pathname
+            ? caches.match('./update-required.html') : Response.error())
     );
     return;
   }
