@@ -44,6 +44,7 @@ FILES=(
   "supabase/migrations/20260929142912_admin_ranking_entry_delete.sql"
   "supabase/migrations/20260929150241_mode_reward_receipts.sql"
   "supabase/migrations/20260930051226_ranking_prompt_every_play.sql"
+  "supabase/migrations/20260930065937_assignment_completion_bonus.sql"
 )
 
 if grep -q '__TOO_LARGE_PLACEHOLDER__' "$ROOT_DIR/supabase_setup.sql"; then

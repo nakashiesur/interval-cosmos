@@ -25,3 +25,11 @@
 @media(max-width:720px){
   .v205-assignment-overlay{padding:10px}.v205-assignment-panel{padding:16px;border-radius:18px}.v205-assignment-head h2{font-size:21px}.v205-a-toolbar{align-items:stretch;flex-direction:column}.v205-a-best{grid-template-columns:repeat(3,1fr)}.v205-a-best>div{padding:9px 8px}.v205-a-best strong{font-size:14px}.v205-a-two{grid-template-columns:1fr}.v205-a-intervals{grid-template-columns:repeat(4,1fr)}.v205-a-results{overflow-x:auto}.v205-a-result-row{min-width:650px}.v205-a-game{min-height:calc(100vh - 20px)}.v205-a-game .play-hud{grid-template-columns:1fr auto 1fr}.v205-a-game-foot{flex-direction:column;align-items:stretch}.v205-a-current strong{font-size:44px}
 }
+
+/* Match the home notification with unfinished, currently available assignments. */
+.v205-assignment-panel.student .v205-a-card.active:not(.achieved){border-color:#a45a70;background:linear-gradient(120deg,rgba(113,39,62,.16),rgba(255,255,255,.02));box-shadow:inset 3px 0 #dc8b9f}
+.v205-assignment-panel.student .v205-a-card.active:not(.achieved) .v205-a-card-top b{color:#ffc1cd;border-color:#985468;background:rgba(113,39,62,.2)}
+.v205-a-bonus{display:flex;align-items:center;gap:8px;font-size:11px;color:#efd8a0;line-height:1.7}
+.v205-a-bonus strong{font-weight:700;letter-spacing:.03em}.v205-a-bonus.earned{color:#8ee5cb}.v205-a-bonus.excluded{color:#9daac0}
+.v205-a-bonus-result{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 16px;padding:14px 18px;margin:14px 0;border:1px solid #766842;border-radius:14px;background:rgba(161,125,49,.08);color:#f6dfab}.v205-a-bonus-result strong{font-size:22px}.v205-a-bonus-result span{font-size:12px}.v205-a-bonus-result small{width:100%;text-align:center;color:#acbad0;font-size:11px}
+.v205-a-bonus-result.settled{border-color:#35465c;color:#b7c6dc;background:rgba(255,255,255,.025)}
