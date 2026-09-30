@@ -139,13 +139,19 @@
       <div class="v205-a-list">${available.map(studentCard).join('')}${closed.length?`<details class="v205-a-closed" ${archiveBreakpoint.matches?'open':''}><summary>終了した課題 <span>${closed.length}件</span></summary><div class="v205-a-list">${closed.map(studentCard).join('')}</div></details>`:''}${rows.length?'':'<div class="v205-a-empty">現在公開されている課題はありません。</div>'}</div>
     </section>`;
   }
+  function assignmentBonus(a){
+    const points=Number(a.bonus_points||0),awarded=Number(a.bonus_awarded||0);
+    if(a.bonus_excluded)return '<div class="v205-a-bonus excluded">クリア済み・ボーナス対象外</div>';
+    if(awarded>0)return `<div class="v205-a-bonus earned">✓ <strong>+${fmt(awarded)} COSMOS PT</strong> 獲得済み</div>`;
+    return `<div class="v205-a-bonus"><strong>${points>0?`初回クリア +${fmt(points)} COSMOS PT`:'ボーナスなし'}</strong></div>`;
+  }
   function studentCard(a){
     const st=statusOf(a),best=a.best_score==null?'—':fmt(a.best_score),acc=a.best_accuracy==null?'—':`${Number(a.best_accuracy).toFixed(1).replace('.0','')}%`;
     const badge=a.achieved?'ACHIEVED':st==='active'?'OPEN':st==='upcoming'?'COMING':'CLOSED';
     return `<article class="v205-a-card ${st} ${a.achieved?'achieved':''}">
       <div class="v205-a-card-top"><span>${esc(MODE_MAP[a.mode]?.label||a.mode)}</span><b>${badge}</b></div>
       <h3>${esc(a.title)}</h3>${a.description?`<p>${esc(a.description)}</p>`:''}
-      <div class="v205-a-meta"><span>音程 <strong>${esc(intervalText(a))}</strong></span><span>期限 <strong>${esc(dateText(a.deadline_at))}</strong></span><span>目標 <strong>${esc(targetText(a))}</strong></span></div>
+      ${assignmentBonus(a)}<div class="v205-a-meta"><span>音程 <strong>${esc(intervalText(a))}</strong></span><span>期限 <strong>${esc(dateText(a.deadline_at))}</strong></span><span>目標 <strong>${esc(targetText(a))}</strong></span></div>
       <div class="v205-a-best"><div><small>BEST SCORE</small><strong>${best}</strong></div><div><small>BEST ACC.</small><strong>${acc}</strong></div><div><small>ATTEMPTS</small><strong>${Number(a.attempts||0)}</strong></div></div>
       <button class="primary-btn v205-a-play" data-a-play="${esc(a.id)}" ${st==='active'?'':'disabled'}>${st==='active'?'PLAY ASSIGNMENT':st==='upcoming'?`開始 ${esc(dateText(a.start_at))}`:'受付終了'}</button>
     </article>`;
@@ -164,7 +170,7 @@
     const st=statusOf(a),total=Number(a.total_students||0),done=Number(a.achieved_students||0);
     return `<article class="v205-a-card teacher ${a.is_published?'published':'draft'}">
       <div class="v205-a-card-top"><span>${esc(MODE_MAP[a.mode]?.label||a.mode)}</span><b>${a.is_published?'PUBLISHED':'DRAFT'}</b></div>
-      <h3>${esc(a.title)}</h3>${a.description?`<p>${esc(a.description)}</p>`:''}
+      <h3>${esc(a.title)}</h3>${assignmentBonus(a)}${a.description?`<p>${esc(a.description)}</p>`:''}
       <div class="v205-a-meta"><span>${esc(intervalText(a))}</span><span>期限 <strong>${esc(dateText(a.deadline_at))}</strong></span><span>目標 <strong>${esc(targetText(a))}</strong></span></div>
       <div class="v205-a-best"><div><small>挑戦学生</small><strong>${Number(a.attempted_students||0)} / ${total}</strong></div><div><small>達成</small><strong>${done} / ${total}</strong></div><div><small>総挑戦</small><strong>${Number(a.total_attempts||0)}</strong></div></div>
       <div class="v205-a-actions"><button class="secondary-btn" data-a-results="${esc(a.id)}">RESULTS</button><button class="secondary-btn ${a.is_published?'danger':''}" data-a-publish="${esc(a.id)}" data-published="${a.is_published?'1':'0'}">${a.is_published?'公開停止':'公開する'}</button></div>

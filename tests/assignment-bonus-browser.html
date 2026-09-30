@@ -1,0 +1,16 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>課題ボーナス確認</title>
+<link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../phase6-assignments-v205.css"><link rel="stylesheet" href="../phase6-multimode-v205.css"><link rel="stylesheet" href="../phase10-assignment-polish-v205.css"><link rel="stylesheet" href="../assignment-status-v205.css">
+<style>body{padding:24px;color:white;overflow:auto}main{max-width:800px;margin:auto}main>button{margin:8px}#capture{color:#b8dccf}</style>
+<main><h1>課題ボーナスの確認</h1><p>架空データのみ。本番への送信はありません。</p><button id="student">課題一覧</button><button id="admin">課題を作成</button><button id="earned">獲得リザルト</button><button id="settled">獲得済み</button><button id="excluded">導入前クリア</button><button id="queued">同期待ち</button><p id="capture"></p><footer class="home-footer"><button class="secondary-btn v205-assignment-launch" data-a-open>ASSIGNMENTS</button></footer></main>
+<script>
+let profile={id:'fixture',is_admin:false,account_type:'student'};let captured=null;
+const task=(id,title,achieved=false)=>({id,title,mode:'TEXT',allowed_modes:['TEXT'],interval_keys:['P1'],start_at:'2020-01-01',deadline_at:'2099-01-01',target_accuracy:80,attempts:achieved?1:0,achieved,bonus_points:100,bonus_awarded:achieved?100:null,mode_bests:[]});
+const tasks=[task('new','第1回：基礎音程トレーニング'),task('done','第0回：ウォームアップ',true)];
+window.IntervalCosmosCloud={configured:()=>true,getCachedPlayer:()=>profile,init:async()=>{},submitScore:async()=>({})};window.IntervalCosmosSupabaseSingleton={getClient:()=>({rpc:async(name,args)=>{if(name==='create_assignment_v3'){captured=args;document.querySelector('#capture').textContent='保存したボーナス：'+args.p_bonus_points+' PT';return {data:'new-id'}}return {data:name==='get_teacher_assignments'?[]:tasks,error:null}}})};
+</script><script src="../phase6-admin-policy-v205.js"></script><script src="../phase6-multimode-v205.js"></script><script src="../phase6-assignments-v205.js"></script><script src="../assignment-status-v205.js"></script><script>
+document.querySelector('#student').onclick=()=>{profile={id:'fixture',is_admin:false};IntervalCosmosAssignmentsV205.open()};document.querySelector('#admin').onclick=()=>{profile={id:'admin',is_admin:true};IntervalCosmosAssignmentMultiModeV205.renderCreateForm()};
+for(const state of ['earned','settled','excluded','queued'])document.querySelector('#'+state).onclick=()=>{
+ IntervalCosmosAssignmentMultiModeV205.lastSubmission={session_id:'result-'+state,this_run_achieved:true,achieved:true,played_mode:'TEXT',mode_bests:[],bonus_points:100,bonus_earned:state==='earned'?100:0,bonus_awarded:state==='settled'?100:0,bonus_excluded:state==='excluded',queued:state==='queued'};
+ document.querySelector('.v205-assignment-overlay')?.remove();const overlay=document.createElement('div');overlay.className='v205-assignment-overlay';overlay.innerHTML='<section class="v205-assignment-panel result"><header class="v205-assignment-head"><div><p>ASSIGNMENT</p><h2>'+(state==='queued'?'端末に保存しました':'RESULT')+'</h2></div><button data-a-close>×</button></header><div class="v205-a-current"><small>THIS RUN</small><strong>1,500</strong><span>正答率 100%</span></div><div class="v205-a-target"><strong></strong><span></span></div></section>';document.body.append(overlay)
+};
+</script></html>

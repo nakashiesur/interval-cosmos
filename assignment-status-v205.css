@@ -1,16 +1,16 @@
 /* Compact, text-backed assignment states; no flashing notification. */
 .home-footer>.v205-assignment-launch[data-assignment-status],
-.home-screen .home-footer-rich>.v205-assignment-launch[data-assignment-status]{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:5px;min-height:58px;padding:10px 12px;text-align:left;white-space:normal;transition:border-color .2s,background .2s,box-shadow .2s}
+.home-screen .home-footer-rich>.v205-assignment-launch[data-assignment-status]{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:5px;min-height:54px;padding:10px 12px;text-align:left;white-space:normal;transition:border-color .2s,background .2s,box-shadow .2s}
 .ic-assignment-line{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0}
 .ic-assignment-line strong{font-size:10px;letter-spacing:.07em;line-height:1.25}
-.ic-assignment-badge{display:inline-grid;place-items:center;min-width:21px;height:21px;padding:0 5px;border-radius:7px;background:#1c2b40;color:#aec0d9;font-size:11px;font-weight:800;line-height:1}
+.ic-assignment-badge{display:inline-grid;place-items:center;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#1c2b40;color:#aec0d9;font-size:9px;font-weight:700;line-height:1}
 .ic-assignment-caption{font-size:10px;font-weight:500;line-height:1.4;color:#bbc9df;letter-spacing:0}
 .ic-assignment-caption>span{white-space:nowrap;color:#8b9ebd}
 .home-footer>.v205-assignment-launch[data-assignment-status="pending"]{border-color:#b76b7c;background:linear-gradient(125deg,rgba(124,45,68,.24),rgba(20,29,49,.85));box-shadow:inset 3px 0 #ec92a4}
-[data-assignment-status="pending"] .ic-assignment-badge{color:#27101a;background:#ffa0b3;box-shadow:0 0 14px #ec92a426}
+[data-assignment-status="pending"] .ic-assignment-badge{color:#ffd4dd;background:#733b4c;border:1px solid #b76b7c;box-shadow:none}
 [data-assignment-status="pending"] .ic-assignment-caption>span{color:#ffb2c1}
 .home-footer>.v205-assignment-launch[data-assignment-status="complete"]{border-color:#478879;background:linear-gradient(125deg,rgba(42,118,103,.17),rgba(20,29,49,.85));box-shadow:inset 3px 0 #73dbc1}
-[data-assignment-status="complete"] .ic-assignment-badge{color:#b4ffe9;background:#245247}
+[data-assignment-status="complete"] .ic-assignment-badge{color:#b4ffe9;background:#193c34;border:1px solid #478879}
 [data-assignment-status="complete"] .ic-assignment-caption>span{color:#8ce4ce}
 @media(max-width:430px){.home-screen .home-footer-rich>.v205-assignment-launch[data-assignment-status]{padding:8px 9px}.ic-assignment-line strong{font-size:9px}.ic-assignment-caption{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.v205-assignment-launch[data-assignment-status]{transition:none}}

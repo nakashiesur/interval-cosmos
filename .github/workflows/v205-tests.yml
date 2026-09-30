@@ -130,3 +130,11 @@ jobs:
 
       - name: Ranking moderation, update and install actions
         run: node tests/app-actions-v205-test.js
+
+      - name: Local PostgreSQL ranking and assignment bonus regression
+        env:
+          PGLITE_PATH: ${{ runner.temp }}/ic-db-tests/node_modules/@electric-sql/pglite
+        run: |
+          npm install --prefix "$RUNNER_TEMP/ic-db-tests" --no-save --ignore-scripts @electric-sql/pglite@0.5.8
+          node tests/ranking-every-play-db-test.cjs
+          node tests/assignment-bonus-db-test.cjs

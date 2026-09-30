@@ -120,6 +120,7 @@
         <fieldset><legend>出題音程 <small>1つ以上</small></legend><div class="v205-a-intervals">${INTERVALS.map(([id,jp])=>`<button type="button" class="v205-a-chip selected" data-a-interval="${id}">${id}<small>${jp}</small></button>`).join('')}</div><div class="v205-a-mini-actions"><button type="button" class="secondary-btn" data-a-iall>ALL</button><button type="button" class="secondary-btn" data-a-icore>CORE 7</button></div></fieldset>
         <div class="v205-a-two"><label><span>開始</span><input id="aStartV2" type="datetime-local" value="${nowIsoLocal(start)}" required></label><label><span>期限</span><input id="aDeadlineV2" type="datetime-local" value="${nowIsoLocal(end)}" required></label></div>
         <div class="v205-a-two"><label><span>目標スコア <small>任意</small></span><input id="aScoreV2" type="number" min="0" step="1" placeholder="例：1500"></label><label><span>目標正答率 % <small>任意</small></span><input id="aAccuracyV2" type="number" min="0" max="100" step="0.1" placeholder="例：90"></label></div>
+        <label><span>初回クリアボーナス（COSMOS PT）</span><input id="aBonusV2" type="number" min="0" max="10000" step="1" value="100" required><small>1人・1課題につき1回。0でボーナスなし。目標達成時に付与します。</small></label>
         <label class="v205-a-check"><input id="aPublishV2" type="checkbox" checked><span>作成と同時に学生へ公開する</span></label>
         <div id="aFormMsgV2" class="v205-a-message"></div>
         <div class="v205-a-form-actions"><button type="button" class="secondary-btn" data-a-v2-back>戻る</button><button type="submit" class="primary-btn">CREATE</button></div>
@@ -156,7 +157,10 @@
     const deadline = document.querySelector('#aDeadlineV2')?.value;
     const scoreRaw = document.querySelector('#aScoreV2')?.value ?? '';
     const accRaw = document.querySelector('#aAccuracyV2')?.value ?? '';
+    const bonusRaw = document.querySelector('#aBonusV2')?.value ?? '';
+    const bonus = Number(bonusRaw);
     const publish = Boolean(document.querySelector('#aPublishV2')?.checked);
+    if (bonusRaw === '' || !Number.isInteger(bonus) || bonus < 0 || bonus > 10000) return msg && (msg.textContent = 'ボーナスは0〜10,000の整数で入力してください。');
     if (!title) return msg && (msg.textContent = '課題名を入力してください。');
     if (!modes.length) return msg && (msg.textContent = 'モードを1つ以上選択してください。');
     if (!intervals.length) return msg && (msg.textContent = '音程を1つ以上選択してください。');
@@ -168,7 +172,7 @@
     submit.textContent = 'CREATING...';
     if (msg) msg.textContent = '';
     try {
-      await rpc('create_assignment_v2', {
+      await rpc('create_assignment_v3', {
         p_title: title,
         p_description: description,
         p_allowed_modes: modes,
@@ -178,6 +182,7 @@
         p_target_score: scoreRaw === '' ? null : Number(scoreRaw),
         p_target_accuracy: accRaw === '' ? null : Number(accRaw),
         p_publish: publish,
+        p_bonus_points: bonus,
       });
       routeBack();
     } catch (error) {
@@ -309,14 +314,14 @@
     container.dataset.v205ModeEnhanced = lastResultsAssignmentId;
   }
   function correctResultState() {
-    if (!lastSubmission) return;
+    if (!lastSubmission || lastSubmission.queued) return;
     const panel = document.querySelector('.v205-assignment-panel.result');
     if (!panel || !panel.querySelector('.v205-a-current')) return;
     const thisRun = Boolean(lastSubmission.this_run_achieved);
     const overall = Boolean(lastSubmission.achieved);
     const playedMode = lastSubmission.played_mode;
     const mb = (lastSubmission.mode_bests||[]).find(x=>x.mode===playedMode);
-    const signature = `${lastSubmission.session_id}:${thisRun}:${overall}:${playedMode||''}:${mb?.best_score??''}:${mb?.attempts??''}`;
+    const signature = `${lastSubmission.session_id}:${thisRun}:${overall}:${playedMode||''}:${mb?.best_score??''}:${mb?.attempts??''}:${lastSubmission.bonus_earned||0}:${lastSubmission.bonus_awarded??''}:${Boolean(lastSubmission.bonus_excluded)}`;
     if (panel.dataset.v205ResultCorrected === signature) return;
 
     const title = panel.querySelector('.v205-assignment-head h2');
@@ -348,6 +353,14 @@
       if (strong) strong.textContent = '今回は目標未達でした';
       if (span) span.textContent = '何度でも挑戦できます。条件を満たす記録を目指してください。';
     }
+    const earned=Number(lastSubmission.bonus_earned||0),awarded=Number(lastSubmission.bonus_awarded||0),bonus=Number(lastSubmission.bonus_points||0);
+    let bonusBox=panel.querySelector('.v205-a-bonus-result');
+    if(!bonusBox){bonusBox=document.createElement('aside');bonusBox.className='v205-a-bonus-result';bonusBox.setAttribute('role','status');panel.querySelector('.v205-a-current').after(bonusBox);}
+    bonusBox.classList.toggle('settled',earned<=0);
+    bonusBox.innerHTML=earned>0?`<strong>+${fmt(earned)} COSMOS PT</strong><span>初回クリアボーナス獲得</span><small>1人・1課題につき1回</small>`
+      :lastSubmission.bonus_excluded?'<span>この課題はボーナス対象外です</span><small>ボーナス設定前にクリア済みのため、追加付与はありません。</small>'
+      :awarded>0?`<span>初回クリアボーナス +${fmt(awarded)} PT は獲得済み</span><small>再挑戦・別モードでの重複獲得はありません。</small>`
+      :bonus>0?`<span>課題をクリアすると +${fmt(bonus)} COSMOS PT</span><small>今回は未達のためボーナスはありません。</small>`:'<span>この課題のボーナス設定はありません。</span>';
     panel.dataset.v205ResultCorrected = signature;
   }
 
