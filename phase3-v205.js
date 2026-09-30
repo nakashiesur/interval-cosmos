@@ -124,7 +124,7 @@
   }
 
   function schedulePublicationPrompt(result) {
-    if (!result?.publication_required || !result?.session_id || !improved(result)) return;
+    if (!result?.publication_required || !result?.session_id) return;
     if (promptScheduledFor === result.session_id) return;
     promptScheduledFor = result.session_id;
 
@@ -132,7 +132,7 @@
       Number(result.monthly_rank || 9999),
       Number(result.hall_rank || 9999)
     );
-    const delay = bestRank <= 50 ? 2300 : 180;
+    const delay = improved(result) && bestRank <= 50 ? 2300 : 180;
 
     window.setTimeout(() => {
       if (lastSubmitResult?.session_id !== result.session_id || !lastSubmitResult.publication_required) return;
@@ -182,10 +182,10 @@
     const html = `<section class="v205-publication-card">
       <p class="v205-kicker">RANKING PRIVACY</p>
       <h2>この記録を公開しますか？</h2>
-      <p class="v205-publication-copy">自己ベストを更新しました。公開しなくても、あなた自身には順位相当が表示されます。</p>
+      <p class="v205-publication-copy">このプレイの記録をランキングに反映しますか？ 公開済みの記録より低い場合は、公開済みのベストを維持します。</p>
       <div class="v205-publication-positions">
-        <div><span>月間</span><strong>${result.monthly_rank || '-'}${result.monthly_rank ? '位相当' : ''}</strong></div>
-        <div><span>殿堂</span><strong>${result.hall_rank || '-'}${result.hall_rank ? '位相当' : ''}</strong></div>
+        <div><span>自己ベスト 月間</span><strong>${result.monthly_rank || '-'}${result.monthly_rank ? '位相当' : ''}</strong></div>
+        <div><span>自己ベスト 殿堂</span><strong>${result.hall_rank || '-'}${result.hall_rank ? '位相当' : ''}</strong></div>
       </div>
       <p class="v205-publication-note">公開されるのはプレイヤー名・コースバッジ・アバター・称号・フレーム・スコア・正答率・最大コンボです。学籍番号は公開されません。</p>
       <div class="v205-publication-actions">
@@ -323,11 +323,11 @@
       ? '今後の自己ベスト更新を自動で公開します。'
       : visibility === 'always_private'
         ? '今後の自己ベスト更新は自動公開しません。現在公開中の過去記録はそのまま残ります。'
-        : '自己ベスト更新時に、公開するか毎回確認します。';
+        : '通常プレイ終了ごとに、ランキングへ公開するか確認します。';
 
     const html = `<div class="setting-label"><strong>Ranking publication</strong><span>公開設定</span></div>
       <div class="v205-privacy-tabs">
-        <button type="button" class="v205-privacy-btn ${visibility === 'ask' ? 'active' : ''}" data-v205-visibility="ask"><strong>毎回確認</strong><small>ベスト更新時に選択</small></button>
+        <button type="button" class="v205-privacy-btn ${visibility === 'ask' ? 'active' : ''}" data-v205-visibility="ask"><strong>毎回確認</strong><small>プレイごとに選択</small></button>
         <button type="button" class="v205-privacy-btn ${visibility === 'always_public' ? 'active' : ''}" data-v205-visibility="always_public"><strong>常に公開</strong><small>今後の更新を自動公開</small></button>
         <button type="button" class="v205-privacy-btn ${visibility === 'always_private' ? 'active' : ''}" data-v205-visibility="always_private"><strong>常に非公開</strong><small>今後の更新を非公開</small></button>
       </div>
@@ -347,7 +347,7 @@
         ? '今後の自己ベスト更新を自動公開します。'
         : value === 'always_private'
           ? '今後の更新を非公開にしました。過去の公開記録は残ります。'
-          : '自己ベスト更新時に公開確認を表示します。');
+          : '通常プレイ終了ごとに公開確認を表示します。');
       queueEnhance();
     } catch (error) {
       console.error('[v2.0.5 visibility]', error);
