@@ -117,6 +117,23 @@ vm.runInContext(code,context,{filename:'phase3-v205.js'});
   listeners.keydown(retryKey());
   assertions.push(['retry still works after the prompt closes',retries===1]);
 
+  for (const [id, improvedFlag] of [['below-best',false],['equal-best',false],['empty-after-delete',false]]) {
+    overlays.delete('v205-publication-overlay');
+    submitResult={session_id:id,publication_required:true,monthly_rank:1,hall_rank:1,monthly_best_improved:improvedFlag,hall_best_improved:improvedFlag};
+    const start=timers.length;
+    await cloud.submitScore({});
+    const timer=timers.slice(start).find(t=>t.ms===180);
+    timer?.fn();
+    const dialog=overlays.get('v205-publication-overlay');
+    assertions.push([id+' asks without a personal-best improvement',!!dialog&&!dialog.innerHTML.includes('自己ベストを更新しました')]);
+    listeners.click({target:{closest:selector=>selector==='[data-v205-publication]'?{dataset:{v205Publication:'private'}}:null}});
+  }
+  for (const id of ['always-public','always-private','practice','assignment','queued']) {
+    submitResult={session_id:id,publication_required:false,monthly_best_improved:true};
+    const start=timers.length;await cloud.submitScore({});
+    assertions.push([id+' does not schedule a publication choice',!timers.slice(start).some(t=>t.ms===180||t.ms===2300)]);
+  }
+
   await cloud.fetchRankings({mode:'TEXT',scope:'monthly'});
   assertions.push(['ranking rows cached',windowObj.IntervalCosmosV205.getRankingCache().length===1]);
 
