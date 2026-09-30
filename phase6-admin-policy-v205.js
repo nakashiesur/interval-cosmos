@@ -46,6 +46,11 @@
     const button = document.querySelector('[data-a-open]');
     if (!button) return;
     const player = realPlayer();
+    if (window.IntervalCosmosAssignmentStatusV205 && !(player?.is_admin && !isStudentView())) {
+      window.IntervalCosmosAssignmentStatusV205.render(button);
+      return;
+    }
+    if (button.dataset.assignmentStatus) window.IntervalCosmosAssignmentStatusV205?.render(button);
     const desired = player?.is_admin && !isStudentView() ? '▣ ADMIN ASSIGNMENTS' : '▣ ASSIGNMENTS';
     if (button.textContent !== desired) button.textContent = desired;
   }
