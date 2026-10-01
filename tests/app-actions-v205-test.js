@@ -16,5 +16,5 @@ for(const nav of [{userAgent:'iPhone',maxTouchPoints:5},{userAgent:'Macintosh',m
 assert(read('app-update-v205.js').includes("'interval-cosmos-sync'"));
 assert(read('app-update-v205.js').includes("addEventListener('cancel',e=>e.preventDefault())"));
 assert(read('sw.js').includes("url.pathname.endsWith('/release.json')"));
-const manifest=JSON.parse(read('manifest.webmanifest'));for(const n of [192,512])assert(manifest.icons.some(x=>x.sizes===`${n}x${n}`&&fs.existsSync(require('path').join(root,x.src))));
+const manifest=JSON.parse(read('manifest.webmanifest'));for(const n of [192,512])assert(manifest.icons.some(x=>x.sizes===`${n}x${n}`&&fs.existsSync(require('path').join(root,x.src.split('?')[0]))));
 console.log('PASS long hold/cancel/authorization, confirmation contract, device install guidance, update gate and install icons');
