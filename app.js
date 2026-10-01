@@ -893,11 +893,11 @@ function questionHTML() {
 }
 
 function renderSplash() {
-  app.innerHTML = `<main class="screen splash"><div class="splash-logo"><img src="nakashima-logo.png" alt="中島ゼミ" class="splash-logo-image" /><div class="splash-name">NAKASHIMA SEMINAR</div></div><div class="splash-meta">Heisei College of Music</div><div class="splash-version">${APP_VERSION}</div></main>`;
+  app.innerHTML = `<main class="screen splash"><div class="splash-logo"><img src="nakashima-logo.png" alt="中島ゼミ" class="splash-logo-image" /></div><div class="splash-meta">Heisei College of Music</div><div class="splash-version">${APP_VERSION}</div></main>`;
 }
 
 function renderTitle() {
-  app.innerHTML = `<main class="screen"><section class="shell hero-wrap"><div class="logo-mark"></div><h1 class="title-display">INTERVAL</h1><h2 class="title-display secondary">COSMOS</h2><p class="title-sub">SEE IT. HEAR IT. KNOW IT.</p><p class="eyebrow">v2.0.5 BETA 1</p><button class="primary-btn" data-action="home">START</button></section></main>`;
+  app.innerHTML = `<main class="screen"><section class="shell hero-wrap"><div class="logo-mark"></div><h1 class="title-display">INTERVAL</h1><h2 class="title-display secondary">COSMOS</h2><p class="title-sub">SEE IT. HEAR IT. KNOW IT.</p><p class="eyebrow">v2.0.5</p><button class="primary-btn" data-action="home">START</button></section></main>`;
 }
 
 function renderHome() {

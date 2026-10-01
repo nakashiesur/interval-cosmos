@@ -50,7 +50,7 @@ const tests=[
   ['polish observer is child-list only',polishJs.includes('{ subtree: true, childList: true }') && !polishJs.includes('attributes: true')],
   ['PC controls load before assignment engine',index.indexOf('phase8-pc-controls-v205.js?v=beta.1.2') < index.indexOf('phase6-assignments-v205.js?v=beta.1.15')],
   ['PC input-mode assets are loaded',index.includes('phase8-pc-controls-v205.css?v=beta.1.2') && index.includes('phase8-pc-controls-v205.js?v=beta.1.2') && index.includes('phase8-config-polish-v205.css?v=alpha8.7') && index.includes('phase8-config-polish-v205.js?v=alpha8.7')],
-  ['pc assets use current cache generation',sw.includes('beta-1')],
+  ['pc assets use current cache generation',sw.includes("const CACHE = 'interval-cosmos-v2-0-5-release'")],
   ['pc assets cached',sw.includes('phase8-pc-controls-v205.js') && sw.includes('phase8-pc-controls-v205.css') && sw.includes('phase8-config-polish-v205.js') && sw.includes('phase8-config-polish-v205.css')],
   ['observer only watches child list',js.includes("{ subtree: true, childList: true }") && !js.includes('attributes: true')],
 ];

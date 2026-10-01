@@ -132,7 +132,7 @@ h1, h2, h3, p { margin-top: 0; }
   right: -14px; top: 29px;
 }
 .splash-name { font-weight: 900; letter-spacing: 0.25em; font-size: clamp(1.1rem, 4vw, 1.8rem); }
-.splash-meta { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); color: #718096; font-size: .62rem; letter-spacing: .28em; text-transform: uppercase; white-space: nowrap; }
+.splash-meta { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); color: #718096; font-size: .72rem; letter-spacing: .28em; text-transform: uppercase; white-space: nowrap; }
 .splash-version { position: fixed; right: 16px; bottom: 12px; color: #a6afbd; font: 0.58rem ui-monospace, monospace; }
 @keyframes splashLife { 0% { opacity: 0; } 16%, 78% { opacity: 1; } 100% { opacity: 0; } }
 
@@ -534,7 +534,7 @@ button { touch-action: manipulation; user-select: none; }
 .screen { overflow-y: auto; }
 
 /* Splash */
-.splash-logo-image { width:min(340px,72vw); max-height:42vh; object-fit:contain; display:block; margin:0 auto 12px; }
+.splash-logo-image { width:min(270px,58vw); max-height:34vh; object-fit:contain; display:block; margin:0 auto 12px; }
 .splash-name { font-size:clamp(.82rem,3vw,1.18rem); letter-spacing:.26em; }
 .splash-version { right:max(14px,env(safe-area-inset-right)); bottom:max(10px,env(safe-area-inset-bottom)); opacity:.62; }
 
