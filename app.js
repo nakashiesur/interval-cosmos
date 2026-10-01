@@ -893,7 +893,7 @@ function questionHTML() {
 }
 
 function renderSplash() {
-  app.innerHTML = `<main class="screen splash"><div class="splash-logo"><img src="nakashima-logo.png" alt="中島ゼミ" class="splash-logo-image" /><div class="splash-name">NAKASHIMA SEMINAR</div></div><div class="splash-meta">Heisei College of Music</div><div class="splash-version">${APP_VERSION}</div></main>`;
+  app.innerHTML = `<main class="screen splash"><div class="splash-logo"><img src="nakashima-logo.png" alt="中島ゼミ" class="splash-logo-image" /></div><div class="splash-meta">Heisei College of Music</div><div class="splash-version">${APP_VERSION}</div></main>`;
 }
 
 function renderTitle() {
