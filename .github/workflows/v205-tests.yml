@@ -138,3 +138,4 @@ jobs:
           npm install --prefix "$RUNNER_TEMP/ic-db-tests" --no-save --ignore-scripts @electric-sql/pglite@0.5.8
           node tests/ranking-every-play-db-test.cjs
           node tests/assignment-bonus-db-test.cjs
+          node tests/brushup-db-v205-test.cjs

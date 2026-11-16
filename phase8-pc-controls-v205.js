@@ -1,6 +1,15 @@
 (() => {
   const STORAGE_KEY = 'intervalCosmos.pcKeys.v205';
   const INPUT_MODE_KEY = 'intervalCosmos.pcInputMode.v205';
+  const FOCUS_KEY = 'intervalCosmos.pcQuestionFocus.v205';
+  const desktop = window.matchMedia?.('(hover:hover) and (pointer:fine) and (min-width:781px)');
+  let focusMode = false;
+  try { focusMode = localStorage.getItem(FOCUS_KEY) === '1'; } catch {}
+  let draftFocusMode = focusMode;
+  function setFocusMode(value) {
+    focusMode = value;
+    try { localStorage.setItem(FOCUS_KEY, value ? '1' : '0'); } catch {}
+  }
   const PREFIX_TIMEOUT = 1800;
   const RESERVED_KEYS = new Set(['Escape', 'Space']);
   const INPUT_MODES = new Set(['sequence', 'chord']);
@@ -287,12 +296,15 @@
     return inputMode === 'chord' ? resolveChordKey(key) : resolveSequenceKey(key);
   }
 
-  function answerButtonsVisible() {
-    return [...document.querySelectorAll('[data-answer], [data-a-answer]')].some(button => visible(button) && !button.disabled);
+  function availableAnswerButtons() {
+    return [...document.querySelectorAll('[data-answer], [data-a-answer]')].filter(button =>
+      !button.disabled && (visible(button) ||
+        Boolean(desktop?.matches && button.closest('.v205-pc-focus') && visible(button.closest('.v205-pc-focus')))));
   }
 
   function handleAnswerShortcut(event) {
-    if (!answerButtonsVisible()) return false;
+    const answers = availableAnswerButtons();
+    if (!answers.length) return false;
     const key = normalizeEventKey(event);
     if (!key) return false;
     if (inputMode === 'chord') pressedKeys.add(key);
@@ -303,11 +315,39 @@
       return true;
     }
     if (!resolved.interval) return false;
-    const button = firstVisible([
-      `[data-a-answer="${resolved.interval}"]`,
-      `[data-answer="${resolved.interval}"]`,
-    ]);
+    const button = answers.find(b => b.dataset.aAnswer === resolved.interval) ||
+      answers.find(b => b.dataset.answer === resolved.interval);
     return clickAndConsume(event, button);
+  }
+
+  function syncFocusDisplay() {
+    for (const area of document.querySelectorAll('.answer-area')) {
+      const shell = area.parentElement;
+      const buttons = [...area.querySelectorAll('[data-answer], [data-a-answer]')];
+      const enabled = Boolean(desktop?.matches && focusMode && buttons.length &&
+        shell.matches('.play-shell,.v205-a-game'));
+      shell.classList.toggle('v205-pc-focus', enabled);
+      const existing = shell.querySelector('.v205-pc-focus-dock');
+      if (!enabled) { existing?.remove(); continue; }
+      if (existing) continue;
+      const dock=document.createElement('div');
+      dock.className='v205-pc-focus-dock';
+      const guide=document.createElement('div');
+      guide.className='v205-pc-focus-keys';
+      guide.setAttribute('aria-label','回答キー');
+      const active = new Set(buttons.map(b => b.dataset.answer || b.dataset.aAnswer));
+      for (const [id,label] of INTERVALS) {
+        if (!active.has(id)) continue;
+        const pair=document.createElement('span');
+        pair.textContent=label+' ';
+        const key=document.createElement('kbd');
+        key.textContent=bindingLabel(bindings[id]);
+        pair.appendChild(key);guide.appendChild(pair);
+      }
+      const back=document.createElement('button');
+      back.type='button';back.dataset.pcFocusOff='1';back.textContent='クリック操作に戻す';
+      dock.appendChild(guide);dock.appendChild(back);shell.appendChild(dock);
+    }
   }
 
   function decorateAnswers() {
@@ -335,6 +375,7 @@
         button.appendChild(hint);
       }
     }
+    syncFocusDisplay();
     injectSettingsEntry();
   }
 
@@ -411,6 +452,7 @@
     overlay.innerHTML = `<section class="v205-pc-config-panel">
       <header class="v205-pc-config-head"><div><p>PC CONTROLS</p><h2>KEY CONFIG</h2><span>予備キーは任意、決定キーは必須です。変更したい枠をクリックしてください。</span></div><button type="button" class="icon-btn" data-pc-config-close>×</button></header>
       ${inputModeControl()}
+      <label class="v205-pc-focus-setting"><input type="checkbox" data-pc-focus-setting ${draftFocusMode?'checked':''}> 問題集中表示 <small>回答ボタンを隠し、下に回答キーを表示します。</small></label>
       <div class="v205-pc-column-head"><span>音程</span><span>予備キー</span><span></span><span>決定キー</span></div>
       <div class="v205-pc-bindings">${INTERVALS.map(([id,label]) => configRow(id,label)).join('')}</div>
       <div class="v205-pc-config-note">${configNote()}</div>
@@ -423,6 +465,7 @@
     closeConfig();
     draftBindings = cloneBindings();
     draftInputMode = inputMode;
+    draftFocusMode = focusMode;
     recordTarget = null;
     const overlay = document.createElement('div');
     overlay.className = 'v205-pc-config-overlay';
@@ -434,6 +477,7 @@
     document.querySelector('.v205-pc-config-overlay')?.remove();
     draftBindings = null;
     draftInputMode = inputMode;
+    draftFocusMode = focusMode;
     recordTarget = null;
   }
 
@@ -472,7 +516,18 @@
     });
   }
 
+  desktop?.addEventListener?.('change', scheduleDecorate);
+  document.addEventListener('change', event => {
+    if (event.target.matches?.('[data-pc-focus-setting]')) draftFocusMode = event.target.checked;
+  });
   document.addEventListener('click', event => {
+    const back=event.target.closest?.('[data-pc-focus-off]');
+    if(back){
+      const shell=back.closest('.v205-pc-focus');
+      setFocusMode(false);syncFocusDisplay();
+      shell?.querySelector('[data-answer]:enabled,[data-a-answer]:enabled')?.focus({preventScroll:true});
+      return;
+    }
     const open = event.target.closest?.('[data-pc-config-open]');
     if (open) { event.preventDefault(); openConfig(); return; }
     const close = event.target.closest?.('[data-pc-config-close]');
@@ -495,6 +550,7 @@
       event.preventDefault();
       draftBindings = cloneDefaults();
       draftInputMode = 'sequence';
+      draftFocusMode = false;
       recordTarget = null;
       renderConfig('初期値に戻しました。保存すると確定します。');
       return;
@@ -510,6 +566,7 @@
       pressedKeys.clear();
       saveBindings();
       saveInputMode();
+      setFocusMode(draftFocusMode);
       closeConfig();
       decorateAnswers();
       return;
@@ -531,7 +588,7 @@
     if (event.repeat || event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
     if (isEditable(event.target)) return;
     // Ranking dialogs own Escape and must shield underlying game shortcuts.
-    if (document.querySelector('.v205-publication-overlay,.rank-burst.v205-rank-privacy-burst,.v205-profile-overlay')) return;
+    if (document.querySelector('.v205-publication-overlay,.rank-burst.v205-rank-privacy-burst,.v205-profile-overlay,dialog[open]')) return;
 
     if (event.key === 'Escape') {
       handleEscape(event);

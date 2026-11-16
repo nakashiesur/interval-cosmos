@@ -18,7 +18,7 @@
     return client;
   }
   async function rpc(name,args){const c=await progressClient();const {data,error}=await c.rpc(name,args);if(error)throw error;return data;}
-  async function evaluate(){const r=await rpc('evaluate_my_progress');try{await cloud?.getMyPlayer?.();}catch{}queueUnlocks(r);return r;}
+  async function evaluate(){await window.IntervalCosmosLearningSync?.flush?.().catch(()=>{});const r=await rpc('evaluate_my_progress');try{await cloud?.getMyPlayer?.();}catch{}queueUnlocks(r);return r;}
   async function fetchProgress(){const request=cosmosRequest;const data=await rpc('get_my_cosmos_progress');if(request===cosmosRequest)cache=data;return data;}
 
   function rankingPresentationBusy(){
@@ -68,7 +68,7 @@
   }
 
   function getOverlay(){let n=document.querySelector('.v205-cosmos-overlay');if(!n){n=document.createElement('div');n.className='v205-cosmos-overlay';document.body.appendChild(n)}return n}
-  function close(){cosmosRequest++;opening=false;document.querySelector('.v205-cosmos-overlay')?.remove()}
+  function close(){document.querySelector('.v205-frame-requirements[open]')?.close?.();cosmosRequest++;opening=false;document.querySelector('.v205-cosmos-overlay')?.remove()}
   function loading(){getOverlay().innerHTML='<section class="v205-cosmos-card"><button class="icon-btn v205-cosmos-close" data-v205-cosmos-close>×</button><div class="v205-cosmos-loading"><span class="spinner"></span><strong>CALCULATING COSMOS PROGRESS...</strong><small>実績・フレーム・デイリーミッションを同期しています</small></div></section>'}
 
   function frameStatus(d){
@@ -88,22 +88,27 @@
       const secret=locked&&(f.appearance_hidden||['supernova','event_horizon','pulsar','omega'].includes(f.id)||(!f.id&&f.hidden));
       const previous=frames.find(x=>x.id===f.unlock_rule?.requires_frame);
       const revealed=!secret||f.conditions_revealed===true||Boolean(previous?.unlocked);
-      let req='???';
+      let req='前提フレームを解放すると、条件を確認できます。';
       if(revealed){
-        if(f.unlocked&&!POINT_FRAMES.has(f.id)) req='UNLOCKED';
-        else if(f.id==='normal') req='BASE';
+        if(f.id==='normal') req='最初から使えます';
         else {
           req=`${Number(f.points_required||0).toLocaleString('ja-JP')} PT`;
           if(f.unlock_rule?.type==='achievement_combo'){
-            const descriptions=f.requirement_descriptions||[];
-            req+=' ＋ '+(f.id==='omega'?'全39実績を達成':descriptions.length?descriptions.join(' / '):'複数実績を達成');
+            const descriptions=(f.requirement_descriptions||[]).filter(text=>text!=='???');
+            if(f.id==='event_horizon'){
+              descriptions.length=0;
+              descriptions.push('累計150プレイ','EAR LINKで15問以上・全問正解を3回','殿堂ランキング1位、または高精度クリア累計50回（1プレイで20問以上・正答率90%以上。EAR LINKは10問以上）');
+            }
+            req+=' ＋ '+(f.id==='omega'?'全39実績を達成':descriptions.length?descriptions.join(' ＋ '):'複数実績を達成');
           }
+          if(f.unlock_rule?.mastery_seen) req+=` ＋ 全13音程それぞれ、同期済みの回答が${Number(f.unlock_rule.mastery_seen)}回以上・正答率${Number(f.unlock_rule.mastery_accuracy)}%以上`;
+          if(f.unlock_rule?.monthly_firsts) req+=` ＋ 公開月間ランキング1位を累計${Number(f.unlock_rule.monthly_firsts)}回（到達時に記録。同じ月・同じモードは1回まで）`;
           if(f.unlock_rule?.requires_frame) req+=` ＋ ${previous?.name&&previous.name!=='???'?previous.name:'直前のフレーム'}解放`;
         }
       }
-      return `<button class="v205-frame-card v205-frame-${secret?'secret':esc(f.id||'secret')} ${!secret&&f.animated?'animated':''} ${locked?'locked':''} ${f.equipped?'equipped':''}" ${f.unlocked&&f.id?`data-v205-equip-frame="${esc(f.id)}"`:'disabled'}><span class="v205-frame-orb">${secret?'?':'✦'}</span><strong>${esc(secret?'???':f.name||'???')}</strong><small>${esc(req)}</small>${f.equipped?'<em>EQUIPPED</em>':f.unlocked?'<em>SELECT</em>':''}</button>`;
+      return `<div class="v205-frame-entry"><button class="v205-frame-card v205-frame-${secret?'secret':esc(f.id||'secret')} ${!secret&&f.animated?'animated':''} ${locked?'locked':''} ${f.equipped?'equipped':''}" ${f.unlocked&&f.id?`data-v205-equip-frame="${esc(f.id)}"`:'disabled'}><span class="v205-frame-orb">${secret?'?':'✦'}</span><strong>${esc(secret?'???':f.name||'???')}</strong>${f.equipped?'<em>EQUIPPED</em>':f.unlocked?'<em>SELECT</em>':''}</button><button type="button" class="secondary-btn v205-frame-info" data-v205-frame-info="${esc(req)}" aria-label="${esc(secret?'???':f.name||'???')}の解放条件">解放条件</button></div>`;
     }).join('');
-    return `<section class="v205-cosmos-section"><div class="v205-cosmos-section-head"><div><p>FRAME EVOLUTION</p><h3>フレーム</h3></div><span>段階成長＋複合解放</span></div><div class="v205-frame-grid">${cards}</div><p class="v205-cosmos-note">NORMAL → BRONZE → SILVER → GOLD → PLATINUM → COSMIC はPTで自動成長。AURORA以降は必要PT・実績・直前のフレームのすべてが必要です。PTは消費されません。未獲得の上位フレームは、直前のフレーム獲得後に条件が表示されます。</p></section>`;
+    return `<section class="v205-cosmos-section"><div class="v205-cosmos-section-head"><div><p>FRAME EVOLUTION</p><h3>フレーム</h3></div><span>段階成長＋複合解放</span></div><div class="v205-frame-grid">${cards}</div><p class="v205-cosmos-note">NORMAL → BRONZE → SILVER → GOLD → PLATINUM → COSMIC はPTで自動成長。AURORA以降は必要PTと個別の条件を満たすと解放されます。PTは消費されません。秘密のフレームは、前提フレームの獲得後に条件が表示されます。</p></section>`;
   }
   function titleHTML(d){const rows=(d.titles||[]).filter(t=>!t.hidden||t.unlocked);return `<section class="v205-cosmos-section"><div class="v205-cosmos-section-head"><div><p>TITLES</p><h3>称号</h3></div><span>ランキング表示はメイン称号1個</span></div><div class="v205-title-grid">${rows.map(t=>`<button class="v205-title-card ${t.unlocked?'unlocked':'locked'} ${t.equipped?'equipped':''}" ${t.unlocked?`data-v205-equip-title="${esc(t.id)}"`:'disabled'}><strong>${esc(t.name)}</strong><span>${esc(t.description||'')}</span><small>${t.equipped?'MAIN TITLE':t.unlocked?'SELECT':'LOCKED'}</small></button>`).join('')}</div></section>`}
   function achievementHTML(d){
@@ -148,7 +153,15 @@
 
   if(cloud?.submitScore&&!cloud.__v205Phase5Wrapped){const submit=cloud.submitScore.bind(cloud);cloud.submitScore=async p=>{const r=await submit(p);if(!r?.guest&&!r?.queued)evaluate().then(()=>window.dispatchEvent(new CustomEvent('ic-mode-reward-ready',{detail:r}))).catch(()=>{});return r};if(cloud.publishPlaySession){const pub=cloud.publishPlaySession.bind(cloud);cloud.publishPlaySession=async id=>{const r=await pub(id);evaluate().catch(()=>{});return r}}cloud.__v205Phase5Wrapped=true}
   function schedule(){if(queued)return;queued=true;queueMicrotask(()=>{queued=false;inject()})}new MutationObserver(schedule).observe(document.documentElement,{subtree:true,childList:true});window.addEventListener('DOMContentLoaded',schedule,{once:true});
-  window.addEventListener('click',async e=>{if(e.target.closest?.('[data-v205-cosmos-open]')){open();return}if(e.target.closest?.('[data-v205-cosmos-close]')||e.target===document.querySelector('.v205-cosmos-overlay')){close();return}const t=e.target.closest?.('[data-v205-equip-title]');if(t){await cloud.updateMyProfile({mainTitleId:t.dataset.v205EquipTitle});await refresh();return}const f=e.target.closest?.('[data-v205-equip-frame]');if(f){await cloud.updateMyProfile({equippedFrameId:f.dataset.v205EquipFrame});await refresh();return}const a=e.target.closest?.('[data-v205-feature]');if(a){try{await rpc('toggle_featured_achievement',{p_achievement_id:a.dataset.v205Feature});await refresh()}catch(err){alert(err?.message||'代表実績を変更できませんでした。')}}},true);
-  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('.v205-cosmos-overlay')){e.preventDefault();e.stopImmediatePropagation();close()}},true);
+  window.addEventListener('click',async e=>{const info=e.target.closest?.('[data-v205-frame-info]');if(info){
+    const dialog=document.createElement('dialog');dialog.className='v205-frame-requirements';dialog.setAttribute('aria-label',info.getAttribute('aria-label'));
+    dialog.innerHTML='<h3></h3><ul></ul><form method="dialog"><button class="secondary-btn" autofocus>閉じる</button></form>';
+    dialog.querySelector('h3').textContent=info.getAttribute('aria-label');
+    for(const condition of info.dataset.v205FrameInfo.split(' ＋ ')){const li=document.createElement('li');li.textContent=condition;dialog.querySelector('ul').append(li)}
+    dialog.addEventListener('close',()=>{dialog.remove();if(info.isConnected)info.focus()},{once:true});
+    dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close()}});
+    document.body.append(dialog);dialog.showModal();return
+  }if(e.target.closest?.('[data-v205-cosmos-open]')){open();return}if(e.target.closest?.('[data-v205-cosmos-close]')||e.target===document.querySelector('.v205-cosmos-overlay')){close();return}const t=e.target.closest?.('[data-v205-equip-title]');if(t){await cloud.updateMyProfile({mainTitleId:t.dataset.v205EquipTitle});await refresh();return}const f=e.target.closest?.('[data-v205-equip-frame]');if(f){await cloud.updateMyProfile({equippedFrameId:f.dataset.v205EquipFrame});await refresh();return}const a=e.target.closest?.('[data-v205-feature]');if(a){try{await rpc('toggle_featured_achievement',{p_achievement_id:a.dataset.v205Feature});await refresh()}catch(err){alert(err?.message||'代表実績を変更できませんでした。')}}},true);
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.querySelector('.v205-frame-requirements[open]')&&document.querySelector('.v205-cosmos-overlay')){e.preventDefault();e.stopImmediatePropagation();close()}},true);
   window.IntervalCosmosProgressV205={open,fetchProgress,evaluate,getCache:()=>cache};
 })();
