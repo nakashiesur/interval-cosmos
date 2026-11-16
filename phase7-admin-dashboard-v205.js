@@ -9,7 +9,9 @@
   });
   let client = null;
   let overview = null;
-  let filter = { search:'', course:'all' };
+  let filter = { search:'', course:'all', sort:'recent', activity:'all' };
+  let requestVersion = 0;
+  let recentRequest = 0;
   let injectQueued = false;
   let opening = false;
 
@@ -42,7 +44,7 @@
     if (error) throw error;
     return data;
   }
-  function isAdmin(){ return Boolean(cloud?.getCachedPlayer?.()?.is_admin); }
+  function isAdmin(){ return Boolean(cloud?.getCachedPlayer?.()?.is_admin && !window.IntervalCosmosAssignmentAdminPolicyV205?.isStudentView?.()); }
 
   function overlay(){
     let node = document.querySelector('.v205-admin-dashboard-overlay');
@@ -53,10 +55,10 @@
     }
     return node;
   }
-  function close(){ document.querySelector('.v205-admin-dashboard-overlay')?.remove(); }
+  function close(){ requestVersion++; recentRequest++; opening=false; overview=null; document.querySelector('.v205-admin-dashboard-overlay')?.remove(); }
   function closeButton(){ return '<button type="button" class="icon-btn v205-admin-close" data-v205-admin-close>×</button>'; }
   function loading(label='学生データを集計しています'){
-    overlay().innerHTML = `<section class="v205-admin-dashboard"><div class="v205-admin-loading"><div><span class="spinner"></span><strong>${esc(label)}</strong></div></div></section>`;
+    overlay().innerHTML = `<section class="v205-admin-dashboard">${closeButton()}<div class="v205-admin-loading"><div><span class="spinner"></span><strong>${esc(label)}</strong></div></div></section>`;
   }
   function errorView(error){
     overlay().innerHTML = `<section class="v205-admin-dashboard"><div class="v205-admin-head"><div><p>ADMIN DASHBOARD</p><h2>読み込めませんでした</h2><span>${esc(error?.message||'データ取得に失敗しました。')}</span></div>${closeButton()}</div></section>`;
@@ -79,7 +81,7 @@
       <div class="metric"><small>30D PLAY</small><b>${Number(row.sessions_30d||0)}</b></div>
       <div class="metric"><small>30D ACC.</small><b>${pct(row.correct_30d,row.answers_30d)}%</b></div>
       <div class="metric"><small>ALL PLAY</small><b>${Number(row.sessions_all||0)}</b></div>
-      <div class="metric"><small>LAST ACTIVE</small><b>${esc(dateText(row.last_play_at))}</b></div>
+      <div class="metric"><small>LAST ACTIVE</small><b>${esc(dateText(row.last_play_at)==='—'?'未プレイ':dateText(row.last_play_at))}</b></div>
       ${assignmentProgress(row)}
     </button>`;
   }
@@ -88,9 +90,35 @@
     const q = filter.search.trim().toLowerCase();
     return rows.filter(r => {
       if (filter.course !== 'all' && r.course_code !== filter.course) return false;
+      if (filter.activity==='never' && Number(r.sessions_all)>0) return false;
+      if (filter.activity==='7' && !(Date.parse(r.last_play_at)>=Date.now()-7*86400000)) return false;
+      if (filter.activity==='30' && !Number(r.sessions_30d)) return false;
       if (!q) return true;
       return [r.student_number,r.player_name,r.course_name,r.course_code].some(v=>String(v||'').toLowerCase().includes(q));
+    }).sort((a,b)=>{
+      const latest=(Date.parse(b.last_play_at)||0)-(Date.parse(a.last_play_at)||0);
+      const name=String(a.player_name||'').localeCompare(String(b.player_name||''),'ja');
+      const by=filter.sort==='plays30'?Number(b.sessions_30d||0)-Number(a.sessions_30d||0):
+        filter.sort==='playsAll'?Number(b.sessions_all||0)-Number(a.sessions_all||0):
+        filter.sort==='name'?name:latest;
+      return by || latest || name || String(a.player_id).localeCompare(String(b.player_id));
     });
+  }
+  function selectOptions(options,selected){
+    return options.map(([value,label])=>`<option value="${esc(value)}" ${value===selected?'selected':''}>${esc(label)}</option>`).join('');
+  }
+  async function loadRecent(panel){
+    const version=++recentRequest;
+    const holder=panel.querySelector('[data-v205-admin-recent-list]');
+    holder.textContent='最近のプレイを読み込んでいます…';
+    const p_days=Number(panel.querySelector('[data-v205-admin-recent-days]').value);
+    try {
+      const rows=await rpc('get_admin_recent_plays',{p_days,p_course:filter.course==='all'?null:filter.course});
+      if(version!==recentRequest||!panel.isConnected) return;
+      holder.innerHTML=rows?.length?rows.map(row=>`<button type="button" class="v205-admin-recent-row" data-v205-admin-student="${esc(row.player_id)}"><span><strong>${esc(row.player_name||'PLAYER')}</strong><small>${esc(row.course_name||'所属未設定')}</small></span><span>${esc(MODE_LABELS[row.mode]||row.mode)} <small>${esc(({ranked:'通常',practice:'練習',assignment:'課題'})[row.source]||'')}</small></span><time datetime="${esc(row.played_at)}">${esc(dateText(row.played_at))}</time><span>${nfmt(row.score)} pts <small>正答率 ${pct(row.correct_answers,row.total_answers)}%</small></span></button>`).join(''):'指定期間のプレイ記録はありません。';
+    }catch(error){
+      if(version===recentRequest&&panel.isConnected) holder.textContent='最近のプレイを読み込めませんでした。更新を押して再試行してください。';
+    }
   }
   function renderStudentListOnly(){
     const holder = document.querySelector('.v205-admin-students');
@@ -119,12 +147,21 @@
       <div class="v205-admin-toolbar">
         <input type="search" id="v205AdminSearch" value="${esc(filter.search)}" placeholder="学籍番号・名前・コースで検索">
         <select id="v205AdminCourse"><option value="all">全コース</option>${courses.map(([code,name])=>`<option value="${esc(code)}" ${filter.course===code?'selected':''}>${esc(name)}</option>`).join('')}</select>
+        <select id="v205AdminSort" aria-label="学生の並び順">${selectOptions([['recent','最終プレイが新しい順'],['plays30','30日のプレイ回数順'],['playsAll','全期間のプレイ回数順'],['name','プレイヤー名順']],filter.sort)}</select>
+        <select id="v205AdminActivity" aria-label="学生のプレイ状況">${selectOptions([['all','全プレイ状況'],['7','直近7日にプレイ'],['30','直近30日にプレイ'],['never','未プレイ']],filter.activity)}</select>
         <button type="button" class="secondary-btn" data-v205-admin-refresh>↻ 更新</button>
       </div>
+      <details class="v205-admin-recent"><summary>最近のプレイ <small>記録が新しい順・最大50件</small></summary>
+        <div class="v205-admin-recent-tools"><select aria-label="最近のプレイの期間" data-v205-admin-recent-days><option value="7">直近7日</option><option value="30">直近30日</option></select><button type="button" class="secondary-btn" data-v205-admin-recent-refresh>更新</button><small>コース絞り込みと連動します（日本時間）</small></div>
+        <div data-v205-admin-recent-list aria-live="polite"></div>
+      </details>
       <div class="v205-admin-section-title"><div><h3>STUDENTS</h3><span data-v205-admin-visible-count>${rows.length} students</span></div></div>
       <div class="v205-admin-table-head"><span>STUDENT</span><span>30D PLAY</span><span>30D ACC.</span><span>ALL PLAY</span><span>LAST ACTIVE</span><span>ACTIVE TASKS</span></div>
       <div class="v205-admin-students">${rows.length?rows.map(studentRow).join(''):'<div class="v205-admin-empty">学生アカウントはまだありません。</div>'}</div>
     </section>`;
+    renderStudentListOnly();
+    const panel=overlay().querySelector('.v205-admin-recent');
+    panel.addEventListener('toggle',()=>{if(panel.open && panel.isConnected) loadRecent(panel)});
   }
 
   function modeCard(row){
@@ -192,17 +229,22 @@
     if (opening) return;
     if (!isAdmin()) return;
     opening=true;
+    const version=++requestVersion;
     loading();
     try{
-      if (!overview || force) overview=await rpc('get_admin_dashboard_overview');
-      renderOverview(overview);
-    }catch(error){console.error('[admin dashboard]',error);errorView(error)}finally{opening=false}
+      const data=await rpc('get_admin_dashboard_overview');
+      if(version===requestVersion&&isAdmin()) renderOverview(data);
+    }catch(error){if(version===requestVersion)errorView(error)}
+    finally{if(version===requestVersion) opening=false}
   }
   async function openStudent(playerId){
     if (!isAdmin() || !playerId) return;
+    const version=++requestVersion;
     loading('学生の詳細データを集計しています');
-    try{renderStudentDetail(await rpc('get_admin_student_dashboard',{p_player_id:playerId}))}
-    catch(error){console.error('[admin student dashboard]',error);errorView(error)}
+    try{
+      const data=await rpc('get_admin_student_dashboard',{p_player_id:playerId});
+      if(version===requestVersion&&isAdmin()) renderStudentDetail(data);
+    }catch(error){if(version===requestVersion) errorView(error)}
   }
 
   function inject(){
@@ -220,6 +262,8 @@
   }
 
   window.addEventListener('click',event=>{
+    const reload=event.target.closest?.('[data-v205-admin-recent-refresh]');
+    if(reload){loadRecent(reload.closest('.v205-admin-recent'));return}
     if(event.target.closest?.('[data-v205-admin-dashboard-open]')){openDashboard();return}
     if(event.target.closest?.('[data-v205-admin-close]')){close();return}
     if(event.target.closest?.('[data-v205-admin-refresh]')){openDashboard(true);return}
@@ -232,8 +276,12 @@
     filter.search=event.target.value||'';renderStudentListOnly();
   },true);
   window.addEventListener('change',event=>{
-    if(event.target.id!=='v205AdminCourse')return;
-    filter.course=event.target.value||'all';renderStudentListOnly();
+    const field={v205AdminCourse:'course',v205AdminSort:'sort',v205AdminActivity:'activity'}[event.target.id];
+    if(field){filter[field]=event.target.value;renderStudentListOnly()}
+    if(field==='course'||event.target.matches?.('[data-v205-admin-recent-days]')){
+      const panel=document.querySelector('.v205-admin-recent[open]');
+      if(panel) loadRecent(panel);
+    }
   },true);
   window.addEventListener('keydown',event=>{
     if(event.key==='Escape'&&document.querySelector('.v205-admin-dashboard-overlay')){event.preventDefault();close()}

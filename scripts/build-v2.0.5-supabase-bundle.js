@@ -35,6 +35,7 @@ const files = [
   'supabase/migrations/20260929150241_mode_reward_receipts.sql',
   'supabase/migrations/20260930051226_ranking_prompt_every_play.sql',
   'supabase/migrations/20260930065937_assignment_completion_bonus.sql',
+  'supabase/migrations/20261116045626_brushup_frame_unlocks_and_admin_activity.sql',
 ];
 
 for (const relative of files) {
